@@ -3,6 +3,12 @@
 import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { 
+  embedProfile, 
+  embedIdea, 
+  createProfileEmbeddingText, 
+  createVentureEmbeddingText 
+} from "@/lib/embeddings-client";
 
 interface ProfileData {
   name: string;
@@ -149,7 +155,58 @@ export default function ProfilePage() {
       if (errors.length > 0) {
         setMessage("Error saving profile: " + errors.map(e => e!.message).join(", "));
       } else {
-        setMessage(publish ? "Profile published successfully!" : "Profile saved as draft!");
+        // Generate embeddings after successful save
+        try {
+          const embeddingPromises = [];
+
+          // Generate profile embedding if profile data exists
+          if (profileData.name || profileData.bio || profileData.achievements || profileData.region) {
+            const profileText = createProfileEmbeddingText({
+              name: profileData.name,
+              bio: profileData.bio,
+              achievements: profileData.achievements,
+              region: profileData.region,
+            });
+            if (profileText.trim()) {
+              embeddingPromises.push(embedProfile(profileText));
+            }
+          }
+
+          // Generate venture embedding if venture data exists
+          if (profileData.venture_title || profileData.venture_description) {
+            const ventureText = createVentureEmbeddingText({
+              title: profileData.venture_title,
+              description: profileData.venture_description,
+            });
+            if (ventureText.trim()) {
+              embeddingPromises.push(embedIdea(ventureText));
+            }
+          }
+
+          // Execute all embedding operations
+          if (embeddingPromises.length > 0) {
+            const embeddingResults = await Promise.all(embeddingPromises);
+            const embeddingErrors = embeddingResults.filter(result => !result.success);
+            
+            if (embeddingErrors.length > 0) {
+              const errorMessages = embeddingErrors.map(e => e.error).join(", ");
+              setMessage(publish 
+                ? `Profile published! Embedding errors: ${errorMessages}` 
+                : `Profile saved! Embedding errors: ${errorMessages}`
+              );
+            } else {
+              setMessage(publish ? "Profile published successfully! Ready for matching." : "Profile saved as draft!");
+            }
+          } else {
+            setMessage(publish ? "Profile published successfully!" : "Profile saved as draft!");
+          }
+        } catch (embeddingError) {
+          const errorMsg = embeddingError instanceof Error ? embeddingError.message : String(embeddingError);
+          setMessage(publish 
+            ? `Profile published! Embedding error: ${errorMsg}` 
+            : `Profile saved! Embedding error: ${errorMsg}`
+          );
+        }
       }
     } catch (error) {
       setMessage("An unexpected error occurred");
