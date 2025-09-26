@@ -195,7 +195,15 @@ export default function ProfilePage() {
                 : `Profile saved! Embedding errors: ${errorMessages}`
               );
             } else {
-              setMessage(publish ? "Profile published successfully! Ready for matching." : "Profile saved as draft!");
+              if (publish) {
+                setMessage("Profile published successfully! Redirecting to matches...");
+                // Redirect to matches page after successful publish
+                setTimeout(() => {
+                  router.push("/matches");
+                }, 1500);
+              } else {
+                setMessage("Profile saved as draft!");
+              }
             }
           } else {
             setMessage(publish ? "Profile published successfully!" : "Profile saved as draft!");
@@ -235,12 +243,20 @@ export default function ProfilePage() {
       <header className="px-6 py-4 border-b border-gray-200 bg-white">
         <nav className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center space-x-3">
+            <button onClick={() => router.push("/")} className="flex items-center space-x-3 hover:opacity-80">
             <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
               <span className="text-white font-mono text-sm">λ</span>
             </div>
             <span className="font-mono text-lg text-gray-900">vectorized-ideas</span>
+            </button>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
+            <button
+              onClick={() => router.push("/matches")}
+              className="font-mono text-sm text-gray-600 hover:text-gray-900"
+            >
+              matches
+            </button>
             <span className="font-mono text-sm text-gray-600">
               {user?.email}
             </span>

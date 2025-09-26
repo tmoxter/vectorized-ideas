@@ -101,14 +101,24 @@ export default function Home() {
       <header className="px-6 py-4 border-b border-gray-200">
         <nav className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-              <span className="text-white font-mono text-sm">λ</span>
-            </div>
-            <span className="font-mono text-lg text-gray-900">vectorized-ideas</span>
+            <button onClick={() => window.location.reload()} className="flex items-center space-x-3 hover:opacity-80">
+              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
+                <span className="text-white font-mono text-sm">λ</span>
+              </div>
+              <span className="font-mono text-lg text-gray-900">vectorized-ideas</span>
+            </button>
           </div>
-          <a href="https://github.com" className="text-gray-600 hover:text-gray-900 font-mono text-sm">
-            github
-          </a>
+          <div className="flex items-center space-x-4">
+            <a href="/matches" className="font-mono text-sm text-gray-600 hover:text-gray-900">
+              matches
+            </a>
+            <a href="/profile" className="font-mono text-sm text-gray-600 hover:text-gray-900">
+              profile
+            </a>
+            <a href="https://github.com" className="text-gray-600 hover:text-gray-900 font-mono text-sm">
+              github
+            </a>
+          </div>
         </nav>
       </header>
 

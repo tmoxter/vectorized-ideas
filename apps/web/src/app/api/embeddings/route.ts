@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const embedding = response.data[0].embedding;
+    let embedding = response.data[0].embedding;
     
     // Validate embedding dimensions
     if (embedding.length !== 1536) {
@@ -80,6 +80,8 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+    const norm = Math.hypot(...embedding);
+    if (norm > 0) embedding = embedding.map(x => x / norm);
 
     // Upsert to Supabase embeddings table
     const { error: upsertError } = await supabase
