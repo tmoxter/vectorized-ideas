@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { supabaseClient } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+//import { rescoreBlend } from "@/server/matching";
 
 export type EntityType = 'idea' | 'profile';
 
@@ -121,4 +123,50 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+const MODEL = "text-embedding-3-small";
+const VERSION = "v1";
+
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const userId = url.searchParams.get("userId");
+  const limit = Number(url.searchParams.get("limit") ?? "20");
+  if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+
+  const sb = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // Get the user's most recent venture from user_ventures table
+  const { data: userVenture, error: ventureErr } = await sb
+    .from("user_ventures")
+    .select("id, title, description, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (ventureErr || !userVenture) {
+    return NextResponse.json({ error: "No venture found for user" }, { status: 404 });
+  }
+
+  const ideaId = userVenture.id;
+
+  const { data: cands, error: kErr } = await sb.rpc("knn_candidates", {
+    p_idea_id: ideaId,
+    p_model: MODEL,
+    p_version: VERSION,
+    p_limit: 100,
+    p_probes: 10
+  });
+  if (kErr) return NextResponse.json({ error: kErr.message }, { status: 500 });
+
+  //const rescored = rescoreBlend(ventureInfo, cands).slice(0, limit);
+  const limitedCands = Array.isArray(cands) ? cands.slice(0, limit) : [];
+  return NextResponse.json({
+    items: limitedCands,
+    baseVenture: userVenture // Include the base venture info for reference
+  });
 }

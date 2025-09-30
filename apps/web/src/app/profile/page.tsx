@@ -244,10 +244,10 @@ export default function ProfilePage() {
         <nav className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center space-x-3">
             <button onClick={() => router.push("/")} className="flex items-center space-x-3 hover:opacity-80">
-            <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-              <span className="text-white font-mono text-sm">λ</span>
-            </div>
-            <span className="font-mono text-lg text-gray-900">vectorized-ideas</span>
+              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
+                <span className="text-white font-mono text-sm">λ</span>
+              </div>
+              <span className="font-mono text-lg text-gray-900">vectorized-ideas</span>
             </button>
           </div>
           <div className="flex items-center space-x-6">
