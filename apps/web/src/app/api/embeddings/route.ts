@@ -4,7 +4,7 @@ import { supabaseClient } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 //import { rescoreBlend } from "@/server/matching";
 
-export type EntityType = 'idea' | 'profile';
+export type EntityType = "idea" | "profile";
 
 interface EmbedRequest {
   entityType: EntityType;
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
 
     // Get user from session (server-side)
     const supabase = supabaseClient();
-    const authHeader = request.headers.get('authorization');
-    
+    const authHeader = request.headers.get("authorization");
+
     if (!authHeader) {
       return NextResponse.json(
         { success: false, error: "No authorization header" },
@@ -43,9 +43,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Set the session from the authorization header
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    
+    const token = authHeader.replace("Bearer ", "");
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser(token);
+
     if (userError || !user) {
       return NextResponse.json(
         { success: false, error: "User not authenticated" },
@@ -60,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     // Call OpenAI embeddings API
     const response = await client.embeddings.create({
-      model: 'text-embedding-3-small',
+      model: "text-embedding-3-small",
       input: text,
     });
 
@@ -72,31 +75,29 @@ export async function POST(request: NextRequest) {
     }
 
     let embedding = response.data[0].embedding;
-    
+
     // Validate embedding dimensions
     if (embedding.length !== 1536) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: `Invalid embedding dimensions: expected 1536, got ${embedding.length}` 
+        {
+          success: false,
+          error: `Invalid embedding dimensions: expected 1536, got ${embedding.length}`,
         },
         { status: 500 }
       );
     }
     const norm = Math.hypot(...embedding);
-    if (norm > 0) embedding = embedding.map(x => x / norm);
+    if (norm > 0) embedding = embedding.map((x) => x / norm);
 
     // Upsert to Supabase embeddings table
-    const { error: upsertError } = await supabase
-      .from('embeddings')
-      .upsert({
-        entity_type: entityType,
-        entity_id: entityId,
-        user_id: user.id,
-        model: 'text-embedding-3-small',
-        vector: embedding,
-        updated_at: new Date().toISOString(),
-      });
+    const { error: upsertError } = await supabase.from("embeddings").upsert({
+      entity_type: entityType,
+      entity_id: entityId,
+      user_id: user.id,
+      model: "text-embedding-3-small",
+      vector: embedding,
+      updated_at: new Date().toISOString(),
+    });
 
     if (upsertError) {
       return NextResponse.json(
@@ -106,21 +107,20 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-
   } catch (error: unknown) {
-    console.error('Error in embedding API:', error);
-    
+    console.error("Error in embedding API:", error);
+
     if (error instanceof OpenAI.APIError) {
       return NextResponse.json(
         { success: false, error: `OpenAI API error: ${error.message}` },
         { status: 500 }
       );
     }
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
-        error: `Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}` 
+      {
+        success: false,
+        error: `Unexpected error: ${error instanceof Error ? error.message : "Unknown error"}`,
       },
       { status: 500 }
     );
@@ -135,10 +135,16 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const userId = url.searchParams.get("userId");
     const limit = Number(url.searchParams.get("limit") ?? "20");
-    
-    console.log("GET /api/embeddings called with userId:", userId, "limit:", limit);
-    
-    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+
+    console.log(
+      "GET /api/embeddings called with userId:",
+      userId,
+      "limit:",
+      limit
+    );
+
+    if (!userId)
+      return NextResponse.json({ error: "userId required" }, { status: 400 });
 
     const sb = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -159,7 +165,10 @@ export async function GET(req: NextRequest) {
 
     if (ventureErr || !userVenture) {
       console.log("No venture found for user:", userId, "Error:", ventureErr);
-      return NextResponse.json({ error: "No venture found for user" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No venture found for user" },
+        { status: 404 }
+      );
     }
 
     const ideaId = userVenture.id;
@@ -172,53 +181,62 @@ export async function GET(req: NextRequest) {
       .eq("entity_type", "idea")
       .eq("entity_id", ideaId.toString())
       .single();
-    
+
     console.log("Embedding check result:", { embedding, embErr });
 
     if (embErr || !embedding) {
       console.log("No embedding found for idea:", ideaId);
-      return NextResponse.json({ 
-        error: "No embedding found for this venture. Please make sure your profile is published to generate embeddings.",
-        details: embErr?.message 
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          error:
+            "No embedding found for this venture. Please make sure your profile is published to generate embeddings.",
+          details: embErr?.message,
+        },
+        { status: 404 }
+      );
     }
 
     // Use the corrected knn_candidates function
     console.log("Attempting KNN search with corrected function...");
-    console.log("entity_id from embeddings:", embedding.entity_id, "type:", typeof embedding.entity_id);
-    
+    console.log(
+      "entity_id from embeddings:",
+      embedding.entity_id,
+      "type:",
+      typeof embedding.entity_id
+    );
+
     const { data: cands, error: kErr } = await sb.rpc("knn_candidates", {
       p_idea_id: embedding.entity_id, // Now expects text type
       p_model: MODEL,
       p_version: VERSION,
       p_limit: 100,
-      p_probes: 10
+      p_probes: 10,
     });
-    
+
     console.log("KNN candidates result:", { cands, kErr });
-    
+
     if (kErr) {
       console.error("KNN function error:", kErr);
       return NextResponse.json({ error: kErr.message }, { status: 500 });
     }
 
-    // For now, return basic candidate data without vector similarity scoring
-    // TODO: Implement proper cosine similarity calculation in JavaScript if needed
     const limitedCands = Array.isArray(cands) ? cands.slice(0, limit) : [];
     console.log("Returning limited candidates:", limitedCands.length, "items");
-    
+
     const response = {
       items: limitedCands,
-      baseVenture: userVenture // Include the base venture info for reference
+      baseVenture: userVenture, // Include the base venture info for reference
     };
-    
+
     console.log("Final response:", response);
     return NextResponse.json(response);
-    
   } catch (error) {
     console.error("GET /api/embeddings error:", error);
-    return NextResponse.json({ 
-      error: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}` 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: `Server error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      },
+      { status: 500 }
+    );
   }
 }

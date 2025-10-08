@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { 
-  embedProfile, 
-  embedIdea, 
-  createProfileEmbeddingText, 
-  createVentureEmbeddingText 
+import {
+  embedProfile,
+  embedIdea,
+  createProfileEmbeddingText,
+  createVentureEmbeddingText,
 } from "@/lib/embeddings-client";
 
 interface ProfileData {
@@ -32,12 +32,12 @@ export default function ProfilePage() {
     cofounder_preferences_title: "",
     cofounder_preferences_description: "",
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<any>(null);
-  
+
   const router = useRouter();
   const supabase = supabaseClient();
 
@@ -47,7 +47,9 @@ export default function ProfilePage() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       router.push("/");
       return;
@@ -58,27 +60,30 @@ export default function ProfilePage() {
   const loadProfile = async () => {
     setIsLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       // Load data from all three tables
-      const [profileResult, ventureResult, preferencesResult] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .single(),
-        supabase
-          .from("user_ventures")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .single(),
-        supabase
-          .from("user_cofounder_preferences")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .single()
-      ]);
+      const [profileResult, ventureResult, preferencesResult] =
+        await Promise.all([
+          supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single(),
+          supabase
+            .from("user_ventures")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single(),
+          supabase
+            .from("user_cofounder_preferences")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single(),
+        ]);
 
       setProfileData({
         name: profileResult.data?.name || "",
@@ -88,7 +93,8 @@ export default function ProfilePage() {
         venture_title: ventureResult.data?.title || "",
         venture_description: ventureResult.data?.description || "",
         cofounder_preferences_title: preferencesResult.data?.title || "",
-        cofounder_preferences_description: preferencesResult.data?.description || "",
+        cofounder_preferences_description:
+          preferencesResult.data?.description || "",
       });
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -98,21 +104,21 @@ export default function ProfilePage() {
   };
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
-    setProfileData(prev => ({
+    setProfileData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const saveProfile = async (publish: boolean = false) => {
     if (!user) return;
-    
+
     setIsSaving(true);
     setMessage("");
 
     try {
       const now = new Date().toISOString();
-      
+
       // Prepare data for all three tables
       const profilePayload = {
         user_id: user.id,
@@ -139,28 +145,36 @@ export default function ProfilePage() {
       };
 
       // Save to all three tables
-      const [profileResult, ventureResult, preferencesResult] = await Promise.all([
-        supabase.from("profiles").upsert(profilePayload),
-        supabase.from("user_ventures").upsert(venturePayload),
-        supabase.from("user_cofounder_preference").upsert(preferencesPayload)
-      ]);
+      const [profileResult, ventureResult, preferencesResult] =
+        await Promise.all([
+          supabase.from("profiles").upsert(profilePayload),
+          supabase.from("user_ventures").upsert(venturePayload),
+          supabase.from("user_cofounder_preference").upsert(preferencesPayload),
+        ]);
 
       // Check for errors in any of the operations
       const errors = [
         profileResult.error,
         ventureResult.error,
-        preferencesResult.error
+        preferencesResult.error,
       ].filter(Boolean);
 
       if (errors.length > 0) {
-        setMessage("Error saving profile: " + errors.map(e => e!.message).join(", "));
+        setMessage(
+          "Error saving profile: " + errors.map((e) => e!.message).join(", ")
+        );
       } else {
         // Generate embeddings after successful save
         try {
           const embeddingPromises = [];
 
           // Generate profile embedding if profile data exists
-          if (profileData.name || profileData.bio || profileData.achievements || profileData.region) {
+          if (
+            profileData.name ||
+            profileData.bio ||
+            profileData.achievements ||
+            profileData.region
+          ) {
             const profileText = createProfileEmbeddingText({
               name: profileData.name,
               bio: profileData.bio,
@@ -189,9 +203,11 @@ export default function ProfilePage() {
                 .order("updated_at", { ascending: false })
                 .limit(1)
                 .single();
-              
+
               if (recentVenture) {
-                embeddingPromises.push(embedIdea(recentVenture.id, ventureText));
+                embeddingPromises.push(
+                  embedIdea(recentVenture.id, ventureText)
+                );
               }
             }
           }
@@ -199,17 +215,24 @@ export default function ProfilePage() {
           // Execute all embedding operations
           if (embeddingPromises.length > 0) {
             const embeddingResults = await Promise.all(embeddingPromises);
-            const embeddingErrors = embeddingResults.filter(result => !result.success);
-            
+            const embeddingErrors = embeddingResults.filter(
+              (result) => !result.success
+            );
+
             if (embeddingErrors.length > 0) {
-              const errorMessages = embeddingErrors.map(e => e.error).join(", ");
-              setMessage(publish 
-                ? `Profile published! Embedding errors: ${errorMessages}` 
-                : `Profile saved! Embedding errors: ${errorMessages}`
+              const errorMessages = embeddingErrors
+                .map((e) => e.error)
+                .join(", ");
+              setMessage(
+                publish
+                  ? `Profile published! Embedding errors: ${errorMessages}`
+                  : `Profile saved! Embedding errors: ${errorMessages}`
               );
             } else {
               if (publish) {
-                setMessage("Profile published successfully! Redirecting to matches...");
+                setMessage(
+                  "Profile published successfully! Redirecting to matches..."
+                );
                 // Redirect to matches page after successful publish
                 setTimeout(() => {
                   router.push("/matches");
@@ -219,13 +242,21 @@ export default function ProfilePage() {
               }
             }
           } else {
-            setMessage(publish ? "Profile published successfully!" : "Profile saved as draft!");
+            setMessage(
+              publish
+                ? "Profile published successfully!"
+                : "Profile saved as draft!"
+            );
           }
         } catch (embeddingError) {
-          const errorMsg = embeddingError instanceof Error ? embeddingError.message : String(embeddingError);
-          setMessage(publish 
-            ? `Profile published! Embedding error: ${errorMsg}` 
-            : `Profile saved! Embedding error: ${errorMsg}`
+          const errorMsg =
+            embeddingError instanceof Error
+              ? embeddingError.message
+              : String(embeddingError);
+          setMessage(
+            publish
+              ? `Profile published! Embedding error: ${errorMsg}`
+              : `Profile saved! Embedding error: ${errorMsg}`
           );
         }
       }
@@ -256,11 +287,16 @@ export default function ProfilePage() {
       <header className="px-6 py-4 border-b border-gray-200 bg-white">
         <nav className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center space-x-3">
-            <button onClick={() => router.push("/")} className="flex items-center space-x-3 hover:opacity-80">
+            <button
+              onClick={() => router.push("/")}
+              className="flex items-center space-x-3 hover:opacity-80"
+            >
               <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
                 <span className="text-white font-mono text-sm">λ</span>
               </div>
-              <span className="font-mono text-lg text-gray-900">vectorized-ideas</span>
+              <span className="font-mono text-lg text-gray-900">
+                vectorized-ideas
+              </span>
             </button>
           </div>
           <div className="flex items-center space-x-6">
@@ -291,7 +327,8 @@ export default function ProfilePage() {
               profile setup
             </h1>
             <p className="font-mono text-gray-600 text-sm">
-              describe yourself and what you want to build. this helps the semantic matching algorithm find compatible co-founders.
+              describe yourself and what you want to build. this helps the
+              semantic matching algorithm find compatible co-founders.
             </p>
           </div>
 
@@ -301,7 +338,7 @@ export default function ProfilePage() {
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
                 01. personal info
               </h2>
-              
+
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block font-mono text-sm text-gray-700 mb-2">
@@ -316,7 +353,7 @@ export default function ProfilePage() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block font-mono text-sm text-gray-700 mb-2">
                     region
@@ -324,7 +361,9 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     value={profileData.region}
-                    onChange={(e) => handleInputChange("region", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("region", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     placeholder="e.g., san francisco, remote, europe"
                   />
@@ -350,7 +389,9 @@ export default function ProfilePage() {
                 </label>
                 <textarea
                   value={profileData.achievements}
-                  onChange={(e) => handleInputChange("achievements", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("achievements", e.target.value)
+                  }
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
                   placeholder="previous companies, projects, notable achievements, technical skills..."
@@ -364,7 +405,8 @@ export default function ProfilePage() {
                 02. venture / project ideas
               </h2>
               <p className="font-mono text-sm text-gray-600 mb-6">
-                describe what you want to build. be specific about the problem, solution, and vision.
+                describe what you want to build. be specific about the problem,
+                solution, and vision.
               </p>
 
               <div className="mb-6">
@@ -374,7 +416,9 @@ export default function ProfilePage() {
                 <input
                   type="text"
                   value={profileData.venture_title}
-                  onChange={(e) => handleInputChange("venture_title", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("venture_title", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="e.g., AI-powered code review platform, sustainable food delivery network..."
                   required
@@ -387,14 +431,17 @@ export default function ProfilePage() {
                 </label>
                 <textarea
                   value={profileData.venture_description}
-                  onChange={(e) => handleInputChange("venture_description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("venture_description", e.target.value)
+                  }
                   rows={8}
                   className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
                   placeholder="explain the problem you're solving, your proposed solution, target market, technical approach, business model, vision for the future..."
                   required
                 />
                 <p className="text-xs font-mono text-gray-500 mt-1">
-                  this description is used for semantic matching. be detailed and specific.
+                  this description is used for semantic matching. be detailed
+                  and specific.
                 </p>
               </div>
             </section>
@@ -405,7 +452,8 @@ export default function ProfilePage() {
                 03. co-founder preferences
               </h2>
               <p className="font-mono text-sm text-gray-600 mb-6">
-                describe what kind of co-founder you're looking for and what you bring to the table.
+                describe what kind of co-founder you're looking for and what you
+                bring to the table.
               </p>
 
               <div className="mb-6">
@@ -415,7 +463,12 @@ export default function ProfilePage() {
                 <input
                   type="text"
                   value={profileData.cofounder_preferences_title}
-                  onChange={(e) => handleInputChange("cofounder_preferences_title", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "cofounder_preferences_title",
+                      e.target.value
+                    )
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                   placeholder="e.g., seeking technical co-founder, looking for business-minded partner..."
                 />
@@ -427,7 +480,12 @@ export default function ProfilePage() {
                 </label>
                 <textarea
                   value={profileData.cofounder_preferences_description}
-                  onChange={(e) => handleInputChange("cofounder_preferences_description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "cofounder_preferences_description",
+                      e.target.value
+                    )
+                  }
                   rows={6}
                   className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
                   placeholder="describe ideal co-founder skills, experience, work style, equity expectations, time commitment, complementary skills to yours..."
@@ -445,10 +503,15 @@ export default function ProfilePage() {
             >
               {isSaving ? "saving..." : "save draft"}
             </button>
-            
+
             <button
               onClick={() => saveProfile(true)}
-              disabled={isSaving || !profileData.name || !profileData.venture_title || !profileData.venture_description}
+              disabled={
+                isSaving ||
+                !profileData.name ||
+                !profileData.venture_title ||
+                !profileData.venture_description
+              }
               className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? "publishing..." : "save & publish"}
@@ -456,18 +519,23 @@ export default function ProfilePage() {
           </div>
 
           {message && (
-            <div className={`mt-4 p-3 rounded text-sm font-mono ${
-              message.includes("Error") 
-                ? "bg-red-50 text-red-600 border border-red-200" 
-                : "bg-green-50 text-green-600 border border-green-200"
-            }`}>
+            <div
+              className={`mt-4 p-3 rounded text-sm font-mono ${
+                message.includes("Error")
+                  ? "bg-red-50 text-red-600 border border-red-200"
+                  : "bg-green-50 text-green-600 border border-green-200"
+              }`}
+            >
               {message}
             </div>
           )}
 
           <div className="mt-8 p-4 bg-gray-100 rounded border-l-4 border-blue-600">
             <p className="text-sm font-mono text-gray-700">
-              <strong>tip:</strong> the more detailed and specific your descriptions, the better the semantic matching algorithm can find compatible co-founders. focus on technical details, problem domains, and specific goals.
+              <strong>tip:</strong> the more detailed and specific your
+              descriptions, the better the semantic matching algorithm can find
+              compatible co-founders. focus on technical details, problem
+              domains, and specific goals.
             </p>
           </div>
         </div>

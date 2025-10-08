@@ -16,7 +16,7 @@ export default function Home() {
     setMessage("");
 
     const supabase = supabaseClient();
-    
+
     try {
       if (isLoginMode) {
         // Handle login
@@ -59,10 +59,10 @@ export default function Home() {
 
   const handleGoogleSignIn = async () => {
     const supabase = supabaseClient();
-    
+
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/profile`,
         },
@@ -78,10 +78,10 @@ export default function Home() {
 
   const handleAppleSignIn = async () => {
     const supabase = supabaseClient();
-    
+
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
+        provider: "apple",
         options: {
           redirectTo: `${window.location.origin}/profile`,
         },
@@ -101,21 +101,35 @@ export default function Home() {
       <header className="px-6 py-4 border-b border-gray-200">
         <nav className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center space-x-3">
-            <button onClick={() => window.location.reload()} className="flex items-center space-x-3 hover:opacity-80">
+            <button
+              onClick={() => window.location.reload()}
+              className="flex items-center space-x-3 hover:opacity-80"
+            >
               <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
                 <span className="text-white font-mono text-sm">λ</span>
               </div>
-              <span className="font-mono text-lg text-gray-900">vectorized-ideas</span>
+              <span className="font-mono text-lg text-gray-900">
+                vectorized-ideas
+              </span>
             </button>
           </div>
           <div className="flex items-center space-x-4">
-            <a href="/matches" className="font-mono text-sm text-gray-600 hover:text-gray-900">
+            <a
+              href="/matches"
+              className="font-mono text-sm text-gray-600 hover:text-gray-900"
+            >
               matches
             </a>
-            <a href="/profile" className="font-mono text-sm text-gray-600 hover:text-gray-900">
+            <a
+              href="/profile"
+              className="font-mono text-sm text-gray-600 hover:text-gray-900"
+            >
               profile
             </a>
-            <a href="https://github.com" className="text-gray-600 hover:text-gray-900 font-mono text-sm">
+            <a
+              href="https://github.com"
+              className="text-gray-600 hover:text-gray-900 font-mono text-sm"
+            >
               github
             </a>
           </div>
@@ -131,8 +145,9 @@ export default function Home() {
               <span className="text-blue-600"> semantic similarity</span>
             </h1>
             <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
-              Transform your project ideas into vector embeddings and find co-founders with conceptually similar visions. 
-              No keyword matching — actual semantic understanding of what you want to build.
+              Transform your project ideas into vector embeddings and find
+              co-founders with conceptually similar visions. No keyword matching
+              — actual semantic understanding of what you want to build.
             </p>
 
             {/* How it works */}
@@ -141,24 +156,39 @@ export default function Home() {
                 <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
                   <span className="font-mono text-sm font-bold">01</span>
                 </div>
-                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">Vector Embeddings</h3>
-                <p className="text-gray-600 text-sm">Describe your project idea. We convert it to high-dimensional vectors using transformer models.</p>
+                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                  Vector Embeddings
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Describe your project idea. We convert it to high-dimensional
+                  vectors using transformer models.
+                </p>
               </div>
 
               <div className="p-6 bg-white rounded border border-gray-200">
                 <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
                   <span className="font-mono text-sm font-bold">02</span>
                 </div>
-                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">Similarity Search</h3>
-                <p className="text-gray-600 text-sm">Cosine similarity calculation finds others with conceptually similar ideas, not just keyword matches.</p>
+                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                  Similarity Search
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Cosine similarity calculation finds others with conceptually
+                  similar ideas, not just keyword matches.
+                </p>
               </div>
 
               <div className="p-6 bg-white rounded border border-gray-200">
                 <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
                   <span className="font-mono text-sm font-bold">03</span>
                 </div>
-                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">Connect</h3>
-                <p className="text-gray-600 text-sm">Browse matches ranked by semantic similarity score. Direct contact with potential co-founders.</p>
+                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                  Connect
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Browse matches ranked by semantic similarity score. Direct
+                  contact with potential co-founders.
+                </p>
               </div>
             </div>
 
@@ -168,7 +198,7 @@ export default function Home() {
                 <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
                   {isLoginMode ? "welcome back" : "join the experiment"}
                 </h2>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <input
@@ -180,11 +210,13 @@ export default function Home() {
                       className="w-full px-4 py-3 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                     />
                   </div>
-                  
+
                   <div>
                     <input
                       type="password"
-                      placeholder={isLoginMode ? "password" : "password (min 6 characters)"}
+                      placeholder={
+                        isLoginMode ? "password" : "password (min 6 characters)"
+                      }
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -192,16 +224,19 @@ export default function Home() {
                       className="w-full px-4 py-3 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                     />
                   </div>
-                  
+
                   <button
                     type="submit"
                     disabled={isLoading || !email || !password}
                     className="w-full bg-black text-white py-3 px-4 rounded font-mono hover:bg-gray-800 transition duration-200 disabled:opacity-50"
                   >
-                    {isLoading 
-                      ? (isLoginMode ? "logging in..." : "creating account...") 
-                      : (isLoginMode ? "log in" : "create account")
-                    }
+                    {isLoading
+                      ? isLoginMode
+                        ? "logging in..."
+                        : "creating account..."
+                      : isLoginMode
+                        ? "log in"
+                        : "create account"}
                   </button>
                 </form>
 
@@ -222,7 +257,7 @@ export default function Home() {
                     >
                       continue with google
                     </button>
-                    
+
                     <button
                       onClick={handleAppleSignIn}
                       className="w-full bg-black border border-black text-white py-3 px-4 rounded font-mono hover:bg-gray-800 transition duration-200"
@@ -233,11 +268,13 @@ export default function Home() {
                 </div>
 
                 {message && (
-                  <div className={`mt-4 p-3 rounded text-sm font-mono ${
-                    message.includes("Error") 
-                      ? "bg-red-50 text-red-600 border border-red-200" 
-                      : "bg-green-50 text-green-600 border border-green-200"
-                  }`}>
+                  <div
+                    className={`mt-4 p-3 rounded text-sm font-mono ${
+                      message.includes("Error")
+                        ? "bg-red-50 text-red-600 border border-red-200"
+                        : "bg-green-50 text-green-600 border border-green-200"
+                    }`}
+                  >
                     {message}
                   </div>
                 )}
@@ -253,10 +290,9 @@ export default function Home() {
                     }}
                     className="font-mono text-sm text-gray-600 hover:text-gray-900 underline"
                   >
-                    {isLoginMode 
-                      ? "need an account? sign up" 
-                      : "already have an account? log in"
-                    }
+                    {isLoginMode
+                      ? "need an account? sign up"
+                      : "already have an account? log in"}
                   </button>
                 </div>
               </div>
@@ -265,9 +301,16 @@ export default function Home() {
             {/* Technical Note */}
             <div className="mt-12 p-4 bg-gray-100 rounded border-l-4 border-blue-600">
               <p className="text-sm font-mono text-gray-700">
-                <strong>Note:</strong> This is an open source experiment in semantic matching for co-founder discovery. 
-                Built with transformer embeddings, vector similarity search, and minimal UI. 
-                <a href="https://github.com" className="text-blue-600 hover:underline ml-1">View source →</a>
+                <strong>Note:</strong> This is an open source experiment in
+                semantic matching for co-founder discovery. Built with
+                transformer embeddings, vector similarity search, and minimal
+                UI.
+                <a
+                  href="https://github.com"
+                  className="text-blue-600 hover:underline ml-1"
+                >
+                  View source →
+                </a>
               </p>
             </div>
           </div>
@@ -283,22 +326,32 @@ export default function Home() {
                 <div className="w-6 h-6 bg-black rounded flex items-center justify-center">
                   <span className="text-white font-mono text-xs">λ</span>
                 </div>
-                <span className="font-mono text-sm text-gray-700">vectorized-ideas</span>
+                <span className="font-mono text-sm text-gray-700">
+                  vectorized-ideas
+                </span>
               </div>
               <p className="text-gray-500 text-sm font-mono">
                 semantic co-founder matching experiment
               </p>
             </div>
-            
+
             <div className="flex space-x-6 text-sm font-mono">
-              <a href="#" className="text-gray-500 hover:text-gray-700">github</a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">docs</a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">api</a>
+              <a href="#" className="text-gray-500 hover:text-gray-700">
+                github
+              </a>
+              <a href="#" className="text-gray-500 hover:text-gray-700">
+                docs
+              </a>
+              <a href="#" className="text-gray-500 hover:text-gray-700">
+                api
+              </a>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-200 mt-6 pt-6 text-center">
-            <p className="text-gray-400 text-xs font-mono">built for hackers, by hackers</p>
+            <p className="text-gray-400 text-xs font-mono">
+              built for hackers, by hackers
+            </p>
           </div>
         </div>
       </footer>

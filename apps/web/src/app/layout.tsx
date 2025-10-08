@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "vectorized ideas - co-founder matching via semantic similarity",
-  description: "Match with co-founders based on vector embeddings of your project ideas. Open source platform for finding technical partners.",
+  description:
+    "Match with co-founders based on vector embeddings of your project ideas. Open source platform for finding technical partners.",
 };
 
 export default function RootLayout({
