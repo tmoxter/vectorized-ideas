@@ -168,18 +168,31 @@ export default function ProfilePage() {
               region: profileData.region,
             });
             if (profileText.trim()) {
-              embeddingPromises.push(embedProfile(profileText));
+              embeddingPromises.push(embedProfile(user.id, profileText));
             }
           }
 
-          // Generate venture embedding if venture data exists
+          // Generate venture embedding if venture data exists - need to get the venture ID
           if (profileData.venture_title || profileData.venture_description) {
+            // Get the venture ID from the venture result (which was just saved)
             const ventureText = createVentureEmbeddingText({
               title: profileData.venture_title,
               description: profileData.venture_description,
             });
             if (ventureText.trim()) {
-              embeddingPromises.push(embedIdea(ventureText));
+              // We need to get the venture ID that was just created/updated
+              // Let's fetch the most recent venture for this user
+              const { data: recentVenture } = await supabase
+                .from("user_ventures")
+                .select("id")
+                .eq("user_id", user.id)
+                .order("updated_at", { ascending: false })
+                .limit(1)
+                .single();
+              
+              if (recentVenture) {
+                embeddingPromises.push(embedIdea(recentVenture.id, ventureText));
+              }
             }
           }
 

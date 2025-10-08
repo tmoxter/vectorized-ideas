@@ -8,15 +8,16 @@ export type EntityType = 'idea' | 'profile';
 
 interface EmbedRequest {
   entityType: EntityType;
+  entityId: string;
   text: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { entityType, text }: EmbedRequest = await request.json();
+    const { entityType, entityId, text }: EmbedRequest = await request.json();
 
     // Validate inputs
-    if (!entityType || !text) {
+    if (!entityType || !entityId || !text) {
       return NextResponse.json(
         { success: false, error: "Missing required parameters" },
         { status: 400 }
@@ -90,6 +91,7 @@ export async function POST(request: NextRequest) {
       .from('embeddings')
       .upsert({
         entity_type: entityType,
+        entity_id: entityId,
         user_id: user.id,
         model: 'text-embedding-3-small',
         vector: embedding,
@@ -129,44 +131,94 @@ const MODEL = "text-embedding-3-small";
 const VERSION = "v1";
 
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const userId = url.searchParams.get("userId");
-  const limit = Number(url.searchParams.get("limit") ?? "20");
-  if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+  try {
+    const url = new URL(req.url);
+    const userId = url.searchParams.get("userId");
+    const limit = Number(url.searchParams.get("limit") ?? "20");
+    
+    console.log("GET /api/embeddings called with userId:", userId, "limit:", limit);
+    
+    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
 
-  const sb = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+    const sb = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-  // Get the user's most recent venture from user_ventures table
-  const { data: userVenture, error: ventureErr } = await sb
-    .from("user_ventures")
-    .select("id, title, description, created_at")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single();
+    // Get the user's most recent venture from user_ventures table
+    console.log("Fetching user venture for userId:", userId);
+    const { data: userVenture, error: ventureErr } = await sb
+      .from("user_ventures")
+      .select("id, title, description, created_at, user_id")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
 
-  if (ventureErr || !userVenture) {
-    return NextResponse.json({ error: "No venture found for user" }, { status: 404 });
+    console.log("User venture query result:", { userVenture, ventureErr });
+
+    if (ventureErr || !userVenture) {
+      console.log("No venture found for user:", userId, "Error:", ventureErr);
+      return NextResponse.json({ error: "No venture found for user" }, { status: 404 });
+    }
+
+    const ideaId = userVenture.id;
+    console.log("Using ideaId for KNN search:", ideaId);
+
+    // Check if we have an embedding for this idea
+    const { data: embedding, error: embErr } = await sb
+      .from("embeddings")
+      .select("entity_id, entity_type")
+      .eq("entity_type", "idea")
+      .eq("entity_id", ideaId.toString())
+      .single();
+    
+    console.log("Embedding check result:", { embedding, embErr });
+
+    if (embErr || !embedding) {
+      console.log("No embedding found for idea:", ideaId);
+      return NextResponse.json({ 
+        error: "No embedding found for this venture. Please make sure your profile is published to generate embeddings.",
+        details: embErr?.message 
+      }, { status: 404 });
+    }
+
+    // Use the corrected knn_candidates function
+    console.log("Attempting KNN search with corrected function...");
+    console.log("entity_id from embeddings:", embedding.entity_id, "type:", typeof embedding.entity_id);
+    
+    const { data: cands, error: kErr } = await sb.rpc("knn_candidates", {
+      p_idea_id: embedding.entity_id, // Now expects text type
+      p_model: MODEL,
+      p_version: VERSION,
+      p_limit: 100,
+      p_probes: 10
+    });
+    
+    console.log("KNN candidates result:", { cands, kErr });
+    
+    if (kErr) {
+      console.error("KNN function error:", kErr);
+      return NextResponse.json({ error: kErr.message }, { status: 500 });
+    }
+
+    // For now, return basic candidate data without vector similarity scoring
+    // TODO: Implement proper cosine similarity calculation in JavaScript if needed
+    const limitedCands = Array.isArray(cands) ? cands.slice(0, limit) : [];
+    console.log("Returning limited candidates:", limitedCands.length, "items");
+    
+    const response = {
+      items: limitedCands,
+      baseVenture: userVenture // Include the base venture info for reference
+    };
+    
+    console.log("Final response:", response);
+    return NextResponse.json(response);
+    
+  } catch (error) {
+    console.error("GET /api/embeddings error:", error);
+    return NextResponse.json({ 
+      error: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}` 
+    }, { status: 500 });
   }
-
-  const ideaId = userVenture.id;
-
-  const { data: cands, error: kErr } = await sb.rpc("knn_candidates", {
-    p_idea_id: ideaId,
-    p_model: MODEL,
-    p_version: VERSION,
-    p_limit: 100,
-    p_probes: 10
-  });
-  if (kErr) return NextResponse.json({ error: kErr.message }, { status: 500 });
-
-  //const rescored = rescoreBlend(ventureInfo, cands).slice(0, limit);
-  const limitedCands = Array.isArray(cands) ? cands.slice(0, limit) : [];
-  return NextResponse.json({
-    items: limitedCands,
-    baseVenture: userVenture // Include the base venture info for reference
-  });
 }

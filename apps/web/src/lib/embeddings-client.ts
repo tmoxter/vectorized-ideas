@@ -4,6 +4,7 @@ export type EntityType = 'idea' | 'profile';
 
 export async function embedAndUpsert(
   entityType: EntityType,
+  entityId: string,
   text: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -24,6 +25,7 @@ export async function embedAndUpsert(
       },
       body: JSON.stringify({
         entityType,
+        entityId,
         text,
       }),
     });
@@ -45,13 +47,13 @@ export async function embedAndUpsert(
 }
 
 // Helper function to generate embeddings for profile data
-export async function embedProfile(profileText: string) {
-  return embedAndUpsert('profile', profileText);
+export async function embedProfile(userId: string, profileText: string) {
+  return embedAndUpsert('profile', userId, profileText);
 }
 
 // Helper function to generate embeddings for venture ideas
-export async function embedIdea(ideaText: string) {
-  return embedAndUpsert('idea', ideaText);
+export async function embedIdea(ventureId: string, ideaText: string) {
+  return embedAndUpsert('idea', ventureId, ideaText);
 }
 
 // Function to combine profile data into embeddings text
