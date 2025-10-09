@@ -164,9 +164,10 @@ export default function ProfilePage() {
           "Error saving profile: " + errors.map((e) => e!.message).join(", ")
         );
       } else {
-        // Generate embeddings after successful save
-        try {
-          const embeddingPromises = [];
+        // Generate embeddings only when publishing
+        if (publish) {
+          try {
+            const embeddingPromises = [];
 
           // Generate profile embedding if profile data exists
           if (
@@ -248,16 +249,18 @@ export default function ProfilePage() {
                 : "Profile saved as draft!"
             );
           }
-        } catch (embeddingError) {
-          const errorMsg =
-            embeddingError instanceof Error
-              ? embeddingError.message
-              : String(embeddingError);
-          setMessage(
-            publish
-              ? `Profile published! Embedding error: ${errorMsg}`
-              : `Profile saved! Embedding error: ${errorMsg}`
-          );
+          } catch (embeddingError) {
+            const errorMsg =
+              embeddingError instanceof Error
+                ? embeddingError.message
+                : String(embeddingError);
+            setMessage(
+              `Profile published! Embedding error: ${errorMsg}`
+            );
+          }
+        } else {
+          // Draft save - no embeddings generated
+          setMessage("Profile saved as draft!");
         }
       }
     } catch (error) {
