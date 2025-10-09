@@ -223,12 +223,62 @@ export async function GET(req: NextRequest) {
     const limitedCands = Array.isArray(cands) ? cands.slice(0, limit) : [];
     console.log("Returning limited candidates:", limitedCands.length, "items");
 
+    // Enrich candidate data with profile, venture, and preferences
+    const enrichedCandidates = await Promise.all(
+      limitedCands.map(async (candidate: any) => {
+        const candidateUserId = candidate.user_id;
+
+        if (!candidateUserId) {
+          console.warn("Candidate missing user_id:", candidate);
+          return null;
+        }
+
+        try {
+          // Fetch all data in parallel
+          const [profileResult, ventureResult, preferencesResult] = await Promise.all([
+            sb
+              .from("profiles")
+              .select("name, bio, achievements, region")
+              .eq("user_id", candidateUserId)
+              .maybeSingle(),
+            sb
+              .from("user_ventures")
+              .select("title, description")
+              .eq("user_id", candidateUserId)
+              .maybeSingle(),
+            sb
+              .from("user_cofounder_preference")
+              .select("title, description")
+              .eq("user_id", candidateUserId)
+              .maybeSingle(),
+          ]);
+
+          return {
+            id: candidateUserId,
+            stage: candidate.stage,
+            timezone: candidate.timezone,
+            availability_hours: candidate.availability_hours,
+            similarity_score: candidate.similarity_score,
+            profile: profileResult.data,
+            venture: ventureResult.data,
+            preferences: preferencesResult.data,
+          };
+        } catch (error) {
+          console.error("Error enriching candidate data:", candidateUserId, error);
+          return null;
+        }
+      })
+    );
+
+    // Filter out null candidates (failed to load)
+    const validCandidates = enrichedCandidates.filter((c) => c !== null);
+
     const response = {
-      items: limitedCands,
+      items: validCandidates,
       baseVenture: userVenture, // Include the base venture info for reference
     };
 
-    console.log("Final response:", response);
+    console.log("Final response with enriched data:", response);
     return NextResponse.json(response);
   } catch (error) {
     console.error("GET /api/embeddings error:", error);

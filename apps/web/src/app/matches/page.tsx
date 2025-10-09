@@ -59,45 +59,21 @@ export default function MatchesPage() {
   };
 
   const loadMatches = async (userId: string) => {
-    //this should be loadCandidates
     setIsLoading(true);
     try {
       const response = await fetch(`/api/embeddings?userId=${userId}&limit=20`);
 
-      console.log("Response status:", response.status);
-      console.log(
-        "Response content-type:",
-        response.headers.get("content-type")
-      );
-
-      const responseText = await response.text();
-      console.log("Raw response text:", responseText);
-
-      if (!responseText) {
-        setMessage("Error: Empty response from server");
-        return;
-      }
-
-      let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error("JSON parse error:", parseError);
-        console.error("Response text that failed to parse:", responseText);
-        setMessage(
-          `Error: Invalid JSON response from server. Raw response: ${responseText.substring(0, 200)}`
-        );
-        return;
-      }
-
       if (!response.ok) {
+        const errorData = await response.json();
         setMessage(
-          `Error loading matches: ${result?.error || "Unknown error"}`
+          `Error loading matches: ${errorData?.error || "Unknown error"}`
         );
         return;
       }
 
+      const result = await response.json();
       const matchCandidates = result?.items || [];
+
       console.log("Match candidates received:", matchCandidates);
       console.log("Number of candidates:", matchCandidates.length);
 
@@ -111,107 +87,8 @@ export default function MatchesPage() {
         return;
       }
 
-      console.log("Starting to process candidates...");
-      
-      // Load additional profile data for each candidate
-      let enrichedCandidates;
-      try {
-        console.log("About to start Promise.all for candidate processing...");
-        enrichedCandidates = await Promise.all(
-          matchCandidates.map(async (candidate: any, index: number) => {
-            try {
-              console.log(`Processing candidate ${index + 1}/${matchCandidates.length}`);
-              console.log("Full candidate object:", JSON.stringify(candidate, null, 2));
-              console.log("Raw candidate data:", candidate);
-              
-              // Try different possible field names for user_id
-              const candidateUserId = candidate.user_id || candidate.userId || candidate.id || candidate.venture_user_id;
-              console.log("Processing candidate with userId:", candidateUserId);
-              console.log("Available candidate fields:", Object.keys(candidate));
-
-              if (!candidateUserId) {
-                console.warn("Candidate missing user_id:", candidate);
-                return null;
-              }
-
-              console.log("About to query database with candidateUserId:", candidateUserId, "type:", typeof candidateUserId);
-              
-              // Let's also check if this user exists in profiles table at all
-              const { data: profileCheck } = await supabase
-                .from("profiles")
-                .select("user_id, name")
-                .eq("user_id", candidateUserId);
-              console.log("Profile existence check:", profileCheck);
-              
-              const [profileResult, ventureResult, preferencesResult] =
-                await Promise.all([
-                  supabase
-                    .from("profiles")
-                    .select("name, bio, achievements, region")
-                    .eq("user_id", candidateUserId)
-                    .maybeSingle(),
-                  supabase
-                    .from("user_ventures")
-                    .select("title, description")
-                    .eq("user_id", candidateUserId)
-                    .maybeSingle(),
-                  supabase
-                    .from("user_cofounder_preference")
-                    .select("title, description")
-                    .eq("user_id", candidateUserId)
-                    .maybeSingle(),
-                ]);
-
-              console.log("Profile result for", candidateUserId, ":", profileResult);
-              console.log("Venture result for", candidateUserId, ":", ventureResult);
-              console.log("Preferences result for", candidateUserId, ":", preferencesResult);
-              
-              if (profileResult.error) {
-                console.error("Profile query error:", profileResult.error);
-              }
-              if (ventureResult.error) {
-                console.error("Venture query error:", ventureResult.error);
-              }
-              if (preferencesResult.error) {
-                console.error("Preferences query error:", preferencesResult.error);
-              }
-
-              return {
-                ...candidate,
-                id: candidateUserId, // Ensure we use the user_id for actions
-                profile: profileResult.data,
-                venture: ventureResult.data,
-                preferences: preferencesResult.data,
-              };
-            } catch (error) {
-              console.error(
-                "Error loading candidate data for candidate:",
-                candidate,
-                error
-              );
-              return null;
-            }
-          })
-        );
-      } catch (promiseAllError) {
-        console.error("Error in Promise.all for candidate processing:", promiseAllError);
-        setMessage("Error processing candidate data");
-        return;
-      }
-
-      // Filter out null candidates (failed to load)
-      const validCandidates = enrichedCandidates.filter(
-        (candidate) => candidate !== null
-      );
-      console.log("Valid enriched candidates:", validCandidates);
-
-      setCandidates(validCandidates);
-
-      if (validCandidates.length === 0) {
-        setMessage(
-          "Found potential matches but unable to load their profile data. Please try again."
-        );
-      }
+      // Candidates are already enriched with profile, venture, and preferences data from the API
+      setCandidates(matchCandidates);
     } catch (error) {
       setMessage("Failed to load matches");
       console.error("Error loading matches:", error);
