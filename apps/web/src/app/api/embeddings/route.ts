@@ -205,7 +205,7 @@ export async function GET(req: NextRequest) {
       typeof embedding.entity_id
     );
 
-    const { data: cands, error: kErr } = await sb.rpc("knn_candidates", {
+    const { data: cands, error: kErr } = await sb.rpc("knn_candidates_excl", {
       p_idea_id: embedding.entity_id, // Now expects text type
       p_model: MODEL,
       p_version: VERSION,

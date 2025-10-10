@@ -19,10 +19,19 @@ let mockEmbeddings: Array<{
   user_id: string;
   vector: number[];
 }> = [];
+let mockInteractions: Array<{
+  id: string;
+  actor_user: string;
+  target_user: string;
+  action: 'like' | 'pass' | 'block';
+  created_at: string;
+  updated_at: string;
+}> = [];
 
 // Initialize mock embeddings for test users
 export function initializeMockData() {
   mockMatches = [];
+  mockInteractions = [];
   mockEmbeddings = testUsers.map((user, index) => ({
     entity_type: 'idea',
     entity_id: user.venture.id,
@@ -35,6 +44,7 @@ export function initializeMockData() {
 export function resetMockData() {
   mockMatches = [];
   mockEmbeddings = [];
+  mockInteractions = [];
 }
 
 // Helper to calculate cosine similarity
@@ -163,6 +173,46 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
       });
     }
 
+    // Mock interactions table
+    if (table === 'interactions') {
+      queryBuilder.insert.mockImplementation((data: any) => {
+        const interaction = {
+          id: `interaction-${Date.now()}-${Math.random()}`,
+          ...data,
+          created_at: data.created_at || new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        mockInteractions.push(interaction);
+        return Promise.resolve({ data: interaction, error: null });
+      });
+
+      queryBuilder.upsert.mockImplementation((data: any) => {
+        const existingIndex = mockInteractions.findIndex(
+          i => i.actor_user === data.actor_user &&
+               i.target_user === data.target_user &&
+               i.action === data.action
+        );
+
+        if (existingIndex >= 0) {
+          mockInteractions[existingIndex] = {
+            ...mockInteractions[existingIndex],
+            ...data,
+            updated_at: new Date().toISOString(),
+          };
+          return Promise.resolve({ data: mockInteractions[existingIndex], error: null });
+        } else {
+          const interaction = {
+            id: `interaction-${Date.now()}-${Math.random()}`,
+            ...data,
+            created_at: data.created_at || new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+          mockInteractions.push(interaction);
+          return Promise.resolve({ data: interaction, error: null });
+        }
+      });
+    }
+
     return queryBuilder;
   };
 
@@ -200,7 +250,7 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
   };
 
   const mockRpc = vi.fn().mockImplementation((fn: string, params: any) => {
-    if (fn === 'knn_candidates') {
+    if (fn === 'knn_candidates' || fn === 'knn_candidates_excl') {
       const { p_idea_id, p_limit = 20 } = params;
 
       // Find the embedding for the query idea
@@ -235,6 +285,81 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
       return Promise.resolve({ data: candidates, error: null });
     }
 
+    // Mock insert_like_interaction RPC
+    if (fn === 'insert_like_interaction') {
+      const { p_actor_user, p_target_user } = params;
+
+      // Check if already exists
+      const exists = mockInteractions.find(
+        i => i.actor_user === p_actor_user &&
+             i.target_user === p_target_user &&
+             (i.action === 'like' || i.action === 'pass')
+      );
+
+      if (!exists) {
+        const interaction = {
+          id: `interaction-${Date.now()}-${Math.random()}`,
+          actor_user: p_actor_user,
+          target_user: p_target_user,
+          action: 'like' as const,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        mockInteractions.push(interaction);
+      }
+
+      return Promise.resolve({ data: null, error: null });
+    }
+
+    // Mock insert_pass_interaction RPC
+    if (fn === 'insert_pass_interaction') {
+      const { p_actor_user, p_target_user } = params;
+
+      const existingIndex = mockInteractions.findIndex(
+        i => i.actor_user === p_actor_user &&
+             i.target_user === p_target_user &&
+             i.action === 'pass'
+      );
+
+      const now = new Date().toISOString();
+
+      if (existingIndex >= 0) {
+        // Update created_at for existing pass
+        mockInteractions[existingIndex].created_at = now;
+        mockInteractions[existingIndex].updated_at = now;
+      } else {
+        // Insert new pass interaction
+        const interaction = {
+          id: `interaction-${Date.now()}-${Math.random()}`,
+          actor_user: p_actor_user,
+          target_user: p_target_user,
+          action: 'pass' as const,
+          created_at: now,
+          updated_at: now,
+        };
+        mockInteractions.push(interaction);
+      }
+
+      return Promise.resolve({ data: null, error: null });
+    }
+
+    // Mock block_user RPC
+    if (fn === 'block_user') {
+      const { p_actor, p_target } = params;
+
+      const interaction = {
+        id: `interaction-${Date.now()}-${Math.random()}`,
+        actor_user: p_actor,
+        target_user: p_target,
+        action: 'block' as const,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      mockInteractions.push(interaction);
+
+      return Promise.resolve({ data: null, error: null });
+    }
+
     return Promise.resolve({ data: null, error: { message: 'Unknown RPC function' } });
   });
 
@@ -256,5 +381,26 @@ export function addMockMatch(userA: string, userB: string) {
     user_a: userA,
     user_b: userB,
     created_at: new Date().toISOString(),
+  });
+}
+
+// Get mock interactions for testing
+export function getMockInteractions() {
+  return mockInteractions;
+}
+
+// Add a mock interaction
+export function addMockInteraction(
+  actorUser: string,
+  targetUser: string,
+  action: 'like' | 'pass' | 'block'
+) {
+  mockInteractions.push({
+    id: `interaction-${Date.now()}-${Math.random()}`,
+    actor_user: actorUser,
+    target_user: targetUser,
+    action,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   });
 }

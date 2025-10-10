@@ -119,6 +119,40 @@ export default function MatchesPage() {
     }
   };
 
+  const recordInteraction = async (
+    targetUserId: string,
+    action: "like" | "pass" | "block"
+  ): Promise<boolean> => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return false;
+
+      const response = await fetch("/api/interactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          targetUserId,
+          action,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Error recording interaction:", await response.json());
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error recording interaction:", error);
+      return false;
+    }
+  };
+
   const handleAction = async (candidateId: string, action: MatchAction) => {
     if (!user) return;
 
@@ -126,7 +160,28 @@ export default function MatchesPage() {
     setUserActions((prev) => ({ ...prev, [candidateId]: action }));
 
     try {
-      // If user is interested, save to matches table
+      // Map UI actions to database interaction types
+      let interactionAction: "like" | "pass" | "block";
+      if (action === "interested") {
+        interactionAction = "like";
+      } else if (action === "not_interested") {
+        interactionAction = "pass";
+      } else {
+        // "maybe" maps to pass as well
+        interactionAction = "pass";
+      }
+
+      // Record the interaction
+      const interactionRecorded = await recordInteraction(
+        candidateId,
+        interactionAction
+      );
+
+      if (!interactionRecorded) {
+        setMessage("There was an issue recording your interaction.");
+      }
+
+      // If user is interested, also save to matches table
       if (action === "interested") {
         const matchSaved = await saveMatchToDatabase(user.id, candidateId);
         if (matchSaved) {

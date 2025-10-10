@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { testUsers } from '@/test/fixtures/users';
-import { createMockSupabaseClient, initializeMockData, resetMockData, getMockMatches } from '@/test/mocks/supabase';
+import { createMockSupabaseClient, initializeMockData, resetMockData, getMockMatches, getMockInteractions, addMockInteraction } from '@/test/mocks/supabase';
 
 // Mock Next.js router
 const mockPush = vi.fn();
@@ -42,9 +42,31 @@ describe('MatchesPage Integration Tests', () => {
     // Mock the Supabase client
     mockSupabaseClient.mockReturnValue(createMockSupabaseClient(currentUser.id));
 
-    // Mock the fetch API for embeddings endpoint with enriched data
-    mockFetch.mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    // Mock the fetch API for embeddings and interactions endpoints
+    mockFetch.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+
+      // If input is a Request object, extract body from it
+      let requestBody = init?.body;
+      if (input instanceof Request && input.body) {
+        const reader = input.body.getReader();
+        const chunks: Uint8Array[] = [];
+        let done = false;
+        while (!done) {
+          const result = await reader.read();
+          done = result.done;
+          if (result.value) {
+            chunks.push(result.value);
+          }
+        }
+        const decoder = new TextDecoder();
+        requestBody = decoder.decode(chunks.reduce((acc, chunk) => {
+          const tmp = new Uint8Array(acc.length + chunk.length);
+          tmp.set(acc, 0);
+          tmp.set(chunk, acc.length);
+          return tmp;
+        }, new Uint8Array()));
+      }
 
       if (url.includes('/api/embeddings')) {
         const mockResponse = {
@@ -79,6 +101,32 @@ describe('MatchesPage Integration Tests', () => {
           })
         );
       }
+
+      if (url.includes('/api/interactions')) {
+        // Parse the body to get interaction details
+        let body: any = {};
+        if (requestBody) {
+          if (typeof requestBody === 'string') {
+            body = JSON.parse(requestBody);
+          } else {
+            // Body might be a Buffer or other type
+            body = JSON.parse(requestBody.toString());
+          }
+        }
+
+        // Record interaction directly using the helper function
+        if (body.targetUserId && body.action) {
+          addMockInteraction(currentUser.id, body.targetUserId, body.action);
+        }
+
+        return Promise.resolve(
+          new Response(JSON.stringify({ success: true }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        );
+      }
+
       return Promise.reject(new Error('Unknown URL'));
     });
   });
@@ -213,7 +261,7 @@ describe('MatchesPage Integration Tests', () => {
     expect(nextButton).toBeDisabled();
   });
 
-  it('should save match when interested button is clicked', async () => {
+  it('should save match and record like interaction when interested button is clicked', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -248,9 +296,16 @@ describe('MatchesPage Integration Tests', () => {
     expect(matches).toHaveLength(1);
     expect(matches[0].user_a).toBe(currentUser.id);
     expect(matches[0].user_b).toBe(mockCandidates[0].id);
+
+    // Check that like interaction was recorded
+    const interactions = getMockInteractions();
+    expect(interactions).toHaveLength(1);
+    expect(interactions[0].actor_user).toBe(currentUser.id);
+    expect(interactions[0].target_user).toBe(mockCandidates[0].id);
+    expect(interactions[0].action).toBe('like');
   });
 
-  it('should handle pass action correctly', async () => {
+  it('should handle pass action correctly and record pass interaction', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -273,9 +328,16 @@ describe('MatchesPage Integration Tests', () => {
     // Should NOT save a match
     const matches = getMockMatches();
     expect(matches).toHaveLength(0);
+
+    // But should record a pass interaction
+    const interactions = getMockInteractions();
+    expect(interactions).toHaveLength(1);
+    expect(interactions[0].actor_user).toBe(currentUser.id);
+    expect(interactions[0].target_user).toBe(mockCandidates[0].id);
+    expect(interactions[0].action).toBe('pass');
   });
 
-  it('should handle maybe action correctly', async () => {
+  it('should handle maybe action correctly and record pass interaction', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -299,6 +361,13 @@ describe('MatchesPage Integration Tests', () => {
 
     // First candidate should no longer be displayed
     expect(screen.queryByText(firstCandidateName)).not.toBeInTheDocument();
+
+    // Should record a pass interaction (maybe maps to pass)
+    const interactions = getMockInteractions();
+    expect(interactions).toHaveLength(1);
+    expect(interactions[0].actor_user).toBe(currentUser.id);
+    expect(interactions[0].target_user).toBe(mockCandidates[0].id);
+    expect(interactions[0].action).toBe('pass');
   });
 
   it('should redirect to home page when not authenticated', async () => {
