@@ -64,12 +64,12 @@ export async function POST(request: NextRequest) {
     // Handle different interaction types with the provided SQL logic
     if (action === "like") {
       // For 'like': insert or do nothing if already exists
-      const { error } = await supabase.rpc("insert_like_interaction", {
+      const { error: rpcError } = await supabase.rpc("insert_like_interaction", {
         p_actor_user: user.id,
         p_target_user: targetUserId,
       });
 
-      if (error) {
+      if (rpcError) {
         // Fallback to direct insert if RPC doesn't exist
         const { error: insertError } = await supabase
           .from("interactions")
@@ -86,6 +86,33 @@ export async function POST(request: NextRequest) {
             { success: false, error: `Database error: ${insertError.message}` },
             { status: 500 }
           );
+        }
+      }
+
+      // Check for reciprocal like to create a match
+      const { data: reciprocal } = await supabase
+        .from("interactions")
+        .select("id")
+        .eq("actor_user", targetUserId)
+        .eq("target_user", user.id)
+        .eq("action", "like")
+        .limit(1);
+
+      // If there's a reciprocal like, create a match
+      if (reciprocal && reciprocal.length > 0) {
+        const { error: matchError } = await supabase
+          .from("matches")
+          .insert({
+            user_a: user.id,
+            user_b: targetUserId,
+            active: true,
+          })
+          .select();
+
+        if (matchError && !matchError.message.includes("duplicate")) {
+          console.error("Error creating match:", matchError);
+          // Don't fail the request if match creation fails
+          // The like was still recorded successfully
         }
       }
     } else if (action === "pass") {

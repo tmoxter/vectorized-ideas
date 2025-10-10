@@ -97,28 +97,6 @@ export default function MatchesPage() {
     }
   };
 
-  const saveMatchToDatabase = async (
-    userAId: string,
-    userBId: string
-  ): Promise<boolean> => {
-    try {
-      const { error } = await supabase.from("matches").insert({
-        user_a: userAId,
-        user_b: userBId,
-        created_at: new Date().toISOString(),
-      });
-
-      if (error) {
-        console.error("Error saving match:", error);
-        return false;
-      }
-      return true;
-    } catch (error) {
-      console.error("Error saving match:", error);
-      return false;
-    }
-  };
-
   const recordInteraction = async (
     targetUserId: string,
     action: "like" | "pass" | "block"
@@ -171,7 +149,7 @@ export default function MatchesPage() {
         interactionAction = "pass";
       }
 
-      // Record the interaction
+      // Record the interaction (API will auto-create match if reciprocal like exists)
       const interactionRecorded = await recordInteraction(
         candidateId,
         interactionAction
@@ -179,20 +157,10 @@ export default function MatchesPage() {
 
       if (!interactionRecorded) {
         setMessage("There was an issue recording your interaction.");
-      }
-
-      // If user is interested, also save to matches table
-      if (action === "interested") {
-        const matchSaved = await saveMatchToDatabase(user.id, candidateId);
-        if (matchSaved) {
-          setMessage(
-            "Match saved! We'll notify you if they're interested too."
-          );
-        } else {
-          setMessage(
-            "Match recorded, but there was an issue saving to database."
-          );
-        }
+      } else if (action === "interested") {
+        setMessage(
+          "Like recorded! If they like you back, you'll be matched automatically."
+        );
       }
 
       // Move to next candidate after a short delay

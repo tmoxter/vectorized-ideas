@@ -168,8 +168,25 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     // Mock matches table
     if (table === 'matches') {
       queryBuilder.insert.mockImplementation((data: any) => {
-        mockMatches.push(data);
-        return Promise.resolve({ data, error: null });
+        const match = {
+          ...data,
+          created_at: data.created_at || new Date().toISOString(),
+        };
+        mockMatches.push(match);
+
+        // Return chainable object with select method
+        return {
+          select: vi.fn().mockResolvedValue({ data: match, error: null }),
+          then: (resolve: any) => resolve({ data: match, error: null }),
+        };
+      });
+
+      queryBuilder.select.mockImplementation(() => {
+        return {
+          ...queryBuilder,
+          data: mockMatches,
+          error: null,
+        };
       });
     }
 
@@ -210,6 +227,45 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           mockInteractions.push(interaction);
           return Promise.resolve({ data: interaction, error: null });
         }
+      });
+
+      queryBuilder.select.mockImplementation((fields?: string) => {
+        // Return a chainable query builder for filtering
+        let filteredInteractions = [...mockInteractions];
+
+        return {
+          eq: vi.fn().mockImplementation((field: string, value: any) => {
+            filteredInteractions = filteredInteractions.filter(i => (i as any)[field] === value);
+            return {
+              eq: vi.fn().mockImplementation((field2: string, value2: any) => {
+                filteredInteractions = filteredInteractions.filter(i => (i as any)[field2] === value2);
+                return {
+                  eq: vi.fn().mockImplementation((field3: string, value3: any) => {
+                    filteredInteractions = filteredInteractions.filter(i => (i as any)[field3] === value3);
+                    return {
+                      limit: vi.fn().mockReturnValue(Promise.resolve({
+                        data: filteredInteractions.slice(0, 1),
+                        error: null,
+                      })),
+                    };
+                  }),
+                  limit: vi.fn().mockReturnValue(Promise.resolve({
+                    data: filteredInteractions.slice(0, 1),
+                    error: null,
+                  })),
+                };
+              }),
+              limit: vi.fn().mockReturnValue(Promise.resolve({
+                data: filteredInteractions.slice(0, 1),
+                error: null,
+              })),
+            };
+          }),
+          limit: vi.fn().mockReturnValue(Promise.resolve({
+            data: filteredInteractions.slice(0, 1),
+            error: null,
+          })),
+        };
       });
     }
 

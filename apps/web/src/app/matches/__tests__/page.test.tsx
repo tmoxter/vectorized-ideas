@@ -261,7 +261,7 @@ describe('MatchesPage Integration Tests', () => {
     expect(nextButton).toBeDisabled();
   });
 
-  it('should save match and record like interaction when interested button is clicked', async () => {
+  it('should record like interaction when interested button is clicked', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -280,7 +280,7 @@ describe('MatchesPage Integration Tests', () => {
 
     // Should show success message
     await waitFor(() => {
-      expect(screen.getByText(/match saved/i)).toBeInTheDocument();
+      expect(screen.getByText(/like recorded/i)).toBeInTheDocument();
     });
 
     // Should automatically move to next candidate after a delay
@@ -291,18 +291,16 @@ describe('MatchesPage Integration Tests', () => {
       { timeout: 2000 }
     );
 
-    // Check that match was saved in mock database
-    const matches = getMockMatches();
-    expect(matches).toHaveLength(1);
-    expect(matches[0].user_a).toBe(currentUser.id);
-    expect(matches[0].user_b).toBe(mockCandidates[0].id);
-
     // Check that like interaction was recorded
     const interactions = getMockInteractions();
     expect(interactions).toHaveLength(1);
     expect(interactions[0].actor_user).toBe(currentUser.id);
     expect(interactions[0].target_user).toBe(mockCandidates[0].id);
     expect(interactions[0].action).toBe('like');
+
+    // No manual match should be created (only via API when reciprocal)
+    const matches = getMockMatches();
+    expect(matches).toHaveLength(0);
   });
 
   it('should handle pass action correctly and record pass interaction', async () => {
@@ -450,5 +448,9 @@ describe('MatchesPage Integration Tests', () => {
     await waitFor(() => {
       expect(screen.getByText(/you've reviewed all available matches/i)).toBeInTheDocument();
     }, { timeout: 2000 });
+
+    // Verify all interactions were recorded
+    const interactions = getMockInteractions();
+    expect(interactions).toHaveLength(3);
   });
 });

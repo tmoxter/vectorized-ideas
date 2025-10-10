@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { testUsers } from '@/test/fixtures/users';
-import { createMockSupabaseClient, initializeMockData, resetMockData, getMockInteractions } from '@/test/mocks/supabase';
+import { createMockSupabaseClient, initializeMockData, resetMockData, getMockInteractions, getMockMatches, addMockInteraction } from '@/test/mocks/supabase';
 
 // Mock @supabase/supabase-js - use vi.hoisted to avoid hoisting issues
 const mockCreateClient = vi.hoisted(() => vi.fn());
@@ -300,6 +300,70 @@ describe('Interactions API Route', () => {
       expect(response.status).toBe(401);
       expect(data.success).toBe(false);
       expect(data.error).toContain('User not authenticated');
+    });
+
+    it('should create a match when there is a reciprocal like', async () => {
+      // First, Bob likes Alice (creating the reciprocal like)
+      addMockInteraction(targetUser.id, currentUser.id, 'like');
+
+      // Now Alice likes Bob back
+      const request = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'like',
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify interaction was recorded
+      const interactions = getMockInteractions();
+      expect(interactions).toHaveLength(2); // Bob's like + Alice's like
+
+      // Verify match was created
+      const matches = getMockMatches();
+      expect(matches).toHaveLength(1);
+      expect(matches[0].user_a).toBe(currentUser.id);
+      expect(matches[0].user_b).toBe(targetUser.id);
+      expect(matches[0].active).toBe(true);
+    });
+
+    it('should not create a match when there is no reciprocal like', async () => {
+      // Alice likes Bob (no reciprocal like exists)
+      const request = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'like',
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify interaction was recorded
+      const interactions = getMockInteractions();
+      expect(interactions).toHaveLength(1);
+
+      // Verify no match was created
+      const matches = getMockMatches();
+      expect(matches).toHaveLength(0);
     });
   });
 });
