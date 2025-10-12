@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-export type InteractionAction = "like" | "pass" | "block";
+export type InteractionAction = "like" | "pass" | "block" | "unblock";
 
 interface InteractionRequest {
   targetUserId: string;
@@ -20,9 +20,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!["like", "pass", "block"].includes(action)) {
+    if (!["like", "pass", "block", "unblock"].includes(action)) {
       return NextResponse.json(
-        { success: false, error: "Invalid action. Must be 'like', 'pass', or 'block'" },
+        { success: false, error: "Invalid action. Must be 'like', 'pass', 'block', or 'unblock'" },
         { status: 400 }
       );
     }
@@ -158,6 +158,22 @@ export async function POST(request: NextRequest) {
         console.error("Error blocking user:", error);
         return NextResponse.json(
           { success: false, error: `Database error: ${error.message}` },
+          { status: 500 }
+        );
+      }
+    } else if (action === "unblock") {
+      // For 'unblock': delete the block interaction
+      const { error: deleteError } = await supabase
+        .from("interactions")
+        .delete()
+        .eq("actor_user", user.id)
+        .eq("target_user", targetUserId)
+        .eq("action", "block");
+
+      if (deleteError) {
+        console.error("Error unblocking user:", deleteError);
+        return NextResponse.json(
+          { success: false, error: `Database error: ${deleteError.message}` },
           { status: 500 }
         );
       }

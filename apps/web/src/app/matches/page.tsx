@@ -228,6 +228,30 @@ export default function MatchesPage() {
           </div>
           <div className="flex items-center space-x-6">
             <button
+              onClick={() => router.push("/matches")}
+              className="font-mono text-sm text-gray-900 font-semibold"
+            >
+              discover
+            </button>
+            <button
+              onClick={() => router.push("/my-matches")}
+              className="font-mono text-sm text-gray-600 hover:text-gray-900"
+            >
+              my matches
+            </button>
+            <button
+              onClick={() => router.push("/skipped")}
+              className="font-mono text-sm text-gray-600 hover:text-gray-900"
+            >
+              skipped
+            </button>
+            <button
+              onClick={() => router.push("/blocked")}
+              className="font-mono text-sm text-gray-600 hover:text-gray-900"
+            >
+              blocked
+            </button>
+            <button
               onClick={() => router.push("/profile")}
               className="font-mono text-sm text-gray-600 hover:text-gray-900"
             >

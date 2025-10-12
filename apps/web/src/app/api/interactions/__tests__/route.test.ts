@@ -113,6 +113,39 @@ describe('Interactions API Route', () => {
       expect(interactions[0].action).toBe('block');
     });
 
+    it('should unblock a previously blocked user successfully', async () => {
+      // First, block the user
+      addMockInteraction(currentUser.id, targetUser.id, 'block');
+
+      // Verify block exists
+      const interactionsBefore = getMockInteractions();
+      expect(interactionsBefore).toHaveLength(1);
+      expect(interactionsBefore[0].action).toBe('block');
+
+      // Now unblock
+      const request = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'unblock',
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify block interaction was deleted
+      const interactionsAfter = getMockInteractions();
+      expect(interactionsAfter).toHaveLength(0);
+    });
+
     it('should not create duplicate like interactions', async () => {
       const request1 = new Request('http://localhost/api/interactions', {
         method: 'POST',

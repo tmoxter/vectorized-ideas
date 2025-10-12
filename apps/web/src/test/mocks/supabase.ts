@@ -267,6 +267,29 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           })),
         };
       });
+
+      queryBuilder.delete.mockImplementation(() => {
+        // Return chainable query builder for filtering before delete
+        const deleteFilters: Record<string, any> = {};
+
+        const deleteBuilder = {
+          eq: vi.fn().mockImplementation((field: string, value: any) => {
+            deleteFilters[field] = value;
+            return deleteBuilder;
+          }),
+          then: (resolve: any) => {
+            // Actually perform the delete when promise is resolved
+            const initialLength = mockInteractions.length;
+            mockInteractions = mockInteractions.filter(i => {
+              return !Object.entries(deleteFilters).every(([field, value]) => (i as any)[field] === value);
+            });
+            const deletedCount = initialLength - mockInteractions.length;
+            return resolve({ data: null, error: null, count: deletedCount });
+          },
+        };
+
+        return deleteBuilder;
+      });
     }
 
     return queryBuilder;
