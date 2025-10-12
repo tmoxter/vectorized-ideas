@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
+import TypewriterHero from "@/components/TypewriterHero";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -137,61 +138,62 @@ export default function Home() {
       {/* Hero Section */}
       <main className="px-6 py-16">
         <div className="max-w-6xl mx-auto">
-          <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-5xl font-mono font-bold text-gray-900 mb-6 leading-tight">
-              co-founder matching via
-              <span className="text-blue-600"> semantic similarity</span>
-            </h1>
-            <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
-              Transform your project ideas into vector embeddings and find
-              co-founders with conceptually similar visions. No keyword matching
-              — actual semantic understanding of what you want to build.
-            </p>
-
-            {/* How it works */}
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <div className="p-6 bg-white rounded border border-gray-200">
-                <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
-                  <span className="font-mono text-sm font-bold">01</span>
-                </div>
-                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                  Vector Embeddings
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Describe your project idea. We convert it to high-dimensional
-                  vectors using transformer models.
-                </p>
-              </div>
-
-              <div className="p-6 bg-white rounded border border-gray-200">
-                <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
-                  <span className="font-mono text-sm font-bold">02</span>
-                </div>
-                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                  Similarity Search
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Cosine similarity calculation finds others with conceptually
-                  similar ideas, not just keyword matches.
-                </p>
-              </div>
-
-              <div className="p-6 bg-white rounded border border-gray-200">
-                <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
-                  <span className="font-mono text-sm font-bold">03</span>
-                </div>
-                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                  Connect
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Browse matches ranked by semantic similarity score. Direct
-                  contact with potential co-founders.
-                </p>
-              </div>
+          <div>
+            <div className="max-w-4xl mb-12">
+              <TypewriterHero />
+              <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
+                Transform your project ideas into vector embeddings and find
+                co-founders with conceptually similar visions. No keyword matching
+                — actual semantic understanding of what you want to build.
+              </p>
             </div>
 
-            {/* Sign Up / Login Form */}
-            <div className="max-w-md">
+            {/* Content Section - How it works + Sign Up Form */}
+            <div className="flex flex-col lg:flex-row gap-8 mb-12">
+              {/* How it works */}
+              <div className="flex-1 space-y-6">
+                <div className="p-6 bg-white rounded border border-gray-200">
+                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
+                    <span className="font-mono text-sm font-bold">01</span>
+                  </div>
+                  <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                    Vector Embeddings
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Describe your project idea. We convert it to high-dimensional
+                    vectors using transformer models.
+                  </p>
+                </div>
+
+                <div className="p-6 bg-white rounded border border-gray-200">
+                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
+                    <span className="font-mono text-sm font-bold">02</span>
+                  </div>
+                  <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                    Similarity Search
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Cosine similarity calculation finds others with conceptually
+                    similar ideas, not just keyword matches.
+                  </p>
+                </div>
+
+                <div className="p-6 bg-white rounded border border-gray-200">
+                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
+                    <span className="font-mono text-sm font-bold">03</span>
+                  </div>
+                  <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                    Connect
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Browse matches ranked by semantic similarity score. Direct
+                    contact with potential co-founders.
+                  </p>
+                </div>
+              </div>
+
+              {/* Sign Up / Login Form */}
+              <div className="lg:w-96">
               <div className="bg-white p-6 rounded border border-gray-200">
                 <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
                   {isLoginMode ? "welcome back" : "join the experiment"}
@@ -295,21 +297,24 @@ export default function Home() {
                 </div>
               </div>
             </div>
+            </div>
 
             {/* Technical Note */}
-            <div className="mt-12 p-4 bg-gray-100 rounded border-l-4 border-blue-600">
-              <p className="text-sm font-mono text-gray-700">
-                <strong>Note:</strong> This is an open source experiment in
-                semantic matching for co-founder discovery. Built with
-                transformer embeddings, vector similarity search, and minimal
-                UI.
-                <a
-                  href="https://github.com"
-                  className="text-blue-600 hover:underline ml-1"
-                >
-                  View source →
-                </a>
-              </p>
+            <div className="max-w-4xl">
+              <div className="mt-12 p-4 bg-gray-100 rounded border-l-4 border-blue-600">
+                <p className="text-sm font-mono text-gray-700">
+                  <strong>Note:</strong> This is an open source experiment in
+                  semantic matching for co-founder discovery. Built with
+                  transformer embeddings, vector similarity search, and minimal
+                  UI.
+                  <a
+                    href="https://github.com"
+                    className="text-blue-600 hover:underline ml-1"
+                  >
+                    View source →
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>
