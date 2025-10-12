@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 
 export default function Home() {
@@ -9,6 +9,18 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isLoginMode, setIsLoginMode] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = supabaseClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    checkAuth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +41,7 @@ export default function Home() {
           setMessage("Error: " + error.message);
         } else if (data.session) {
           setMessage("Logged in successfully!");
-          window.location.href = "/profile";
+          window.location.href = "/auth/callback";
         }
       } else {
         // Handle signup
@@ -37,7 +49,7 @@ export default function Home() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/profile`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
 
@@ -47,7 +59,7 @@ export default function Home() {
           setMessage("Check your email to confirm your account!");
         } else if (data.session) {
           setMessage("Account created successfully!");
-          window.location.href = "/profile";
+          window.location.href = "/auth/callback";
         }
       }
     } catch (error) {
@@ -64,7 +76,7 @@ export default function Home() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/profile`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -83,7 +95,7 @@ export default function Home() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "apple",
         options: {
-          redirectTo: `${window.location.origin}/profile`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -102,7 +114,13 @@ export default function Home() {
         <nav className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                if (isAuthenticated) {
+                  window.location.href = "/matches";
+                } else {
+                  window.location.reload();
+                }
+              }}
               className="flex items-center space-x-3 hover:opacity-80"
             >
               <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
@@ -112,26 +130,6 @@ export default function Home() {
                 vectorized-ideas
               </span>
             </button>
-          </div>
-          <div className="flex items-center space-x-4">
-            <a
-              href="/matches"
-              className="font-mono text-sm text-gray-600 hover:text-gray-900"
-            >
-              matches
-            </a>
-            <a
-              href="/profile"
-              className="font-mono text-sm text-gray-600 hover:text-gray-900"
-            >
-              profile
-            </a>
-            <a
-              href="https://github.com"
-              className="text-gray-600 hover:text-gray-900 font-mono text-sm"
-            >
-              github
-            </a>
           </div>
         </nav>
       </header>

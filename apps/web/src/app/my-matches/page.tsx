@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import Navigation from "@/components/Navigation";
 
 interface ProfileData {
   id: string;
@@ -124,10 +125,14 @@ export default function MyMatchesPage() {
       setMatches(profiles);
       if (profiles.length > 0) {
         setSelectedMatch(profiles[0]);
+      } else {
+        setSelectedMatch(null);
       }
     } catch (error) {
       console.error("Error loading matches:", error);
       setMessage("Failed to load matches");
+      setMatches([]);
+      setSelectedMatch(null);
     } finally {
       setIsLoading(false);
     }
@@ -182,65 +187,11 @@ export default function MyMatchesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="px-6 py-4 border-b border-gray-200 bg-white">
-        <nav className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center space-x-3 hover:opacity-80"
-            >
-              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                <span className="text-white font-mono text-sm">λ</span>
-              </div>
-              <span className="font-mono text-lg text-gray-900">
-                vectorized-ideas
-              </span>
-            </button>
-          </div>
-          <div className="flex items-center space-x-6">
-            <button
-              onClick={() => router.push("/matches")}
-              className="font-mono text-sm text-gray-600 hover:text-gray-900"
-            >
-              discover
-            </button>
-            <button
-              onClick={() => router.push("/my-matches")}
-              className="font-mono text-sm text-gray-900 font-semibold"
-            >
-              my matches
-            </button>
-            <button
-              onClick={() => router.push("/skipped")}
-              className="font-mono text-sm text-gray-600 hover:text-gray-900"
-            >
-              skipped
-            </button>
-            <button
-              onClick={() => router.push("/blocked")}
-              className="font-mono text-sm text-gray-600 hover:text-gray-900"
-            >
-              blocked
-            </button>
-            <button
-              onClick={() => router.push("/profile")}
-              className="font-mono text-sm text-gray-600 hover:text-gray-900"
-            >
-              profile
-            </button>
-            <span className="font-mono text-sm text-gray-600">
-              {user?.email}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="font-mono text-sm text-gray-600 hover:text-gray-900"
-            >
-              logout
-            </button>
-          </div>
-        </nav>
-      </header>
+      <Navigation
+        currentPage="my-matches"
+        userEmail={user?.email}
+        onLogout={handleLogout}
+      />
 
       <main className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
