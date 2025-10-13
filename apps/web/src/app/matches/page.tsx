@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
-import { SearchX } from "lucide-react";
+import { SearchX, ShieldX } from "lucide-react";
 
 interface MatchCandidate {
   id: string;
@@ -28,7 +28,7 @@ interface MatchCandidate {
   };
 }
 
-type MatchAction = "interested" | "not_interested" | "maybe";
+type MatchAction = "like" | "pass";
 
 export default function MatchesPage() {
   const [candidates, setCandidates] = useState<MatchCandidate[]>([]);
@@ -40,6 +40,7 @@ export default function MatchesPage() {
     {}
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBlockConfirm, setShowBlockConfirm] = useState(false);
 
   const router = useRouter();
   const supabase = supabaseClient();
@@ -137,6 +138,14 @@ export default function MatchesPage() {
     }
   };
 
+  const goToNext = () => {
+    if (currentIndex < candidates.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      setMessage("You've reviewed all available matches!");
+    }
+  };
+
   const handleAction = async (candidateId: string, action: MatchAction) => {
     if (!user) return;
 
@@ -146,13 +155,14 @@ export default function MatchesPage() {
     try {
       // Map UI actions to database interaction types
       let interactionAction: "like" | "pass" | "block";
-      if (action === "interested") {
+      if (action === "like") {
         interactionAction = "like";
-      } else if (action === "not_interested") {
+      } else if (action === "pass") {
         interactionAction = "pass";
       } else {
-        // "maybe" maps to pass as well
-        interactionAction = "pass";
+        setMessage("Invalid action");
+        setIsSubmitting(false);
+        return;
       }
 
       // Record the interaction (API will auto-create match if reciprocal like exists)
@@ -163,21 +173,19 @@ export default function MatchesPage() {
 
       if (!interactionRecorded) {
         setMessage("There was an issue recording your interaction.");
-      } else if (action === "interested") {
-        setMessage(
-          "Like recorded! If they like you back, you'll be matched automatically."
-        );
-      }
-
-      // Move to next candidate after a short delay
-      setTimeout(() => {
-        if (currentIndex < candidates.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-        } else {
-          setMessage("You've reviewed all available matches!");
-        }
         setIsSubmitting(false);
-      }, 1000);
+      } else {
+        if (action === "like") {
+          setMessage(
+            "Like recorded! If they like you back, you'll be matched automatically."
+          );
+        }
+        // Move to next candidate immediately
+        setTimeout(() => {
+          goToNext();
+          setIsSubmitting(false);
+        }, 800);
+      }
     } catch (error) {
       console.error("Error handling action:", error);
       setMessage("There was an error processing your action.");
@@ -185,15 +193,30 @@ export default function MatchesPage() {
     }
   };
 
-  const goToPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
+  const handleBlock = async (candidateId: string) => {
+    if (!user) return;
 
-  const goToNext = () => {
-    if (currentIndex < candidates.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+    setIsSubmitting(true);
+    setShowBlockConfirm(false);
+
+    try {
+      const interactionRecorded = await recordInteraction(candidateId, "block");
+
+      if (!interactionRecorded) {
+        setMessage("There was an issue blocking this user.");
+        setIsSubmitting(false);
+      } else {
+        setMessage("User blocked successfully.");
+        // Move to next candidate immediately
+        setTimeout(() => {
+          goToNext();
+          setIsSubmitting(false);
+        }, 800);
+      }
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      setMessage("There was an error blocking this user.");
+      setIsSubmitting(false);
     }
   };
 
@@ -269,31 +292,6 @@ export default function MatchesPage() {
             </div>
           ) : currentCandidate ? (
             <>
-              {/* Navigation */}
-              <div className="flex justify-between items-center mb-6">
-                <button
-                  onClick={goToPrevious}
-                  disabled={currentIndex === 0}
-                  className="px-4 py-2 border border-gray-300 rounded font-mono text-sm hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  ← previous
-                </button>
-
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                  <div className="w-2 h-2 bg-black rounded-full"></div>
-                </div>
-
-                <button
-                  onClick={goToNext}
-                  disabled={currentIndex === candidates.length - 1}
-                  className="px-4 py-2 border border-gray-300 rounded font-mono text-sm hover:bg-gray-50 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  next →
-                </button>
-              </div>
-
               {/* Candidate Profile */}
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 {/* Profile Header */}
@@ -334,7 +332,7 @@ export default function MatchesPage() {
                   {currentCandidate.profile?.bio && (
                     <section>
                       <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                        about
+                        Bio
                       </h3>
                       <p className="font-mono text-sm text-gray-700 leading-relaxed">
                         {currentCandidate.profile.bio}
@@ -346,7 +344,7 @@ export default function MatchesPage() {
                   {currentCandidate.profile?.achievements && (
                     <section>
                       <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                        experience & achievements
+                        Past Achievement
                       </h3>
                       <p className="font-mono text-sm text-gray-700 leading-relaxed">
                         {currentCandidate.profile.achievements}
@@ -358,7 +356,7 @@ export default function MatchesPage() {
                   {currentCandidate.venture?.title && (
                     <section>
                       <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                        venture idea
+                        Venture Idea
                       </h3>
                       <h4 className="font-mono font-semibold text-gray-800 mb-2">
                         {currentCandidate.venture.title}
@@ -403,40 +401,63 @@ export default function MatchesPage() {
 
                 {/* Action Buttons */}
                 <div className="p-6 bg-gray-50 border-t border-gray-100">
-                  <div className="flex justify-center space-x-4">
-                    <button
-                      onClick={() =>
-                        handleAction(currentCandidate.id, "not_interested")
-                      }
-                      disabled={isSubmitting}
-                      className="px-6 py-3 border border-gray-300 rounded font-mono text-sm hover:bg-gray-100 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      pass
-                    </button>
-                    <button
-                      onClick={() => handleAction(currentCandidate.id, "maybe")}
-                      disabled={isSubmitting}
-                      className="px-6 py-3 border border-yellow-300 bg-yellow-50 text-yellow-700 rounded font-mono text-sm hover:bg-yellow-100 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      maybe later
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleAction(currentCandidate.id, "interested")
-                      }
-                      disabled={isSubmitting}
-                      className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? "saving..." : "interested"}
-                    </button>
-                  </div>
+                  {!showBlockConfirm ? (
+                    <>
+                      <div className="flex justify-center space-x-4">
+                        <button
+                          onClick={() => handleAction(currentCandidate.id, "pass")}
+                          disabled={isSubmitting}
+                          className="px-6 py-3 border border-gray-300 rounded font-mono text-sm hover:bg-gray-100 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Skip
+                        </button>
+                        <button
+                          onClick={() => handleAction(currentCandidate.id, "like")}
+                          disabled={isSubmitting}
+                          className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSubmitting ? "saving..." : "Let's connect"}
+                        </button>
+                      </div>
 
-                  {userActions[currentCandidate.id] && (
-                    <div className="mt-4 text-center">
-                      <span className="font-mono text-sm text-gray-600">
-                        marked as:{" "}
-                        {userActions[currentCandidate.id].replace("_", " ")}
-                      </span>
+                      {/* Block Button */}
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          onClick={() => setShowBlockConfirm(true)}
+                          disabled={isSubmitting}
+                          className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded font-mono text-xs transition duration-200 disabled:opacity-50"
+                        >
+                          <ShieldX className="w-3 h-3" />
+                          <span>Block User</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="bg-red-50 p-4 rounded border border-red-200">
+                        <p className="font-mono text-sm text-red-800 mb-2">
+                          <strong>Block this user?</strong>
+                        </p>
+                        <p className="font-mono text-xs text-red-700">
+                          They won't appear in your matches again and you won't see each other.
+                        </p>
+                      </div>
+                      <div className="flex justify-center space-x-3">
+                        <button
+                          onClick={() => handleBlock(currentCandidate.id)}
+                          disabled={isSubmitting}
+                          className="px-6 py-2 bg-red-600 text-white rounded font-mono text-sm hover:bg-red-700 transition duration-200 disabled:opacity-50"
+                        >
+                          {isSubmitting ? "Blocking..." : "Confirm Block"}
+                        </button>
+                        <button
+                          onClick={() => setShowBlockConfirm(false)}
+                          disabled={isSubmitting}
+                          className="px-6 py-2 border border-gray-300 rounded font-mono text-sm hover:bg-gray-50 transition duration-200 disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

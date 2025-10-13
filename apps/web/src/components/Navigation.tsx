@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase";
-import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, Menu } from "lucide-react";
+import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, Menu, User } from "lucide-react";
 
 interface NavigationProps {
-  currentPage: "discover" | "my-matches" | "skipped" | "blocked" | "profile";
+  currentPage: "discover" | "my-matches" | "skipped" | "blocked" | "profile" | "settings";
   userEmail?: string;
   onLogout: () => void;
 }
@@ -178,8 +178,11 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                 {/* Divider */}
                 <div className="border-t border-gray-100 my-1"></div>
 
-                {/* Profile Section */}
+                {/* Profile & Settings Section */}
                 <div className="p-2">
+                  <div className="px-4 py-2 text-xs font-mono font-semibold text-gray-500 uppercase tracking-wider">
+                    account
+                  </div>
                   <button
                     onClick={() => navigate("/profile")}
                     className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
@@ -188,8 +191,19 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
+                    <User className="w-4 h-4" />
+                    <span>Profile</span>
+                  </button>
+                  <button
+                    onClick={() => navigate("/settings")}
+                    className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                      currentPage === "settings"
+                        ? "bg-yellow-200 text-gray-900 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
                     <Settings className="w-4 h-4" />
-                    <span>Profile Settings</span>
+                    <span>Account Settings</span>
                   </button>
                 </div>
 
