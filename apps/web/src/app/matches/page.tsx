@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import { SearchX } from "lucide-react";
 
 interface MatchCandidate {
   id: string;
@@ -226,7 +227,7 @@ export default function MatchesPage() {
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
-              potential co-founders
+              Discover Profiles
             </h1>
             <div className="flex items-center justify-between">
               <p className="font-mono text-gray-600 text-sm">
@@ -249,7 +250,9 @@ export default function MatchesPage() {
 
           {candidates.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4">🤖</div>
+              <div className="flex justify-center mb-6">
+                <SearchX className="w-24 h-24 text-gray-400" strokeWidth={1.5} />
+              </div>
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-2">
                 no matches found
               </h2>

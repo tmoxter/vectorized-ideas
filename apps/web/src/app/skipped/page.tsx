@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import { UserX } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -228,7 +229,7 @@ export default function SkippedProfilesPage() {
       <main className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-mono font-bold text-gray-900 mb-6">
-            skipped profiles
+            Skipped Profiles
           </h1>
 
           {message && (
@@ -239,7 +240,9 @@ export default function SkippedProfilesPage() {
 
           {skippedProfiles.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4">👋</div>
+              <div className="flex justify-center mb-6">
+                <UserX className="w-24 h-24 text-gray-400" strokeWidth={1.5} />
+              </div>
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-2">
                 no skipped profiles
               </h2>
@@ -250,7 +253,7 @@ export default function SkippedProfilesPage() {
                 onClick={() => router.push("/matches")}
                 className="px-6 py-3 bg-black text-white rounded font-mono hover:bg-gray-800 transition duration-200"
               >
-                discover co-founders
+                Discover co-founders
               </button>
             </div>
           ) : (

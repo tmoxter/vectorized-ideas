@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import { ShieldOff } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -178,7 +179,7 @@ export default function BlockedProfilesPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="font-mono text-gray-600">loading blocked profiles...</div>
+        <div className="font-mono text-gray-600">Loading blocked profiles...</div>
       </div>
     );
   }
@@ -194,7 +195,7 @@ export default function BlockedProfilesPage() {
       <main className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-mono font-bold text-gray-900 mb-6">
-            blocked profiles
+            Blocked Profiles
           </h1>
 
           {message && (
@@ -205,7 +206,9 @@ export default function BlockedProfilesPage() {
 
           {blockedProfiles.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4">🚫</div>
+              <div className="flex justify-center mb-6">
+                <ShieldOff className="w-24 h-24 text-gray-400" strokeWidth={1.5} />
+              </div>
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-2">
                 no blocked profiles
               </h2>
@@ -216,7 +219,7 @@ export default function BlockedProfilesPage() {
                 onClick={() => router.push("/matches")}
                 className="px-6 py-3 bg-black text-white rounded font-mono hover:bg-gray-800 transition duration-200"
               >
-                discover co-founders
+                Discover co-founders
               </button>
             </div>
           ) : (

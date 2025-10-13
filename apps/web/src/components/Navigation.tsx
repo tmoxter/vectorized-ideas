@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase";
+import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, Menu } from "lucide-react";
 
 interface NavigationProps {
   currentPage: "discover" | "my-matches" | "skipped" | "blocked" | "profile";
@@ -81,121 +82,133 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
             }}
             className="flex items-center space-x-3 hover:opacity-80"
           >
-            <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-              <span className="text-white font-mono text-sm">λ</span>
+            <div className="w-8 h-8 bg-yellow-200 rounded flex items-center justify-center">
+              <span className="text-black font-mono text-2xl">{'\u{1D708}'}</span>
             </div>
-            <span className="font-mono text-lg text-gray-900">
+            <span className="font-mono text-lg text-gray-900 hidden sm:inline">
               vectorized-ideas
             </span>
           </button>
         </div>
 
-        {/* Center - Menu Dropdown */}
-        <div className="relative" ref={menuRef}>
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded font-mono text-sm hover:bg-gray-50 transition duration-200"
-          >
-            <span className="text-gray-900">{getPageTitle()}</span>
-            <svg
-              className={`w-4 h-4 transition-transform duration-200 ${
-                isMenuOpen ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-
-          {/* Dropdown Menu */}
-          {isMenuOpen && (
-            <div className="absolute top-full mt-2 left-0 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-              {/* Discover Section */}
-              <div className="p-2 border-b border-gray-100">
-                <button
-                  onClick={() => navigate("/matches")}
-                  className={`w-full text-left px-3 py-2 rounded font-mono text-sm transition duration-200 ${
-                    currentPage === "discover"
-                      ? "bg-black text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  🔍 discover co-founders
-                </button>
-              </div>
-
-              {/* Past Interactions Section */}
-              <div className="p-2 border-b border-gray-100">
-                <div className="px-3 py-1 text-xs font-mono font-semibold text-gray-500 uppercase">
-                  past interactions
-                </div>
-                <button
-                  onClick={() => navigate("/my-matches")}
-                  className={`w-full text-left px-3 py-2 rounded font-mono text-sm transition duration-200 ${
-                    currentPage === "my-matches"
-                      ? "bg-black text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  my matches
-                </button>
-                <button
-                  onClick={() => navigate("/skipped")}
-                  className={`w-full text-left px-3 py-2 rounded font-mono text-sm transition duration-200 ${
-                    currentPage === "skipped"
-                      ? "bg-black text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  skipped profiles
-                </button>
-                <button
-                  onClick={() => navigate("/blocked")}
-                  className={`w-full text-left px-3 py-2 rounded font-mono text-sm transition duration-200 ${
-                    currentPage === "blocked"
-                      ? "bg-black text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  blocked profiles
-                </button>
-              </div>
-
-              {/* Profile Section */}
-              <div className="p-2">
-                <button
-                  onClick={() => navigate("/profile")}
-                  className={`w-full text-left px-3 py-2 rounded font-mono text-sm transition duration-200 ${
-                    currentPage === "profile"
-                      ? "bg-black text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  profile settings
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right - User Info & Logout */}
+        {/* Right - User Info, Menu & Logout */}
         <div className="flex items-center space-x-4">
           {userEmail && (
-            <span className="font-mono text-sm text-gray-600">{userEmail}</span>
+            <span className="font-mono text-sm text-gray-600 hidden md:inline">{userEmail}</span>
           )}
-          <button
-            onClick={onLogout}
-            className="font-mono text-sm text-gray-600 hover:text-gray-900 transition duration-200"
-          >
-            logout
-          </button>
+
+          {/* Hamburger Menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 hover:bg-gray-100 rounded transition duration-200"
+              aria-label="Menu"
+            >
+              <Menu className="w-6 h-6 text-gray-700" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isMenuOpen && (
+              <div className="absolute top-full mt-2 right-0 w-64 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+                {/* User Info on mobile */}
+                {userEmail && (
+                  <div className="md:hidden px-4 py-3 bg-gray-50 border-b border-gray-200">
+                    <span className="font-mono text-xs text-gray-600">{userEmail}</span>
+                  </div>
+                )}
+
+                {/* Discover Section */}
+                <div className="p-2">
+                  <button
+                    onClick={() => navigate("/matches")}
+                    className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                      currentPage === "discover"
+                        ? "bg-yellow-200 text-gray-900 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Search className="w-4 h-4" />
+                    <span>Discover Profiles</span>
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-gray-100 my-1"></div>
+
+                {/* Past Interactions Section */}
+                <div className="p-2">
+                  <div className="px-4 py-2 text-xs font-mono font-semibold text-gray-500 uppercase tracking-wider">
+                    history
+                  </div>
+                  <button
+                    onClick={() => navigate("/my-matches")}
+                    className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                      currentPage === "my-matches"
+                        ? "bg-yellow-200 text-gray-900 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>My Matches</span>
+                  </button>
+                  <button
+                    onClick={() => navigate("/skipped")}
+                    className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                      currentPage === "skipped"
+                        ? "bg-yellow-200 text-gray-900 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <SkipForward className="w-4 h-4" />
+                    <span>Skipped Profiles</span>
+                  </button>
+                  <button
+                    onClick={() => navigate("/blocked")}
+                    className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                      currentPage === "blocked"
+                        ? "bg-yellow-200 text-gray-900 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <ShieldOff className="w-4 h-4" />
+                    <span>Blocked Profiles</span>
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-gray-100 my-1"></div>
+
+                {/* Profile Section */}
+                <div className="p-2">
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                      currentPage === "profile"
+                        ? "bg-yellow-200 text-gray-900 font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span>Profile Settings</span>
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-gray-100 my-1"></div>
+
+                {/* Logout */}
+                <div className="p-2">
+                  <button
+                    onClick={onLogout}
+                    className="w-full text-left px-4 py-3 rounded-md font-mono text-sm text-red-600 hover:bg-red-50 transition duration-200 flex items-center space-x-3"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
     </header>
