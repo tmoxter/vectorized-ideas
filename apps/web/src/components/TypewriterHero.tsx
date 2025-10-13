@@ -16,8 +16,8 @@ export default function TypewriterHero() {
 
   useEffect(() => {
     const currentPhrase = phrases[currentPhraseIndex];
-    const typingSpeed = isDeleting ? 50 : 100;
-    const pauseDuration = 2000;
+    const typingSpeed = isDeleting ? 30 : 50;
+    const pauseDuration = 3000;
 
     if (!isDeleting && charIndex === currentPhrase.length) {
       // Pause at the end of the phrase
@@ -50,23 +50,23 @@ export default function TypewriterHero() {
   return (
     <div className="text-4xl md:text-5xl font-mono font-bold text-gray-900 mb-6 leading-tight">
       <div>Use the similarity of</div>
-      <div className="relative inline-block my-1">
-        {/* Animated highlighter background */}
+
+      <div className="relative inline-block my-1 isolate min-h-[1em]">
+        {/* Highlighter */}
         <span
-          className="absolute inset-0 bg-yellow-600 -z-10 transition-all duration-200 ease-out"
-          style={{
-            width: displayedText ? `${displayedText.length * 0.6}em` : "0em",
-            height: "1em",
-            top: "0.15em",
-            left: "0",
-          }}
+          aria-hidden
+          className="absolute left-0 top-[0.15em] h-[1em] z-0 block bg-yellow-200 transition-all duration-200 ease-out rounded-sm pointer-events-none"
+          style={{ width: displayedText ? `${displayedText.length}ch` : "0ch" }}
         />
-        {/* Text with cursor */}
-        <span className="relative text-blue-600">
+
+        {/* Text (keeps a minimum width so the line doesn't collapse) */}
+        <span className="relative z-10 inline-block min-w-[1ch] text-black-600">
           {displayedText}
-          <span className="animate-pulse">|</span>
         </span>
+
+
       </div>
+
       <div>to find and connect with co-founders</div>
     </div>
   );

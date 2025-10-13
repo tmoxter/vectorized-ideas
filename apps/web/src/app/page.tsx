@@ -124,8 +124,8 @@ export default function Home() {
               }}
               className="flex items-center space-x-3 hover:opacity-80"
             >
-              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                <span className="text-white font-mono text-sm">λ</span>
+              <div className="w-8 h-8 bg-yellow-200 rounded flex items-center justify-center">
+                <span className="text-black font-mono text-2xl">{'\u{1D708}'}</span>
               </div>
               <span className="font-mono text-lg text-gray-900">
                 vectorized-ideas
@@ -142,9 +142,10 @@ export default function Home() {
             <div className="max-w-4xl mb-12">
               <TypewriterHero />
               <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
-                Transform your project ideas into vector embeddings and find
-                co-founders with conceptually similar visions. No keyword matching
-                — actual semantic understanding of what you want to build.
+                Transform your project and venture ideas into vector embeddings and find
+                collaborators with conceptually similar visions. We found that simple
+                keyword matching leads to a poor signal-to-noise ratio and drowns out those who want to solve the same
+                problems as you.
               </p>
             </div>
 
@@ -153,41 +154,43 @@ export default function Home() {
               {/* How it works */}
               <div className="flex-1 space-y-6">
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
+                  <div className="w-10 h-10 bg-yellow-200 rounded flex items-center justify-center mb-4">
                     <span className="font-mono text-sm font-bold">01</span>
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                    Vector Embeddings
+                    Semantic Similarity
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Describe your project idea. We convert it to high-dimensional
-                    vectors using transformer models.
+                    Describe your project ideas, embed them as semantic vectors, and search through
+                    profiles of others who are either already working on similar ideas or want to
+                    solve the same problems.
                   </p>
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
+                  <div className="w-10 h-10 bg-yellow-200 rounded flex items-center justify-center mb-4">
                     <span className="font-mono text-sm font-bold">02</span>
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                    Similarity Search
+                    Visibility
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Cosine similarity calculation finds others with conceptually
-                    similar ideas, not just keyword matches.
+                    You share your first name and region, and give an overview over your background, skills,
+                    and accomplishments. Of course, you also get to see each other's project ideas along some optional
+                    co-founder preferences. Please don't share any sensitive information.
                   </p>
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-4">
+                  <div className="w-10 h-10 bg-yellow-200 rounded flex items-center justify-center mb-4">
                     <span className="font-mono text-sm font-bold">03</span>
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                    Connect
+                    Connect on LinkedIn*
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Browse matches ranked by semantic similarity score. Direct
-                    contact with potential co-founders.
+                    If (and only if) both parties are interested, your LinkedIn profiles are shared to
+                    connect directly. We don't have a chat feature for now to keep it lightweight. <br /> (* no affiliation)
                   </p>
                 </div>
               </div>
@@ -196,7 +199,7 @@ export default function Home() {
               <div className="lg:w-96">
               <div className="bg-white p-6 rounded border border-gray-200">
                 <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
-                  {isLoginMode ? "welcome back" : "join the experiment"}
+                  {isLoginMode ? "welcome back" : "join the search"}
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -301,15 +304,13 @@ export default function Home() {
 
             {/* Technical Note */}
             <div className="max-w-4xl">
-              <div className="mt-12 p-4 bg-gray-100 rounded border-l-4 border-blue-600">
+              <div className="mt-12 p-4 bg-gray-100 rounded border-l-4 border-blue-950">
                 <p className="text-sm font-mono text-gray-700">
-                  <strong>Note:</strong> This is an open source experiment in
-                  semantic matching for co-founder discovery. Built with
-                  transformer embeddings, vector similarity search, and minimal
-                  UI.
+                  <strong>Note:</strong> Vectorizied-ideas is completely free to use and in an experimental
+                  state. If you find any bugs or have suggestions, please open an issue or even better a PR on GitHub.
                   <a
                     href="https://github.com"
-                    className="text-blue-600 hover:underline ml-1"
+                    className="text-blue-950 hover:underline ml-1"
                   >
                     View source →
                   </a>
@@ -326,15 +327,15 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="mb-4 md:mb-0">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-6 h-6 bg-black rounded flex items-center justify-center">
-                  <span className="text-white font-mono text-xs">λ</span>
+                <div className="w-6 h-6 bg-yellow-200 rounded flex items-center justify-center">
+                  <span className="text-black font-mono text">{'\u{1D708}'}</span>
                 </div>
                 <span className="font-mono text-sm text-gray-700">
                   vectorized-ideas
                 </span>
               </div>
               <p className="text-gray-500 text-sm font-mono">
-                semantic co-founder matching experiment
+                semantically-aware co-founder matching experiment
               </p>
             </div>
 
@@ -342,18 +343,12 @@ export default function Home() {
               <a href="#" className="text-gray-500 hover:text-gray-700">
                 github
               </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                docs
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                api
-              </a>
             </div>
           </div>
 
           <div className="border-t border-gray-200 mt-6 pt-6 text-center">
             <p className="text-gray-400 text-xs font-mono">
-              built for hackers, by hackers
+              built with love
             </p>
           </div>
         </div>
