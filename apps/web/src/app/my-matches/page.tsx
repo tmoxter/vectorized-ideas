@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
-import { Users } from "lucide-react";
+import { Users, ShieldX } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -31,6 +31,8 @@ export default function MyMatchesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const router = useRouter();
   const supabase = supabaseClient();
 
@@ -142,11 +144,17 @@ export default function MyMatchesPage() {
   const handleBlock = async (targetUserId: string) => {
     if (!user) return;
 
+    setIsSubmitting(true);
+    setShowBlockConfirm(false);
+
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        setIsSubmitting(false);
+        return;
+      }
 
       const response = await fetch("/api/interactions", {
         method: "POST",
@@ -170,6 +178,8 @@ export default function MyMatchesPage() {
     } catch (error) {
       console.error("Error blocking user:", error);
       setMessage("Error blocking user");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -291,7 +301,7 @@ export default function MyMatchesPage() {
                       {selectedMatch.bio && (
                         <section>
                           <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            about
+                            Bio
                           </h3>
                           <p className="font-mono text-sm text-gray-700 leading-relaxed">
                             {selectedMatch.bio}
@@ -302,7 +312,7 @@ export default function MyMatchesPage() {
                       {selectedMatch.achievements && (
                         <section>
                           <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            experience & achievements
+                            Personal Achievement
                           </h3>
                           <p className="font-mono text-sm text-gray-700 leading-relaxed">
                             {selectedMatch.achievements}
@@ -313,7 +323,7 @@ export default function MyMatchesPage() {
                       {selectedMatch.venture && (
                         <section>
                           <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            venture idea
+                            Venture Idea
                           </h3>
                           <h4 className="font-mono font-semibold text-gray-800 mb-2">
                             {selectedMatch.venture.title}
@@ -352,12 +362,45 @@ export default function MyMatchesPage() {
 
                     {/* Action Buttons */}
                     <div className="p-6 bg-gray-50 border-t border-gray-100">
-                      <button
-                        onClick={() => handleBlock(selectedMatch.id)}
-                        className="px-6 py-3 border border-red-300 bg-red-50 text-red-700 rounded font-mono text-sm hover:bg-red-100 transition duration-200"
-                      >
-                        block user
-                      </button>
+                      {!showBlockConfirm ? (
+                        <div className="flex justify-center">
+                          <button
+                            onClick={() => setShowBlockConfirm(true)}
+                            disabled={isSubmitting}
+                            className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded font-mono text-xs transition duration-200 disabled:opacity-50"
+                          >
+                            <ShieldX className="w-3 h-3" />
+                            <span>Block User</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="bg-red-50 p-4 rounded border border-red-200">
+                            <p className="font-mono text-sm text-red-800 mb-2">
+                              <strong>Block this user?</strong>
+                            </p>
+                            <p className="font-mono text-xs text-red-700">
+                              They won't appear in your matches again and you won't see each other.
+                            </p>
+                          </div>
+                          <div className="flex justify-center space-x-3">
+                            <button
+                              onClick={() => handleBlock(selectedMatch.id)}
+                              disabled={isSubmitting}
+                              className="px-6 py-2 bg-red-600 text-white rounded font-mono text-sm hover:bg-red-700 transition duration-200 disabled:opacity-50"
+                            >
+                              {isSubmitting ? "Blocking..." : "Confirm Block"}
+                            </button>
+                            <button
+                              onClick={() => setShowBlockConfirm(false)}
+                              disabled={isSubmitting}
+                              className="px-6 py-2 border border-gray-300 rounded font-mono text-sm hover:bg-gray-50 transition duration-200 disabled:opacity-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : (

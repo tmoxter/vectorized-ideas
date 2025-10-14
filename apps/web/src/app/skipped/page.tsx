@@ -381,7 +381,7 @@ export default function SkippedProfilesPage() {
                               disabled={isSubmitting}
                               className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              {isSubmitting ? "saving..." : "Let's Connect"}
+                              {isSubmitting ? "saving..." : "Let's connect"}
                             </button>
                           </div>
 

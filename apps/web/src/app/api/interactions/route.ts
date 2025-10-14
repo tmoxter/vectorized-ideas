@@ -112,6 +112,8 @@ export async function POST(request: NextRequest) {
         .eq("target_user", user.id)
         .eq("action", "like")
         .limit(1);
+      
+        console.log("Reciprocal like check:", reciprocal);
 
       // If there's a reciprocal like, create a match
       if (reciprocal && reciprocal.length > 0) {
@@ -123,6 +125,7 @@ export async function POST(request: NextRequest) {
             active: true,
           })
           .select();
+          console.log("Match creation result:", matchError);
 
         if (matchError && !matchError.message.includes("duplicate")) {
           console.error("Error creating match:", matchError);
