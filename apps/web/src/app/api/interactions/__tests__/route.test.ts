@@ -398,5 +398,169 @@ describe('Interactions API Route', () => {
       const matches = getMockMatches();
       expect(matches).toHaveLength(0);
     });
+
+    it('should record actor_current_idea and target_current_idea for like interactions', async () => {
+      const request = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'like',
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify venture IDs were recorded
+      const interactions = getMockInteractions();
+      expect(interactions).toHaveLength(1);
+      expect(interactions[0].actor_current_idea).toBe(currentUser.venture.id);
+      expect(interactions[0].target_current_idea).toBe(targetUser.venture.id);
+    });
+
+    it('should record actor_current_idea and target_current_idea for pass interactions', async () => {
+      const request = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'pass',
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify venture IDs were recorded
+      const interactions = getMockInteractions();
+      expect(interactions).toHaveLength(1);
+      expect(interactions[0].actor_current_idea).toBe(currentUser.venture.id);
+      expect(interactions[0].target_current_idea).toBe(targetUser.venture.id);
+    });
+
+    it('should handle null venture IDs gracefully when user has no venture', async () => {
+      // Test with a user who doesn't have a venture in the test fixtures
+      // We'll use testUsers[3] or create a simpler mock where actor venture is removed
+
+      // Create a custom mock that returns null for actor's venture
+      mockCreateClient.mockImplementation((url: string, key: string) => {
+        const baseClient = createMockSupabaseClient(currentUser.id);
+
+        // Wrap the from method to intercept user_ventures queries
+        const originalFrom = baseClient.from;
+        let ventureQueryCount = 0;
+
+        baseClient.from = (table: string) => {
+          const queryBuilder = originalFrom(table);
+
+          if (table === 'user_ventures') {
+            // Store the original maybeSingle
+            const originalMaybeSingle = queryBuilder.maybeSingle.getMockImplementation();
+
+            queryBuilder.maybeSingle = vi.fn().mockImplementation(() => {
+              ventureQueryCount++;
+              // First call is actor (return null), second is target (return real data)
+              if (ventureQueryCount === 1) {
+                return Promise.resolve({ data: null, error: null });
+              } else {
+                // Return target user's venture
+                const user = testUsers.find(u => u.id === targetUser.id);
+                if (user) {
+                  return Promise.resolve({ data: user.venture, error: null });
+                }
+                return Promise.resolve({ data: null, error: null });
+              }
+            });
+          }
+
+          return queryBuilder;
+        };
+
+        return baseClient;
+      });
+
+      const request = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'like',
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+
+      // Verify venture IDs are null when user has no venture
+      const interactions = getMockInteractions();
+      expect(interactions).toHaveLength(1);
+      expect(interactions[0].actor_current_idea).toBeNull();
+      expect(interactions[0].target_current_idea).toBe(targetUser.venture.id);
+    });
+
+    it('should preserve venture IDs when pass interaction is updated', async () => {
+      const request1 = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'pass',
+        }),
+      });
+
+      // First pass
+      await POST(request1);
+      const firstInteractions = getMockInteractions();
+      const firstActorIdea = firstInteractions[0].actor_current_idea;
+      const firstTargetIdea = firstInteractions[0].target_current_idea;
+
+      // Wait a bit
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const request2 = new Request('http://localhost/api/interactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer mock-token`,
+        },
+        body: JSON.stringify({
+          targetUserId: targetUser.id,
+          action: 'pass',
+        }),
+      });
+
+      // Second pass (should update)
+      await POST(request2);
+      const secondInteractions = getMockInteractions();
+
+      // Should still only have one interaction
+      expect(secondInteractions).toHaveLength(1);
+
+      // Venture IDs should be updated to current ventures
+      expect(secondInteractions[0].actor_current_idea).toBe(currentUser.venture.id);
+      expect(secondInteractions[0].target_current_idea).toBe(targetUser.venture.id);
+    });
   });
 });

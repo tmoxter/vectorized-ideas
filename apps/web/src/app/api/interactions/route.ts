@@ -61,32 +61,47 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Get current venture IDs for both actor and target users
+    const [actorVenture, targetVenture] = await Promise.all([
+      supabase
+        .from("user_ventures")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("user_ventures")
+        .select("id")
+        .eq("user_id", targetUserId)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+    const actorCurrentIdea = actorVenture.data?.id || null;
+    const targetCurrentIdea = targetVenture.data?.id || null;
+
     // Handle different interaction types with the provided SQL logic
     if (action === "like") {
       // For 'like': insert or do nothing if already exists
-      const { error: rpcError } = await supabase.rpc("insert_like_interaction", {
-        p_actor_user: user.id,
-        p_target_user: targetUserId,
-      });
+      const { error: insertError } = await supabase
+        .from("interactions")
+        .insert({
+          actor_user: user.id,
+          target_user: targetUserId,
+          action: "like",
+          actor_current_idea: actorCurrentIdea,
+          target_current_idea: targetCurrentIdea,
+        })
+        .select();
 
-      if (rpcError) {
-        // Fallback to direct insert if RPC doesn't exist
-        const { error: insertError } = await supabase
-          .from("interactions")
-          .insert({
-            actor_user: user.id,
-            target_user: targetUserId,
-            action: "like",
-          })
-          .select();
-
-        if (insertError && !insertError.message.includes("duplicate")) {
-          console.error("Error inserting like interaction:", insertError);
-          return NextResponse.json(
-            { success: false, error: `Database error: ${insertError.message}` },
-            { status: 500 }
-          );
-        }
+      if (insertError && !insertError.message.includes("duplicate")) {
+        console.error("Error inserting like interaction:", insertError);
+        return NextResponse.json(
+          { success: false, error: `Database error: ${insertError.message}` },
+          { status: 500 }
+        );
       }
 
       // Check for reciprocal like to create a match
@@ -117,35 +132,26 @@ export async function POST(request: NextRequest) {
       }
     } else if (action === "pass") {
       // For 'pass': insert or update created_at if already exists
-      const { error } = await supabase.rpc("insert_pass_interaction", {
-        p_actor_user: user.id,
-        p_target_user: targetUserId,
-      });
+      const { error: upsertError } = await supabase
+        .from("interactions")
+        .upsert(
+          {
+            actor_user: user.id,
+            target_user: targetUserId,
+            action: "pass",
+            actor_current_idea: actorCurrentIdea,
+            target_current_idea: targetCurrentIdea,
+            created_at: new Date().toISOString(),
+          },
+        )
+        .select();
 
-      if (error) {
-        // Fallback to direct upsert if RPC doesn't exist
-        const { error: upsertError } = await supabase
-          .from("interactions")
-          .upsert(
-            {
-              actor_user: user.id,
-              target_user: targetUserId,
-              action: "pass",
-              created_at: new Date().toISOString(),
-            },
-            {
-              onConflict: "actor_user,target_user,action",
-            }
-          )
-          .select();
-
-        if (upsertError) {
-          console.error("Error inserting pass interaction:", upsertError);
-          return NextResponse.json(
-            { success: false, error: `Database error: ${upsertError.message}` },
-            { status: 500 }
-          );
-        }
+      if (upsertError) {
+        console.error("Error inserting pass interaction:", upsertError);
+        return NextResponse.json(
+          { success: false, error: `Database error: ${upsertError.message}` },
+          { status: 500 }
+        );
       }
     } else if (action === "block") {
       // For 'block': use RPC function to handle blocking logic

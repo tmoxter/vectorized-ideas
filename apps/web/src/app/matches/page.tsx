@@ -252,17 +252,10 @@ export default function MatchesPage() {
             <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
               Discover Profiles
             </h1>
-            <div className="flex items-center justify-between">
-              <p className="font-mono text-gray-600 text-sm">
-                semantic similarity matches based on your profile and venture
-                ideas
-              </p>
-              <div className="font-mono text-sm text-gray-500">
-                {candidates.length > 0
-                  ? `${currentIndex + 1} / ${candidates.length}`
-                  : "0 / 0"}
-              </div>
-            </div>
+            <p className="font-mono text-gray-600 text-sm">
+              semantic similarity matches based on your profile and venture
+              ideas
+            </p>
           </div>
 
           {message && (

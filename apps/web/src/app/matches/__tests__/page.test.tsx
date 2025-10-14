@@ -173,15 +173,18 @@ describe('MatchesPage Integration Tests', () => {
     expect(screen.getByText(firstCandidate.availability_hours)).toBeInTheDocument();
   });
 
-  it('should show candidate counter', async () => {
+  it('should display page header with description', async () => {
     render(<MatchesPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/1 \/ 3/)).toBeInTheDocument();
+      expect(screen.getByText(/discover profiles/i)).toBeInTheDocument();
     });
+
+    // Should show description
+    expect(screen.getByText(/semantic similarity matches based on your profile and venture ideas/i)).toBeInTheDocument();
   });
 
-  it('should navigate to next candidate when next button is clicked', async () => {
+  it('should automatically advance to next candidate after skip action', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -190,20 +193,17 @@ describe('MatchesPage Integration Tests', () => {
       expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
     });
 
-    // Click next button
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    await user.click(nextButton);
+    // Click skip button
+    const skipButton = screen.getByRole('button', { name: /skip/i });
+    await user.click(skipButton);
 
-    // Should show the second candidate
+    // Should automatically show the second candidate after delay
     await waitFor(() => {
       expect(screen.getByText(mockCandidates[1].profile.name)).toBeInTheDocument();
-    });
-
-    // Counter should update
-    expect(screen.getByText(/2 \/ 3/)).toBeInTheDocument();
+    }, { timeout: 2000 });
   });
 
-  it('should navigate to previous candidate when previous button is clicked', async () => {
+  it('should automatically advance to next candidate after like action', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -212,36 +212,29 @@ describe('MatchesPage Integration Tests', () => {
       expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
     });
 
-    // Go to next candidate first
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    await user.click(nextButton);
+    // Click "Let's connect" button
+    const connectButton = screen.getByRole('button', { name: /let's connect/i });
+    await user.click(connectButton);
 
+    // Should automatically show the second candidate after delay
     await waitFor(() => {
       expect(screen.getByText(mockCandidates[1].profile.name)).toBeInTheDocument();
-    });
-
-    // Click previous button
-    const previousButton = screen.getByRole('button', { name: /previous/i });
-    await user.click(previousButton);
-
-    // Should show the first candidate again
-    await waitFor(() => {
-      expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
-    });
+    }, { timeout: 2000 });
   });
 
-  it('should disable previous button on first candidate', async () => {
+  it('should show block user button', async () => {
     render(<MatchesPage />);
 
     await waitFor(() => {
       expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
     });
 
-    const previousButton = screen.getByRole('button', { name: /previous/i });
-    expect(previousButton).toBeDisabled();
+    // Block button should be present
+    const blockButton = screen.getByRole('button', { name: /block user/i });
+    expect(blockButton).toBeInTheDocument();
   });
 
-  it('should disable next button on last candidate', async () => {
+  it('should show block confirmation dialog when block button is clicked', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -249,19 +242,21 @@ describe('MatchesPage Integration Tests', () => {
       expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
     });
 
-    // Navigate to the last candidate
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    await user.click(nextButton);
-    await user.click(nextButton);
+    // Click block button
+    const blockButton = screen.getByRole('button', { name: /block user/i });
+    await user.click(blockButton);
 
+    // Should show confirmation dialog
     await waitFor(() => {
-      expect(screen.getByText(mockCandidates[2].profile.name)).toBeInTheDocument();
+      expect(screen.getByText(/block this user\?/i)).toBeInTheDocument();
     });
 
-    expect(nextButton).toBeDisabled();
+    // Should show confirm and cancel buttons
+    expect(screen.getByRole('button', { name: /confirm block/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
-  it('should record like interaction when interested button is clicked', async () => {
+  it('should record like interaction when connect button is clicked', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -269,9 +264,9 @@ describe('MatchesPage Integration Tests', () => {
       expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
     });
 
-    // Click interested button
-    const interestedButton = screen.getByRole('button', { name: /interested/i });
-    await user.click(interestedButton);
+    // Click "Let's connect" button
+    const connectButton = screen.getByRole('button', { name: /let's connect/i });
+    await user.click(connectButton);
 
     // Should show saving state
     await waitFor(() => {
@@ -303,7 +298,7 @@ describe('MatchesPage Integration Tests', () => {
     expect(matches).toHaveLength(0);
   });
 
-  it('should handle pass action correctly and record pass interaction', async () => {
+  it('should handle skip action correctly and record pass interaction', async () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
@@ -311,9 +306,9 @@ describe('MatchesPage Integration Tests', () => {
       expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
     });
 
-    // Click pass button
-    const passButton = screen.getByRole('button', { name: /pass/i });
-    await user.click(passButton);
+    // Click skip button
+    const skipButton = screen.getByRole('button', { name: /skip/i });
+    await user.click(skipButton);
 
     // Should move to next candidate
     await waitFor(
@@ -328,39 +323,6 @@ describe('MatchesPage Integration Tests', () => {
     expect(matches).toHaveLength(0);
 
     // But should record a pass interaction
-    const interactions = getMockInteractions();
-    expect(interactions).toHaveLength(1);
-    expect(interactions[0].actor_user).toBe(currentUser.id);
-    expect(interactions[0].target_user).toBe(mockCandidates[0].id);
-    expect(interactions[0].action).toBe('pass');
-  });
-
-  it('should handle maybe action correctly and record pass interaction', async () => {
-    const user = userEvent.setup();
-    render(<MatchesPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
-    });
-
-    const firstCandidateName = mockCandidates[0].profile.name;
-
-    // Click maybe later button
-    const maybeButton = screen.getByRole('button', { name: /maybe later/i });
-    await user.click(maybeButton);
-
-    // Should automatically move to next candidate after delay
-    await waitFor(
-      () => {
-        expect(screen.getByText(mockCandidates[1].profile.name)).toBeInTheDocument();
-      },
-      { timeout: 2000 }
-    );
-
-    // First candidate should no longer be displayed
-    expect(screen.queryByText(firstCandidateName)).not.toBeInTheDocument();
-
-    // Should record a pass interaction (maybe maps to pass)
     const interactions = getMockInteractions();
     expect(interactions).toHaveLength(1);
     expect(interactions[0].actor_user).toBe(currentUser.id);
@@ -426,23 +388,24 @@ describe('MatchesPage Integration Tests', () => {
       expect(screen.getByText(mockCandidates[0].profile.name)).toBeInTheDocument();
     });
 
-    // Click interested on all candidates
-    const interestedButton = screen.getByRole('button', { name: /interested/i });
-
+    // Click "Let's connect" on all candidates
     // First candidate
-    await user.click(interestedButton);
+    const connectButton1 = screen.getByRole('button', { name: /let's connect/i });
+    await user.click(connectButton1);
     await waitFor(() => {
       expect(screen.getByText(mockCandidates[1].profile.name)).toBeInTheDocument();
     }, { timeout: 2000 });
 
     // Second candidate
-    await user.click(interestedButton);
+    const connectButton2 = screen.getByRole('button', { name: /let's connect/i });
+    await user.click(connectButton2);
     await waitFor(() => {
       expect(screen.getByText(mockCandidates[2].profile.name)).toBeInTheDocument();
     }, { timeout: 2000 });
 
     // Third (last) candidate
-    await user.click(interestedButton);
+    const connectButton3 = screen.getByRole('button', { name: /let's connect/i });
+    await user.click(connectButton3);
 
     // Should show end message
     await waitFor(() => {

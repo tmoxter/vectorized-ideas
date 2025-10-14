@@ -4,17 +4,14 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
-import { UserX } from "lucide-react";
+import { UserX, ShieldX } from "lucide-react";
 
 interface ProfileData {
-  id: string;
+  user_id: string;
   name: string;
   bio: string;
   achievements: string;
   region: string;
-  timezone?: string;
-  stage?: string;
-  availability_hours?: string;
   venture?: {
     title: string;
     description: string;
@@ -31,6 +28,8 @@ export default function SkippedProfilesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const router = useRouter();
   const supabase = supabaseClient();
 
@@ -76,50 +75,49 @@ export default function SkippedProfilesPage() {
       const profilesPromises = interactionsData.map(async (interaction) => {
         const skippedUserId = interaction.target_user;
 
-        const [profileResult, ventureResult, preferencesResult, userDataResult] =
+        const [profileResult, ventureResult, preferencesResult] =
           await Promise.all([
             supabase
               .from("profiles")
               .select("name, bio, achievements, region")
               .eq("user_id", skippedUserId)
+              .limit(1)
               .maybeSingle(),
             supabase
               .from("user_ventures")
               .select("title, description")
               .eq("user_id", skippedUserId)
+              .order("updated_at", { ascending: false })
+              .limit(1)
               .maybeSingle(),
             supabase
               .from("user_cofounder_preference")
               .select("title, description")
               .eq("user_id", skippedUserId)
-              .maybeSingle(),
-            supabase
-              .from("user_data")
-              .select("timezone, stage, availability_hours")
-              .eq("user_id", skippedUserId)
+              .order("updated_at", { ascending: false })
+              .limit(1)
               .maybeSingle(),
           ]);
 
-        if (profileResult.data) {
-          return {
-            id: skippedUserId,
-            name: profileResult.data.name || "Anonymous",
-            bio: profileResult.data.bio || "",
-            achievements: profileResult.data.achievements || "",
-            region: profileResult.data.region || "",
-            timezone: userDataResult.data?.timezone,
-            stage: userDataResult.data?.stage,
-            availability_hours: userDataResult.data?.availability_hours,
-            venture: ventureResult.data || undefined,
-            preferences: preferencesResult.data || undefined,
-          };
-        }
-        return null;
-      });
+          // Only require profile to exist - venture and preferences are optional
+          if (profileResult.data) {
+            return {
+              user_id: skippedUserId,
+              name: profileResult.data.name || "Anonymous",
+              bio: profileResult.data.bio || "",
+              achievements: profileResult.data.achievements || "",
+              region: profileResult.data.region || "",
+              venture: ventureResult.data ? ventureResult.data : undefined,
+              preferences: preferencesResult.data ? preferencesResult.data : undefined,
+            };
+          }
 
-      const profiles = (await Promise.all(profilesPromises)).filter(
-        (p) => p !== null
-      ) as ProfileData[];
+          return null;
+        });
+        
+        const allProfiles = await Promise.all(profilesPromises);
+      const profiles = allProfiles.filter((p) => p !== null) as ProfileData[];
+      console.log("Loaded skipped profiles:", profiles.length);
 
       setSkippedProfiles(profiles);
       if (profiles.length > 0) {
@@ -166,7 +164,6 @@ export default function SkippedProfilesPage() {
         setMessage("Failed to like user");
       }
     } catch (error) {
-      console.error("Error liking user:", error);
       setMessage("Error liking user");
     }
   };
@@ -174,11 +171,17 @@ export default function SkippedProfilesPage() {
   const handleBlock = async (targetUserId: string) => {
     if (!user) return;
 
+    setIsSubmitting(true);
+    setShowBlockConfirm(false);
+
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session) {
+        setIsSubmitting(false);
+        return;
+      }
 
       const response = await fetch("/api/interactions", {
         method: "POST",
@@ -202,6 +205,8 @@ export default function SkippedProfilesPage() {
     } catch (error) {
       console.error("Error blocking user:", error);
       setMessage("Error blocking user");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -267,10 +272,10 @@ export default function SkippedProfilesPage() {
                 <div className="space-y-2">
                   {skippedProfiles.map((profile) => (
                     <button
-                      key={profile.id}
+                      key={profile.user_id}
                       onClick={() => setSelectedProfile(profile)}
                       className={`w-full text-left p-4 rounded-lg border transition duration-200 ${
-                        selectedProfile?.id === profile.id
+                        selectedProfile?.user_id === profile.user_id
                           ? "border-black bg-gray-50"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
@@ -308,12 +313,6 @@ export default function SkippedProfilesPage() {
                             {selectedProfile.region && (
                               <span>📍 {selectedProfile.region}</span>
                             )}
-                            {selectedProfile.timezone && (
-                              <span>🕒 {selectedProfile.timezone}</span>
-                            )}
-                            {selectedProfile.stage && (
-                              <span>🚀 {selectedProfile.stage}</span>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -324,7 +323,7 @@ export default function SkippedProfilesPage() {
                       {selectedProfile.bio && (
                         <section>
                           <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            about
+                            Bio
                           </h3>
                           <p className="font-mono text-sm text-gray-700 leading-relaxed">
                             {selectedProfile.bio}
@@ -335,7 +334,7 @@ export default function SkippedProfilesPage() {
                       {selectedProfile.achievements && (
                         <section>
                           <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            experience & achievements
+                            Personal Achievement
                           </h3>
                           <p className="font-mono text-sm text-gray-700 leading-relaxed">
                             {selectedProfile.achievements}
@@ -346,7 +345,7 @@ export default function SkippedProfilesPage() {
                       {selectedProfile.venture && (
                         <section>
                           <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            venture idea
+                            Venture Idea
                           </h3>
                           <h4 className="font-mono font-semibold text-gray-800 mb-2">
                             {selectedProfile.venture.title}
@@ -360,7 +359,7 @@ export default function SkippedProfilesPage() {
                       {selectedProfile.preferences && (
                         <section>
                           <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            looking for
+                            Co-founder Preferences
                           </h3>
                           <h4 className="font-mono font-semibold text-gray-800 mb-2">
                             {selectedProfile.preferences.title}
@@ -370,33 +369,62 @@ export default function SkippedProfilesPage() {
                           </p>
                         </section>
                       )}
-
-                      {selectedProfile.availability_hours && (
-                        <section>
-                          <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
-                            availability
-                          </h3>
-                          <p className="font-mono text-sm text-gray-700">
-                            {selectedProfile.availability_hours}
-                          </p>
-                        </section>
-                      )}
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="p-6 bg-gray-50 border-t border-gray-100 flex space-x-4">
-                      <button
-                        onClick={() => handleLike(selectedProfile.id)}
-                        className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200"
-                      >
-                        like
-                      </button>
-                      <button
-                        onClick={() => handleBlock(selectedProfile.id)}
-                        className="px-6 py-3 border border-red-300 bg-red-50 text-red-700 rounded font-mono text-sm hover:bg-red-100 transition duration-200"
-                      >
-                        block
-                      </button>
+                    <div className="p-6 bg-gray-50 border-t border-gray-100">
+                      {!showBlockConfirm ? (
+                        <>
+                          <div className="flex justify-center space-x-4">
+                            <button
+                              onClick={() => handleLike(selectedProfile.user_id)}
+                              disabled={isSubmitting}
+                              className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {isSubmitting ? "saving..." : "Let's Connect"}
+                            </button>
+                          </div>
+
+                          {/* Block Button */}
+                          <div className="mt-4 flex justify-center">
+                            <button
+                              onClick={() => setShowBlockConfirm(true)}
+                              disabled={isSubmitting}
+                              className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded font-mono text-xs transition duration-200 disabled:opacity-50"
+                            >
+                              <ShieldX className="w-3 h-3" />
+                              <span>Block User</span>
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="bg-red-50 p-4 rounded border border-red-200">
+                            <p className="font-mono text-sm text-red-800 mb-2">
+                              <strong>Block this user?</strong>
+                            </p>
+                            <p className="font-mono text-xs text-red-700">
+                              They won't appear in your matches again and you won't see each other.
+                            </p>
+                          </div>
+                          <div className="flex justify-center space-x-3">
+                            <button
+                              onClick={() => handleBlock(selectedProfile.user_id)}
+                              disabled={isSubmitting}
+                              className="px-6 py-2 bg-red-600 text-white rounded font-mono text-sm hover:bg-red-700 transition duration-200 disabled:opacity-50"
+                            >
+                              {isSubmitting ? "Blocking..." : "Confirm Block"}
+                            </button>
+                            <button
+                              onClick={() => setShowBlockConfirm(false)}
+                              disabled={isSubmitting}
+                              className="px-6 py-2 border border-gray-300 rounded font-mono text-sm hover:bg-gray-50 transition duration-200 disabled:opacity-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : (

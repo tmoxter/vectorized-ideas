@@ -24,6 +24,8 @@ let mockInteractions: Array<{
   actor_user: string;
   target_user: string;
   action: 'like' | 'pass' | 'block';
+  actor_current_idea: string | null;
+  target_current_idea: string | null;
   created_at: string;
   updated_at: string;
 }> = [];
@@ -193,6 +195,27 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     // Mock interactions table
     if (table === 'interactions') {
       queryBuilder.insert.mockImplementation((data: any) => {
+        // Check for duplicates
+        const exists = mockInteractions.find(
+          i => i.actor_user === data.actor_user &&
+               i.target_user === data.target_user &&
+               i.action === data.action
+        );
+
+        if (exists) {
+          // Return error for duplicate
+          return {
+            select: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: 'duplicate key value violates unique constraint' }
+            }),
+            then: (resolve: any) => resolve({
+              data: null,
+              error: { message: 'duplicate key value violates unique constraint' }
+            }),
+          };
+        }
+
         const interaction = {
           id: `interaction-${Date.now()}-${Math.random()}`,
           ...data,
@@ -200,7 +223,10 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           updated_at: new Date().toISOString(),
         };
         mockInteractions.push(interaction);
-        return Promise.resolve({ data: interaction, error: null });
+        return {
+          select: vi.fn().mockResolvedValue({ data: interaction, error: null }),
+          then: (resolve: any) => resolve({ data: interaction, error: null }),
+        };
       });
 
       queryBuilder.upsert.mockImplementation((data: any) => {
@@ -216,7 +242,10 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
             ...data,
             updated_at: new Date().toISOString(),
           };
-          return Promise.resolve({ data: mockInteractions[existingIndex], error: null });
+          return {
+            select: vi.fn().mockResolvedValue({ data: mockInteractions[existingIndex], error: null }),
+            then: (resolve: any) => resolve({ data: mockInteractions[existingIndex], error: null }),
+          };
         } else {
           const interaction = {
             id: `interaction-${Date.now()}-${Math.random()}`,
@@ -225,7 +254,10 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
             updated_at: new Date().toISOString(),
           };
           mockInteractions.push(interaction);
-          return Promise.resolve({ data: interaction, error: null });
+          return {
+            select: vi.fn().mockResolvedValue({ data: interaction, error: null }),
+            then: (resolve: any) => resolve({ data: interaction, error: null }),
+          };
         }
       });
 
@@ -472,13 +504,17 @@ export function getMockInteractions() {
 export function addMockInteraction(
   actorUser: string,
   targetUser: string,
-  action: 'like' | 'pass' | 'block'
+  action: 'like' | 'pass' | 'block',
+  actorCurrentIdea: string | null = null,
+  targetCurrentIdea: string | null = null
 ) {
   mockInteractions.push({
     id: `interaction-${Date.now()}-${Math.random()}`,
     actor_user: actorUser,
     target_user: targetUser,
     action,
+    actor_current_idea: actorCurrentIdea,
+    target_current_idea: targetCurrentIdea,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   });
