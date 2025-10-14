@@ -298,10 +298,10 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
-              profile setup
+              Profile Setup
             </h1>
             <p className="font-mono text-gray-600 text-sm">
-              describe yourself and what you want to build. this helps the
+              Describe yourself and what you want to build. This helps the
               semantic matching algorithm find compatible co-founders.
             </p>
           </div>
@@ -310,13 +310,13 @@ export default function ProfilePage() {
             {/* Personal Information */}
             <section className="bg-white p-6 rounded border border-gray-200">
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
-                01. personal info
+                01. Personal Info
               </h2>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block font-mono text-sm text-gray-700 mb-2">
-                    name *
+                    Name *
                   </label>
                   <input
                     type="text"
@@ -330,7 +330,7 @@ export default function ProfilePage() {
 
                 <div>
                   <label className="block font-mono text-sm text-gray-700 mb-2">
-                    region
+                    Region
                   </label>
                   <input
                     type="text"
@@ -346,7 +346,7 @@ export default function ProfilePage() {
 
               <div className="mt-6">
                 <label className="block font-mono text-sm text-gray-700 mb-2">
-                  bio
+                  Bio
                 </label>
                 <textarea
                   value={profileData.bio}
@@ -359,7 +359,7 @@ export default function ProfilePage() {
 
               <div className="mt-6">
                 <label className="block font-mono text-sm text-gray-700 mb-2">
-                  achievements & experience
+                  Personal Achievement
                 </label>
                 <textarea
                   value={profileData.achievements}
@@ -376,16 +376,16 @@ export default function ProfilePage() {
             {/* Venture Ideas */}
             <section className="bg-white p-6 rounded border border-gray-200">
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
-                02. venture / project ideas
+                02.Venture / Project Ideas
               </h2>
               <p className="font-mono text-sm text-gray-600 mb-6">
-                describe what you want to build. be specific about the problem,
+                Describe what you want to build. Be specific about the problem,
                 solution, and vision.
               </p>
 
               <div className="mb-6">
                 <label className="block font-mono text-sm text-gray-700 mb-2">
-                  project title *
+                  Project Tagline *
                 </label>
                 <input
                   type="text"
@@ -401,7 +401,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block font-mono text-sm text-gray-700 mb-2">
-                  detailed description *
+                  Description *
                 </label>
                 <textarea
                   value={profileData.venture_description}
@@ -414,7 +414,7 @@ export default function ProfilePage() {
                   required
                 />
                 <p className="text-xs font-mono text-gray-500 mt-1">
-                  this description is used for semantic matching. be detailed
+                  This description is used for semantic matching. Be detailed
                   and specific.
                 </p>
               </div>
@@ -423,16 +423,16 @@ export default function ProfilePage() {
             {/* Co-founder Preferences */}
             <section className="bg-white p-6 rounded border border-gray-200">
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
-                03. co-founder preferences
+                03. Co-founder Preferences
               </h2>
               <p className="font-mono text-sm text-gray-600 mb-6">
-                describe what kind of co-founder you're looking for and what you
+                Describe what kind of co-founder you're looking for and what you
                 bring to the table.
               </p>
 
               <div className="mb-6">
                 <label className="block font-mono text-sm text-gray-700 mb-2">
-                  preferences title
+                  Role Title
                 </label>
                 <input
                   type="text"
@@ -450,7 +450,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block font-mono text-sm text-gray-700 mb-2">
-                  detailed preferences
+                  Description
                 </label>
                 <textarea
                   value={profileData.cofounder_preferences_description}
@@ -475,7 +475,7 @@ export default function ProfilePage() {
               disabled={isSaving}
               className="px-6 py-3 border border-gray-300 rounded font-mono text-sm hover:bg-gray-50 transition duration-200 disabled:opacity-50"
             >
-              {isSaving ? "saving..." : "save draft"}
+              {isSaving ? "saving..." : "Save as draft"}
             </button>
 
             <button
@@ -488,7 +488,7 @@ export default function ProfilePage() {
               }
               className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSaving ? "publishing..." : "save & publish"}
+              {isSaving ? "publishing..." : "Save & publish"}
             </button>
           </div>
 
