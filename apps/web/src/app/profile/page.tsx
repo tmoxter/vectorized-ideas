@@ -298,7 +298,7 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
-              Profile Setup
+              <span className="highlight-brush">Profile Setup</span>
             </h1>
             <p className="font-mono text-gray-600 text-sm">
               Describe yourself and what you want to build. This helps the

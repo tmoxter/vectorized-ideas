@@ -19,8 +19,63 @@
   }
 }
 
+@keyframes gradient-breathe {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-gradient-breathe {
+  background: linear-gradient(
+    -45deg,
+    #fff7ed, #fef3c7, #fde68a, #fff7ed
+  );
+  background-size: 400% 400%;
+  animation: gradient-breathe 20s ease-in-out infinite;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Brush-style highlight behind inline text */
+.highlight-brush {
+  position: relative;
+  display: inline-block;
+  isolation: isolate; /* create stacking context so ::before can sit behind safely */
+  z-index: 0;
+  transition: transform 200ms cubic-bezier(.2,.8,.2,1);
+}
+
+.highlight-brush::before {
+  content: "";
+  position: absolute;
+  left: -0.08em;          /* small overflow for organic edge */
+  right: -0.08em;
+  bottom: 0.06em;         /* sit just under the baseline */
+  height: 0.78em;         /* roughly x-height */
+  background: #fdf7c4;    /* Tailwind yellow-300 */
+  border-radius: 0.15em;  /* soft corners */
+  z-index: -1;            /* behind the text */
+  filter: blur(0.6px);    /* soften the fill to feel brushy */
+  transform: translateY(0) scaleX(1);
+  transition: transform 400ms cubic-bezier(.2,.8,.2,1);
+}
+
+/* Tiny inertial motion on hover */
+.highlight-brush:hover { transform: translateY(-1px); }
+.highlight-brush:hover::before { transform: translateY(1px) scaleX(1.02); }
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .highlight-brush { transition: none; }
+  .highlight-brush::before { transition: none; }
 }

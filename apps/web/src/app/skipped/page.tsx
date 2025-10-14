@@ -234,7 +234,7 @@ export default function SkippedProfilesPage() {
       <main className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-mono font-bold text-gray-900 mb-6">
-            Skipped Profiles
+            <span className="highlight-brush">Skipped Profiles</span>
           </h1>
 
           {message && (

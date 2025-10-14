@@ -250,7 +250,7 @@ export default function MatchesPage() {
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
-              Discover Profiles
+              <span className="highlight-brush">Discover Profiles</span>
             </h1>
             <p className="font-mono text-gray-600 text-sm">
               semantic similarity matches based on your profile and venture
