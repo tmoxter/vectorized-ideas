@@ -5,6 +5,7 @@ import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import { UserX, ShieldX } from "lucide-react";
+import { Circles } from 'react-loader-spinner';
 
 interface ProfileData {
   user_id: string;
@@ -218,7 +219,7 @@ export default function SkippedProfilesPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="font-mono text-gray-600">loading skipped profiles...</div>
+        <Circles color="#111827" width="24" height="24" visible={true} />
       </div>
     );
   }
@@ -379,7 +380,7 @@ export default function SkippedProfilesPage() {
                             <button
                               onClick={() => handleLike(selectedProfile.user_id)}
                               disabled={isSubmitting}
-                              className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="group relative inline-flex items-center justify-center px-6 py-3 rounded-lg font-mono text-sm text-white bg-gray-900 border border-gray-900 shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-transform duration-150 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(0,0,0,0.30)] active:translate-y-0 active:shadow-[0_6px_14px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-900 before:content-[''] before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none before:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.35),rgba(255,255,255,0)_38%)] after:content-[''] after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none after:opacity-0 group-hover:after:opacity-100 after:transition-opacity after:duration-300 after:bg-[radial-gradient(120%_60%_at_50%_-20%,rgba(255,255,255,0.25),rgba(255,255,255,0))]"
                             >
                               {isSubmitting ? "saving..." : "Let's connect"}
                             </button>

@@ -5,6 +5,7 @@ import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import { ShieldOff } from "lucide-react";
+import { Circles } from 'react-loader-spinner';
 
 interface ProfileData {
   id: string;
@@ -179,7 +180,7 @@ export default function BlockedProfilesPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="font-mono text-gray-600">Loading blocked profiles...</div>
+        <Circles color="#111827" width="24" height="24" visible={true} />
       </div>
     );
   }
