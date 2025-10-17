@@ -71,11 +71,15 @@ body {
 }
 
 /* Tiny inertial motion on hover */
-.highlight-brush:hover { transform: translateY(-1px); }
-.highlight-brush:hover::before { transform: translateY(1px) scaleX(1.02); }
+.highlight-brush:hover { transform: scaleY(1.01) scaleX(1.01); }
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .highlight-brush { transition: none; }
   .highlight-brush::before { transition: none; }
+}
+
+::selection {
+  background-color: #fdf7c4; /* Tailwind's yellow-200 equivalent */
+  color: #000000;            /* text color when highlighted */
 }

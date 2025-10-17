@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { Circles } from 'react-loader-spinner';
 
 export default function AuthCallback() {
   const [isChecking, setIsChecking] = useState(true);
@@ -59,7 +60,7 @@ export default function AuthCallback() {
   if (isChecking) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="font-mono text-gray-600">checking your profile...</div>
+        <Circles color="#111827" width="24" height="24" visible={true} />
       </div>
     );
   }

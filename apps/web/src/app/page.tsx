@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { supabaseClient } from "@/lib/supabase";
 import TypewriterHero from "@/components/TypewriterHero";
+import { ArrowUpZA, Telescope, Handshake, Map } from "lucide-react";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -139,37 +141,47 @@ export default function Home() {
       <main className="px-6 py-16">
         <div className="max-w-6xl mx-auto">
           <div>
-            <div className="max-w-4xl mb-12">
-              <TypewriterHero />
-              <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
-                Transform your project and venture ideas into vector embeddings and find
-                collaborators with conceptually similar visions. We found that simple
-                keyword matching leads to a poor signal-to-noise ratio and drowns out those who want to solve the same
-                problems as you.
-              </p>
+            <div className="flex flex-col lg:flex-row items-start gap-8 mb-12">
+              <div className="flex-1 max-w-4xl">
+                <TypewriterHero />
+                <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
+                  Use your projects and venture ideas to find
+                  collaborators with conceptually similar visions and connect with those
+                  who want to work on similar challenges or are already tackling the same problems as you.
+                </p>
+              </div>
+              <div className="hidden lg:block lg:w-90 lg:flex-shrink-0">
+                <Image
+                  src="/bulb.svg"
+                  alt="Light bulb illustration"
+                  width={256}
+                  height={256}
+                  className="w-full h-auto"
+                />
+              </div>
             </div>
 
             {/* Content Section - How it works + Sign Up Form */}
             <div className="flex flex-col lg:flex-row gap-8 mb-12">
               {/* How it works */}
-              <div className="flex-1 space-y-6">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 bg-yellow-200 rounded flex items-center justify-center mb-4">
-                    <span className="font-mono text-sm font-bold">01</span>
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                    <ArrowUpZA className="w-5 h-5 text-black" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Semantic Similarity
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Describe your project ideas, embed them as semantic vectors, and search through
+                    Describe what you are working on, embed your ideas as semantic vectors, and search through
                     profiles of others who are either already working on similar ideas or want to
                     solve the same problems.
                   </p>
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 bg-yellow-200 rounded flex items-center justify-center mb-4">
-                    <span className="font-mono text-sm font-bold">02</span>
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                    <Telescope className="w-5 h-5 text-black" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Visibility
@@ -182,24 +194,41 @@ export default function Home() {
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 bg-yellow-200 rounded flex items-center justify-center mb-4">
-                    <span className="font-mono text-sm font-bold">03</span>
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                    <Handshake className="w-5 h-5 text-black" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                    Connect on LinkedIn*
+                    Connect on LinkedIn
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    If (and only if) both parties are interested, your LinkedIn profiles are shared to
-                    connect directly. We don't have a chat feature for now to keep it lightweight. <br /> (* no affiliation)
+                    If both parties are interested, your LinkedIn profiles are shared to
+                    connect directly. We don't have a chat feature for now to keep it lightweight. <br />
+                  </p>
+                </div>
+
+                <div className="p-6 bg-white rounded border border-gray-200">
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                    <Map className="w-5 h-5 text-black" />
+                  </div>
+                  <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                    Compare
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Get aggregated insights into how much attention your field is getting. Your ideas are
+                    only shared with potential matches you'll soon see a map of venture ideas and how you fit in it.<br />
                   </p>
                 </div>
               </div>
+
+              
+
+
 
               {/* Sign Up / Login Form */}
               <div className="lg:w-96">
               <div className="bg-white p-6 rounded border border-gray-200">
                 <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
-                  {isLoginMode ? "welcome back" : "join the search"}
+                  {isLoginMode ? "welcome back" : "Join the search"}
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -327,7 +356,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="mb-4 md:mb-0">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-6 h-6 bg-yellow-200 rounded flex items-center justify-center">
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
                   <span className="text-black font-mono text">{'\u{1D708}'}</span>
                 </div>
                 <span className="font-mono text-sm text-gray-700">

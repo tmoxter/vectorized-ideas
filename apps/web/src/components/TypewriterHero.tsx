@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 const phrases = [
   "your venture ideas",
   "your vision",
-  "your challenges",
+  "your side-projects",
+  "your interests",
 ];
 
 export default function TypewriterHero() {
@@ -49,8 +50,9 @@ export default function TypewriterHero() {
 
   return (
     <div className="text-4xl md:text-5xl font-mono font-bold text-gray-900 mb-6 leading-tight">
-      <div>Use the similarity of</div>
+      <div>Find co-founders</div>
 
+      <div>based on the similarity of</div>
       <div className="relative inline-block my-1 isolate min-h-[1em]">
         {/* Highlighter */}
         <span
@@ -67,7 +69,6 @@ export default function TypewriterHero() {
 
       </div>
 
-      <div>to find and connect with co-founders</div>
     </div>
   );
 }
