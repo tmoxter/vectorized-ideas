@@ -39,10 +39,10 @@ export default function AuthCallback() {
           return;
         }
 
-        // If profile exists, redirect to discover page
+        // If profile exists, redirect to home page
         // Otherwise, redirect to profile setup page
         if (profileData) {
-          router.push("/matches");
+          router.push("/home");
         } else {
           router.push("/profile");
         }

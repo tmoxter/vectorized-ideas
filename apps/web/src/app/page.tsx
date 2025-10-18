@@ -150,9 +150,9 @@ export default function Home() {
                   who want to work on similar challenges or are already tackling the same problems as you.
                 </p>
               </div>
-              <div className="hidden lg:block lg:w-90 lg:flex-shrink-0">
+              <div className="hidden lg:block lg:w-75 lg:flex-shrink-0">
                 <Image
-                  src="/bulb.svg"
+                  src="/bubble.svg"
                   alt="Light bulb illustration"
                   width={256}
                   height={256}
