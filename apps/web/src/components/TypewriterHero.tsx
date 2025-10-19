@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 
 const phrases = [
   "your venture ideas",
-  "your vision",
   "your side-projects",
-  "your interests",
+  "your research interests",
+  "your vision",
 ];
 
 export default function TypewriterHero() {

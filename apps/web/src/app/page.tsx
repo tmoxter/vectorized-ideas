@@ -147,7 +147,7 @@ export default function Home() {
                 <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
                   Use your projects and venture ideas to find
                   collaborators with conceptually similar visions and connect with those
-                  who want to work on similar challenges or are already tackling the same problems as you.
+                  who want to work on related challenges or are already tackling the same problems as you.
                 </p>
               </div>
               <div className="hidden lg:block lg:w-75 lg:flex-shrink-0">
@@ -166,7 +166,7 @@ export default function Home() {
               {/* How it works */}
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
                     <ArrowUpZA className="w-5 h-5 text-black" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
@@ -180,7 +180,7 @@ export default function Home() {
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
                     <Telescope className="w-5 h-5 text-black" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
@@ -194,7 +194,7 @@ export default function Home() {
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
                     <Handshake className="w-5 h-5 text-black" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
@@ -207,7 +207,7 @@ export default function Home() {
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
                     <Map className="w-5 h-5 text-black" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
@@ -356,7 +356,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="mb-4 md:mb-0">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-gradient-to-br from-yellow-200 via-yellow-200 to-rose-300">
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
                   <span className="text-black font-mono text">{'\u{1D708}'}</span>
                 </div>
                 <span className="font-mono text-sm text-gray-700">
