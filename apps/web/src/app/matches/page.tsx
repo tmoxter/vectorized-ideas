@@ -17,7 +17,8 @@ interface MatchCandidate {
     name: string;
     bio: string;
     achievements: string;
-    region: string;
+    city_name?: string;
+    country?: string;
   };
   venture?: {
     title: string;
@@ -294,8 +295,8 @@ export default function MatchesPage() {
                         {currentCandidate.profile?.name || "Anonymous"}
                       </h2>
                       <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">
-                        {currentCandidate.profile?.region && (
-                          <span>📍 {currentCandidate.profile.region}</span>
+                        {currentCandidate.profile?.city_name && currentCandidate.profile?.country && (
+                          <span>📍 {currentCandidate.profile.city_name}, {currentCandidate.profile.country}</span>
                         )}
                         {currentCandidate.timezone && (
                           <span>🕒 {currentCandidate.timezone}</span>

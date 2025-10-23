@@ -12,7 +12,8 @@ interface ProfileData {
   name: string;
   bio: string;
   achievements: string;
-  region: string;
+  city_name?: string;
+  country?: string;
   venture?: {
     title: string;
     description: string;
@@ -80,7 +81,7 @@ export default function SkippedProfilesPage() {
           await Promise.all([
             supabase
               .from("profiles")
-              .select("name, bio, achievements, region")
+              .select("name, bio, achievements, city_id")
               .eq("user_id", skippedUserId)
               .limit(1)
               .maybeSingle(),
@@ -102,12 +103,30 @@ export default function SkippedProfilesPage() {
 
           // Only require profile to exist - venture and preferences are optional
           if (profileResult.data) {
+            // Fetch city data if city_id exists
+            let city_name: string | undefined;
+            let country: string | undefined;
+
+            if (profileResult.data.city_id) {
+              const { data: cityData } = await supabase
+                .from("cities")
+                .select("name, country_name")
+                .eq("id", profileResult.data.city_id)
+                .maybeSingle();
+
+              if (cityData) {
+                city_name = cityData.name;
+                country = cityData.country_name;
+              }
+            }
+
             return {
               user_id: skippedUserId,
               name: profileResult.data.name || "Anonymous",
               bio: profileResult.data.bio || "",
               achievements: profileResult.data.achievements || "",
-              region: profileResult.data.region || "",
+              city_name,
+              country,
               venture: ventureResult.data ? ventureResult.data : undefined,
               preferences: preferencesResult.data ? preferencesResult.data : undefined,
             };
@@ -284,9 +303,9 @@ export default function SkippedProfilesPage() {
                       <div className="font-mono font-semibold text-gray-900">
                         {profile.name}
                       </div>
-                      {profile.region && (
+                      {profile.city_name && profile.country && (
                         <div className="font-mono text-sm text-gray-600 mt-1">
-                          📍 {profile.region}
+                          📍 {profile.city_name}, {profile.country}
                         </div>
                       )}
                       {profile.venture && (
@@ -311,8 +330,8 @@ export default function SkippedProfilesPage() {
                             {selectedProfile.name}
                           </h2>
                           <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">
-                            {selectedProfile.region && (
-                              <span>📍 {selectedProfile.region}</span>
+                            {selectedProfile.city_name && selectedProfile.country && (
+                              <span>📍 {selectedProfile.city_name}, {selectedProfile.country}</span>
                             )}
                           </div>
                         </div>

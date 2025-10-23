@@ -12,7 +12,8 @@ interface ProfileData {
   name: string;
   bio: string;
   achievements: string;
-  region: string;
+  city_name?: string;
+  country?: string;
   timezone?: string;
   stage?: string;
   availability_hours?: string;
@@ -85,7 +86,7 @@ export default function MyMatchesPage() {
           await Promise.all([
             supabase
               .from("profiles")
-              .select("name, bio, achievements, region")
+              .select("name, bio, achievements, city_id")
               .eq("user_id", matchedUserId)
               .maybeSingle(),
             supabase
@@ -106,18 +107,45 @@ export default function MyMatchesPage() {
           ]);
 
         if (profileResult.data) {
-          return {
+          // Fetch city data if city_id exists
+          let city_name: string | undefined;
+          let country: string | undefined;
+
+          console.log("Profile data for user", matchedUserId, ":", profileResult.data);
+          console.log("City ID:", profileResult.data.city_id);
+
+          if (profileResult.data.city_id) {
+            const { data: cityData, error: cityError } = await supabase
+              .from("cities")
+              .select("name, country_name")
+              .eq("id", profileResult.data.city_id)
+              .maybeSingle();
+
+            console.log("City data:", cityData, "City error:", cityError);
+
+            if (cityData) {
+              city_name = cityData.name;
+              country = cityData.country_name;
+              console.log("Set city_name:", city_name, "country:", country);
+            }
+          }
+
+          const result = {
             id: matchedUserId,
             name: profileResult.data.name || "Anonymous",
             bio: profileResult.data.bio || "",
             achievements: profileResult.data.achievements || "",
-            region: profileResult.data.region || "",
+            city_name,
+            country,
             timezone: userDataResult.data?.timezone,
             stage: userDataResult.data?.stage,
             availability_hours: userDataResult.data?.availability_hours,
             venture: ventureResult.data || undefined,
             preferences: preferencesResult.data || undefined,
           };
+
+          console.log("Final result for user", matchedUserId, ":", result);
+          return result;
         }
         return null;
       });
@@ -212,7 +240,7 @@ export default function MyMatchesPage() {
           </h1>
 
           {message && (
-            <div className="mb-6 p-4 bg-blue-50 text-blue-700 border border-blue-200 rounded font-mono text-sm">
+            <div className="mb-6 p-4 bg-blue-50 text-blue-700 border border-yellow-200 rounded font-mono text-sm">
               {message}
             </div>
           )}
@@ -256,9 +284,9 @@ export default function MyMatchesPage() {
                       <div className="font-mono font-semibold text-gray-900">
                         {match.name}
                       </div>
-                      {match.region && (
+                      {match.city_name && match.country && (
                         <div className="font-mono text-sm text-gray-600 mt-1">
-                          📍 {match.region}
+                          📍 {match.city_name}, {match.country}
                         </div>
                       )}
                       {match.venture && (
@@ -283,8 +311,8 @@ export default function MyMatchesPage() {
                             {selectedMatch.name}
                           </h2>
                           <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">
-                            {selectedMatch.region && (
-                              <span>📍 {selectedMatch.region}</span>
+                            {selectedMatch.city_name && selectedMatch.country && (
+                              <span>📍 {selectedMatch.city_name}, {selectedMatch.country}</span>
                             )}
                             {selectedMatch.timezone && (
                               <span>🕒 {selectedMatch.timezone}</span>

@@ -238,7 +238,7 @@ export async function GET(req: NextRequest) {
           const [profileResult, ventureResult, preferencesResult] = await Promise.all([
             sb
               .from("profiles")
-              .select("name, bio, achievements, region")
+              .select("name, bio, achievements, city_id")
               .eq("user_id", candidateUserId)
               .maybeSingle(),
             sb
@@ -253,13 +253,36 @@ export async function GET(req: NextRequest) {
               .maybeSingle(),
           ]);
 
+          // Fetch city data if city_id exists
+          let cityData = null;
+          console.log("API: Profile data for user", candidateUserId, ":", profileResult.data);
+          console.log("API: City ID:", profileResult.data?.city_id);
+
+          if (profileResult.data?.city_id) {
+            const { data: city, error: cityError } = await sb
+              .from("cities")
+              .select("name, country_name")
+              .eq("id", profileResult.data.city_id)
+              .maybeSingle();
+
+            console.log("API: City data:", city, "City error:", cityError);
+
+            if (city) {
+              cityData = { city_name: city.name, country: city.country_name };
+              console.log("API: Set cityData:", cityData);
+            }
+          }
+
           return {
             id: candidateUserId,
             stage: candidate.stage,
             timezone: candidate.timezone,
             availability_hours: candidate.availability_hours,
             similarity_score: candidate.similarity_score,
-            profile: profileResult.data,
+            profile: profileResult.data ? {
+              ...profileResult.data,
+              ...cityData,
+            } : null,
             venture: ventureResult.data,
             preferences: preferencesResult.data,
           };

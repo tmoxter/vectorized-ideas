@@ -112,7 +112,7 @@ export default function ProfilePage() {
             admin1: cityData.admin1,
             country: cityData.country,
             iso2: cityData.iso2,
-            label: `${cityData.name}${cityData.admin1 ? `, ${cityData.admin1}` : ""} (${cityData.country})`,
+            label: `${cityData.name}${cityData.admin1 ? `, ${cityData.admin1}` : ""} (${cityData.country_name})`,
             population: cityData.population,
           });
         }

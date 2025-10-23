@@ -12,7 +12,8 @@ interface ProfileData {
   name: string;
   bio: string;
   achievements: string;
-  region: string;
+  city_name?: string;
+  country?: string;
   timezone?: string;
   stage?: string;
   availability_hours?: string;
@@ -81,7 +82,7 @@ export default function BlockedProfilesPage() {
           await Promise.all([
             supabase
               .from("profiles")
-              .select("name, bio, achievements, region")
+              .select("name, bio, achievements, city_id")
               .eq("user_id", blockedUserId)
               .maybeSingle(),
             supabase
@@ -102,12 +103,30 @@ export default function BlockedProfilesPage() {
           ]);
 
         if (profileResult.data) {
+          // Fetch city data if city_id exists
+          let city_name: string | undefined;
+          let country: string | undefined;
+
+          if (profileResult.data.city_id) {
+            const { data: cityData } = await supabase
+              .from("cities")
+              .select("name, country_name")
+              .eq("id", profileResult.data.city_id)
+              .maybeSingle();
+
+            if (cityData) {
+              city_name = cityData.name;
+              country = cityData.country_name;
+            }
+          }
+
           return {
             id: blockedUserId,
             name: profileResult.data.name || "Anonymous",
             bio: profileResult.data.bio || "",
             achievements: profileResult.data.achievements || "",
-            region: profileResult.data.region || "",
+            city_name,
+            country,
             timezone: userDataResult.data?.timezone,
             stage: userDataResult.data?.stage,
             availability_hours: userDataResult.data?.availability_hours,
@@ -245,9 +264,9 @@ export default function BlockedProfilesPage() {
                       <div className="font-mono font-semibold text-gray-900">
                         {profile.name}
                       </div>
-                      {profile.region && (
+                      {profile.city_name && profile.country && (
                         <div className="font-mono text-sm text-gray-600 mt-1">
-                          📍 {profile.region}
+                          📍 {profile.city_name}, {profile.country}
                         </div>
                       )}
                       {profile.venture && (
@@ -272,8 +291,8 @@ export default function BlockedProfilesPage() {
                             {selectedProfile.name}
                           </h2>
                           <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">
-                            {selectedProfile.region && (
-                              <span>📍 {selectedProfile.region}</span>
+                            {selectedProfile.city_name && selectedProfile.country && (
+                              <span>📍 {selectedProfile.city_name}, {selectedProfile.country}</span>
                             )}
                             {selectedProfile.timezone && (
                               <span>🕒 {selectedProfile.timezone}</span>

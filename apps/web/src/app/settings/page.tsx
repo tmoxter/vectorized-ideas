@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
-import { Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle, ChevronDown } from "lucide-react";
 import { Circles } from 'react-loader-spinner';
 
 export default function SettingsPage() {
@@ -15,12 +15,36 @@ export default function SettingsPage() {
   const [confirmText, setConfirmText] = useState("");
   const [message, setMessage] = useState("");
   const [deleteError, setDeleteError] = useState("");
+  const [regionFilter, setRegionFilter] = useState("Worldwide");
+  const [similarityLevel, setSimilarityLevel] = useState("Broadly Similar");
+  const [isSavingPreferences, setIsSavingPreferences] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const router = useRouter();
   const supabase = supabaseClient();
+  const regionDropdownRef = useRef<HTMLDivElement>(null);
+  const similarityDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     checkAuth();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        regionDropdownRef.current &&
+        !regionDropdownRef.current.contains(event.target as Node) &&
+        similarityDropdownRef.current &&
+        !similarityDropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const checkAuth = async () => {
@@ -33,6 +57,24 @@ export default function SettingsPage() {
     }
     setUser(session.user);
     setIsLoading(false);
+  };
+
+  const handleSavePreferences = async () => {
+    setIsSavingPreferences(true);
+    setMessage("");
+
+    try {
+      // TODO: Save preferences to database
+      // For now, just simulate saving
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setMessage("Preferences saved successfully!");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (error) {
+      console.error("Error saving preferences:", error);
+      setMessage("Failed to save preferences");
+    } finally {
+      setIsSavingPreferences(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -136,6 +178,106 @@ export default function SettingsPage() {
                   {user?.id}
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* Matching Preferences */}
+          <section className="bg-white p-6 rounded border border-gray-200 mb-6">
+            <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
+              Matching Preferences
+            </h2>
+
+            <div className="space-y-6">
+              {/* Region Filter */}
+              <div ref={regionDropdownRef} className="relative">
+                <label className="block font-mono text-sm text-gray-700 mb-2">
+                  Region Filter
+                </label>
+                <button
+                  onClick={() => setOpenDropdown(openDropdown === "region" ? null : "region")}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm font-mono text-sm focus:ring-2 focus:ring-silver focus:border-transparent outline-none bg-white hover:bg-gray-50 transition duration-200 flex items-center justify-between text-left"
+                >
+                  <span>{regionFilter}</span>
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </button>
+                {openDropdown === "region" && (
+                  <div className="absolute top-full mt-2 left-0 right-0 z-50">
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
+                      <div className="p-2">
+                        {["Only in my city", "Only in my country", "Only on my continent", "Worldwide"].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => {
+                              setRegionFilter(option);
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 ${
+                              regionFilter === option
+                                ? "bg-silver text-gray-900 font-semibold"
+                                : "text-gray-700 hover:silver hover:text-gray-900"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <p className="mt-2 font-mono text-xs text-gray-500">
+                  Filter profiles based on geographic location
+                </p>
+              </div>
+
+              {/* Similarity Level */}
+              <div ref={similarityDropdownRef} className="relative">
+                <label className="block font-mono text-sm text-gray-700 mb-2">
+                  Similarity Level
+                </label>
+                <button
+                  onClick={() => setOpenDropdown(openDropdown === "similarity" ? null : "similarity")}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm font-mono text-sm focus:ring-2 focus:ring-silver focus:border-transparent outline-none bg-white hover:bg-gray-50 transition duration-200 flex items-center justify-between text-left"
+                >
+                  <span>{similarityLevel}</span>
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </button>
+                {openDropdown === "similarity" && (
+                  <div className="absolute top-full mt-2 left-0 right-0 z-50">
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
+                      <div className="p-2">
+                        {["Highly similar (stricter)", "Similar", "Broadly similar", "Vaguely similar (less strict)"].map((option) => (
+                          <button
+                            key={option}
+                            onClick={() => {
+                              setSimilarityLevel(option);
+                              setOpenDropdown(null);
+                            }}
+                            className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 ${
+                              similarityLevel === option
+                                ? "bg-silver text-gray-900 font-semibold"
+                                : "text-gray-700 hover:bg-silver hover:text-gray-900"
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <p className="mt-2 font-mono text-xs text-gray-500">
+                  Stricter thresholds lead to fewer profiles to discover. Profiles will be sorted by similarity in any case so that the most similar profiles will appear first.
+                </p>
+              </div>
+
+              {/* Save Button */}
+              <button
+                onClick={handleSavePreferences}
+                disabled={isSavingPreferences}
+                className="px-6 py-3 bg-black text-white rounded font-mono text-sm hover:bg-gray-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSavingPreferences ? "Saving..." : "Update Preferences"}
+              </button>
             </div>
           </section>
 
