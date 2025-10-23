@@ -11,30 +11,38 @@ import {
   createProfileEmbeddingText,
   createVentureEmbeddingText,
 } from "@/lib/embeddings-client";
+import { CityPicker } from "./city_selection";
 
 interface ProfileData {
   name: string;
   bio: string;
   achievements: string;
-  region: string;
+  city_id: number | null;
   venture_title: string;
   venture_description: string;
   cofounder_preferences_title: string;
   cofounder_preferences_description: string;
 }
 
+type City = {
+  id: number; name: string; admin1?: string | null; country: string; iso2: string;
+  label: string;
+  population: number | null;
+};
+
 export default function ProfilePage() {
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
     bio: "",
     achievements: "",
-    region: "",
+    city_id: null,
     venture_title: "",
     venture_description: "",
     cofounder_preferences_title: "",
     cofounder_preferences_description: "",
   });
 
+  const [city, setCity] = useState<City | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -87,11 +95,34 @@ export default function ProfilePage() {
             .single(),
         ]);
 
+      const cityId = profileResult.data?.city_id;
+
+      // Load city data if available
+      if (cityId) {
+        const { data: cityData } = await supabase
+          .from("cities")
+          .select("*")
+          .eq("id", cityId)
+          .single();
+
+        if (cityData) {
+          setCity({
+            id: cityData.id,
+            name: cityData.name,
+            admin1: cityData.admin1,
+            country: cityData.country,
+            iso2: cityData.iso2,
+            label: `${cityData.name}${cityData.admin1 ? `, ${cityData.admin1}` : ""} (${cityData.country})`,
+            population: cityData.population,
+          });
+        }
+      }
+
       setProfileData({
         name: profileResult.data?.name || "",
         bio: profileResult.data?.bio || "",
         achievements: profileResult.data?.achievements || "",
-        region: profileResult.data?.region || "",
+        city_id: cityId || null,
         venture_title: ventureResult.data?.title || "",
         venture_description: ventureResult.data?.description || "",
         cofounder_preferences_title: preferencesResult.data?.title || "",
@@ -112,6 +143,14 @@ export default function ProfilePage() {
     }));
   };
 
+  const handleCityChange = (selectedCity: City | null) => {
+    setCity(selectedCity);
+    setProfileData((prev) => ({
+      ...prev,
+      city_id: selectedCity?.id || null,
+    }));
+  };
+
   const saveProfile = async (publish: boolean = false) => {
     if (!user) return;
 
@@ -127,7 +166,7 @@ export default function ProfilePage() {
         name: profileData.name,
         bio: profileData.bio,
         achievements: profileData.achievements,
-        region: profileData.region,
+        city_id: city?.id || null,
         is_published: publish,
         updated_at: now,
       };
@@ -176,13 +215,13 @@ export default function ProfilePage() {
             profileData.name ||
             profileData.bio ||
             profileData.achievements ||
-            profileData.region
+            city
           ) {
             const profileText = createProfileEmbeddingText({
               name: profileData.name,
               bio: profileData.bio,
               achievements: profileData.achievements,
-              region: profileData.region,
+              region: city?.label || "",
             });
             if (profileText.trim()) {
               embeddingPromises.push(embedProfile(user.id, profileText));
@@ -331,16 +370,12 @@ export default function ProfilePage() {
 
                 <div>
                   <label className="block font-mono text-sm text-gray-700 mb-2">
-                    Region
+                    City
                   </label>
-                  <input
-                    type="text"
-                    value={profileData.region}
-                    onChange={(e) =>
-                      handleInputChange("region", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    placeholder="e.g., san francisco, remote, europe"
+                  <CityPicker
+                    defaultCity={city}
+                    onChange={handleCityChange}
+                    required={false}
                   />
                 </div>
               </div>
