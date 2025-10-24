@@ -17,6 +17,8 @@ interface ProfileData {
   name: string;
   bio: string;
   achievements: string;
+  experience: string;
+  education: string;
   city_id: number | null;
   venture_title: string;
   venture_description: string;
@@ -35,6 +37,8 @@ export default function ProfilePage() {
     name: "",
     bio: "",
     achievements: "",
+    experience: "",
+    education: "",
     city_id: null,
     venture_title: "",
     venture_description: "",
@@ -110,7 +114,7 @@ export default function ProfilePage() {
             id: cityData.id,
             name: cityData.name,
             admin1: cityData.admin1,
-            country: cityData.country,
+            country: cityData.country_name,
             iso2: cityData.iso2,
             label: `${cityData.name}${cityData.admin1 ? `, ${cityData.admin1}` : ""} (${cityData.country_name})`,
             population: cityData.population,
@@ -122,6 +126,8 @@ export default function ProfilePage() {
         name: profileResult.data?.name || "",
         bio: profileResult.data?.bio || "",
         achievements: profileResult.data?.achievements || "",
+        experience: profileResult.data?.experience || "",
+        education: profileResult.data?.education || "",
         city_id: cityId || null,
         venture_title: ventureResult.data?.title || "",
         venture_description: ventureResult.data?.description || "",
@@ -166,6 +172,8 @@ export default function ProfilePage() {
         name: profileData.name,
         bio: profileData.bio,
         achievements: profileData.achievements,
+        experience: profileData.experience,
+        education: profileData.education,
         city_id: city?.id || null,
         is_published: publish,
         updated_at: now,
@@ -405,6 +413,36 @@ export default function ProfilePage() {
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
                   placeholder="previous companies, projects, notable achievements, technical skills..."
+                />
+              </div>
+
+              <div className="mt-6">
+                <label className="block font-mono text-sm text-gray-700 mb-2">
+                  Experience
+                </label>
+                <textarea
+                  value={profileData.experience}
+                  onChange={(e) =>
+                    handleInputChange("experience", e.target.value)
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  placeholder="work experience, roles, companies..."
+                />
+              </div>
+
+              <div className="mt-6">
+                <label className="block font-mono text-sm text-gray-700 mb-2">
+                  Education
+                </label>
+                <textarea
+                  value={profileData.education}
+                  onChange={(e) =>
+                    handleInputChange("education", e.target.value)
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  placeholder="degrees, schools, certifications..."
                 />
               </div>
             </section>

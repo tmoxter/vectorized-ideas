@@ -12,6 +12,8 @@ interface ProfileData {
   name: string;
   bio: string;
   achievements: string;
+  experience: string;
+  education: string;
   city_name?: string;
   country?: string;
   timezone?: string;
@@ -86,7 +88,7 @@ export default function MyMatchesPage() {
           await Promise.all([
             supabase
               .from("profiles")
-              .select("name, bio, achievements, city_id")
+              .select("name, bio, achievements, experience, education, city_id")
               .eq("user_id", matchedUserId)
               .maybeSingle(),
             supabase
@@ -135,6 +137,8 @@ export default function MyMatchesPage() {
             name: profileResult.data.name || "Anonymous",
             bio: profileResult.data.bio || "",
             achievements: profileResult.data.achievements || "",
+            experience: profileResult.data.experience || "",
+            education: profileResult.data.education || "",
             city_name,
             country,
             timezone: userDataResult.data?.timezone,
@@ -345,6 +349,28 @@ export default function MyMatchesPage() {
                           </h3>
                           <p className="font-mono text-sm text-gray-700 leading-relaxed">
                             {selectedMatch.achievements}
+                          </p>
+                        </section>
+                      )}
+
+                      {selectedMatch.experience && (
+                        <section>
+                          <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
+                            Experience
+                          </h3>
+                          <p className="font-mono text-sm text-gray-700 leading-relaxed">
+                            {selectedMatch.experience}
+                          </p>
+                        </section>
+                      )}
+
+                      {selectedMatch.education && (
+                        <section>
+                          <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
+                            Education
+                          </h3>
+                          <p className="font-mono text-sm text-gray-700 leading-relaxed">
+                            {selectedMatch.education}
                           </p>
                         </section>
                       )}

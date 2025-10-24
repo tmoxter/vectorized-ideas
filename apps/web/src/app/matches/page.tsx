@@ -17,6 +17,8 @@ interface MatchCandidate {
     name: string;
     bio: string;
     achievements: string;
+    experience: string;
+    education: string;
     city_name?: string;
     country?: string;
   };
@@ -309,10 +311,10 @@ export default function MatchesPage() {
                     {currentCandidate.similarity_score && (
                       <div className="text-right">
                         <div className="text-2xl font-mono font-bold text-green-600">
-                          {Math.round(currentCandidate.similarity_score * 100)}%
+                          {Math.round(currentCandidate.similarity_score)}%
                         </div>
                         <div className="text-xs font-mono text-gray-500">
-                          similarity match
+                          similarity score
                         </div>
                       </div>
                     )}
@@ -341,6 +343,30 @@ export default function MatchesPage() {
                       </h3>
                       <p className="font-mono text-sm text-gray-700 leading-relaxed">
                         {currentCandidate.profile.achievements}
+                      </p>
+                    </section>
+                  )}
+
+                  {/* Experience Section */}
+                  {currentCandidate.profile?.experience && (
+                    <section>
+                      <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
+                        Experience
+                      </h3>
+                      <p className="font-mono text-sm text-gray-700 leading-relaxed">
+                        {currentCandidate.profile.experience}
+                      </p>
+                    </section>
+                  )}
+
+                  {/* Education Section */}
+                  {currentCandidate.profile?.education && (
+                    <section>
+                      <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
+                        Education
+                      </h3>
+                      <p className="font-mono text-sm text-gray-700 leading-relaxed">
+                        {currentCandidate.profile.education}
                       </p>
                     </section>
                   )}

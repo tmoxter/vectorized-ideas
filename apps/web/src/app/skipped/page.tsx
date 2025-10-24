@@ -12,6 +12,8 @@ interface ProfileData {
   name: string;
   bio: string;
   achievements: string;
+  experience: string;
+  education: string;
   city_name?: string;
   country?: string;
   venture?: {
@@ -81,7 +83,7 @@ export default function SkippedProfilesPage() {
           await Promise.all([
             supabase
               .from("profiles")
-              .select("name, bio, achievements, city_id")
+              .select("name, bio, achievements, experience, education, city_id")
               .eq("user_id", skippedUserId)
               .limit(1)
               .maybeSingle(),
@@ -125,6 +127,8 @@ export default function SkippedProfilesPage() {
               name: profileResult.data.name || "Anonymous",
               bio: profileResult.data.bio || "",
               achievements: profileResult.data.achievements || "",
+              experience: profileResult.data.experience || "",
+              education: profileResult.data.education || "",
               city_name,
               country,
               venture: ventureResult.data ? ventureResult.data : undefined,
@@ -358,6 +362,28 @@ export default function SkippedProfilesPage() {
                           </h3>
                           <p className="font-mono text-sm text-gray-700 leading-relaxed">
                             {selectedProfile.achievements}
+                          </p>
+                        </section>
+                      )}
+
+                      {selectedProfile.experience && (
+                        <section>
+                          <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
+                            Experience
+                          </h3>
+                          <p className="font-mono text-sm text-gray-700 leading-relaxed">
+                            {selectedProfile.experience}
+                          </p>
+                        </section>
+                      )}
+
+                      {selectedProfile.education && (
+                        <section>
+                          <h3 className="text-lg font-mono font-semibold text-gray-900 mb-3">
+                            Education
+                          </h3>
+                          <p className="font-mono text-sm text-gray-700 leading-relaxed">
+                            {selectedProfile.education}
                           </p>
                         </section>
                       )}

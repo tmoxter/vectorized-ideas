@@ -205,8 +205,8 @@ export async function GET(req: NextRequest) {
       typeof embedding.entity_id
     );
 
-    const { data: cands, error: kErr } = await sb.rpc("knn_candidates_excl", {
-      p_idea_id: embedding.entity_id, // Now expects text type
+    const { data: cands, error: kErr } = await sb.rpc("knn_candidates_interact_prefs_applied", {
+      p_idea_id: embedding.entity_id,
       p_model: MODEL,
       p_version: VERSION,
       p_limit: 100,
@@ -238,7 +238,7 @@ export async function GET(req: NextRequest) {
           const [profileResult, ventureResult, preferencesResult] = await Promise.all([
             sb
               .from("profiles")
-              .select("name, bio, achievements, city_id")
+              .select("name, bio, achievements, experience, education, city_id")
               .eq("user_id", candidateUserId)
               .maybeSingle(),
             sb
@@ -278,7 +278,7 @@ export async function GET(req: NextRequest) {
             stage: candidate.stage,
             timezone: candidate.timezone,
             availability_hours: candidate.availability_hours,
-            similarity_score: candidate.similarity_score,
+            similarity_score: candidate.idea_sim,
             profile: profileResult.data ? {
               ...profileResult.data,
               ...cityData,
