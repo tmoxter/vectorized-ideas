@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { ShieldOff } from "lucide-react";
 import { Circles } from 'react-loader-spinner';
 
@@ -389,6 +390,8 @@ export default function BlockedProfilesPage() {
           )}
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

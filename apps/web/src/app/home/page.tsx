@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { Search, Sparkles, User, Settings, BarChart3, SkipForward, BookOpenText, Clock } from "lucide-react";
 import { Circles } from 'react-loader-spinner';
 import Image from "next/image";
@@ -187,6 +188,8 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
