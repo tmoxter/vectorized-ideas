@@ -1,19 +1,23 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
-// Mock next/navigation
 const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-// Mock Supabase client
-const mockSupabaseClient = vi.fn();
-vi.mock("@/lib/supabase", () => ({
-  supabaseClient: mockSupabaseClient,
+vi.mock("@/hooks/useAuth", () => ({
+  useAuth: vi.fn(),
 }));
 
-// Mock components
+vi.mock("@/hooks/usePendingRequests", () => ({
+  usePendingRequests: vi.fn(),
+}));
+
+vi.mock("@/hooks/useInteraction", () => ({
+  useInteraction: vi.fn(),
+}));
+
 vi.mock("@/components/Navigation", () => ({
   default: () => <div data-testid="navigation">Navigation</div>,
 }));
@@ -22,89 +26,85 @@ vi.mock("@/components/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
 }));
 
-// Import after mocks
+import { useAuth } from "@/hooks/useAuth";
+import { usePendingRequests } from "@/hooks/usePendingRequests";
+import { useInteraction } from "@/hooks/useInteraction";
+
 const PendingRequestsPage = await import("../page").then((m) => m.default);
 
 describe("PendingRequestsPage", () => {
+  const mockLogout = vi.fn();
+  const mockRecordInteraction = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockPush.mockClear();
-    global.fetch = vi.fn();
-  });
+    mockRecordInteraction.mockResolvedValue(true);
 
-  it("should redirect to landing page when not authenticated", async () => {
-    const mockClient = {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: { session: null },
-        }),
-      },
-    };
-    mockSupabaseClient.mockReturnValue(mockClient);
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: "test-user", email: "test@example.com" },
+      isLoading: false,
+      logout: mockLogout,
+    });
 
-    render(<PendingRequestsPage />);
-
-    await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/");
+    vi.mocked(useInteraction).mockReturnValue({
+      recordInteraction: mockRecordInteraction,
+      isSubmitting: false,
     });
   });
 
-  it("should display loading state initially when authenticated", async () => {
-    const mockClient = {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: {
-            session: {
-              user: { id: "test-user", email: "test@example.com" },
-              access_token: "test-token",
-            },
-          },
-        }),
-        signOut: vi.fn(),
-      },
-    };
-    mockSupabaseClient.mockReturnValue(mockClient);
+  it("should display loading state when auth is loading", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      isLoading: true,
+      logout: mockLogout,
+    });
 
-    (global.fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => ({ items: [] }),
+    vi.mocked(usePendingRequests).mockReturnValue({
+      requests: [],
+      isLoading: false,
+      error: "",
+      reload: vi.fn(),
     });
 
     render(<PendingRequestsPage />);
 
-    // Should show loader initially
     expect(screen.getByTestId("circles-loader")).toBeInTheDocument();
   });
 
-  it("should fetch pending requests data", async () => {
-    const mockClient = {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: {
-            session: {
-              user: { id: "test-user", email: "test@example.com" },
-              access_token: "test-token",
-            },
-          },
-        }),
-        signOut: vi.fn(),
-      },
-    };
-    mockSupabaseClient.mockReturnValue(mockClient);
-
-    (global.fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => ({ items: [] }),
+  it("should show empty state when no pending requests", () => {
+    vi.mocked(usePendingRequests).mockReturnValue({
+      requests: [],
+      isLoading: false,
+      error: "",
+      reload: vi.fn(),
     });
 
     render(<PendingRequestsPage />);
 
-    // Wait for loading to finish
-    await waitFor(() => {
-      expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+    expect(screen.getByText(/no pending requests/i)).toBeInTheDocument();
+  });
+
+  it("should display pending requests when available", () => {
+    const mockRequests = [
+      {
+        id: "user-1",
+        name: "Test User",
+        bio: "Test bio",
+        achievements: "Test achievements",
+        created_at: new Date().toISOString(),
+      },
+    ];
+
+    vi.mocked(usePendingRequests).mockReturnValue({
+      requests: mockRequests,
+      isLoading: false,
+      error: "",
+      reload: vi.fn(),
     });
 
-    // Verify fetch was called
-    expect(global.fetch).toHaveBeenCalled();
+    render(<PendingRequestsPage />);
+
+    expect(screen.getByText("Test User")).toBeInTheDocument();
   });
 });

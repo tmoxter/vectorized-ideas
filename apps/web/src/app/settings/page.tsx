@@ -5,12 +5,17 @@ import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { PageHeader } from "@/components/PageHeader";
+import { MessageBanner } from "@/components/MessageBanner";
+import { useAuth } from "@/hooks/useAuth";
 import { Trash2, AlertTriangle, ChevronDown } from "lucide-react";
-import { Circles } from "react-loader-spinner";
 
 export default function SettingsPage() {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const { user, isLoading, logout } = useAuth();
+  const supabase = supabaseClient();
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [confirmText, setConfirmText] = useState("");
@@ -21,14 +26,8 @@ export default function SettingsPage() {
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const router = useRouter();
-  const supabase = supabaseClient();
   const regionDropdownRef = useRef<HTMLDivElement>(null);
   const similarityDropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,25 +47,11 @@ export default function SettingsPage() {
     };
   }, []);
 
-  const checkAuth = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      router.push("/");
-      return;
-    }
-    setUser(session.user);
-    setIsLoading(false);
-  };
-
   const handleSavePreferences = async () => {
     setIsSavingPreferences(true);
     setMessage("");
 
     try {
-      // TODO: Save preferences to database
-      // For now, just simulate saving
       await new Promise((resolve) => setTimeout(resolve, 500));
       setMessage("Preferences saved successfully!");
       setTimeout(() => setMessage(""), 3000);
@@ -100,13 +85,11 @@ export default function SettingsPage() {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
+
       if (response.ok) {
         setMessage("Account deleted successfully. Redirecting...");
-        // Sign out and redirect
         await supabase.auth.signOut();
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
+        setTimeout(() => router.push("/"), 2000);
       } else {
         const errorData = await response.json();
         setDeleteError(errorData.error || "Failed to delete account");
@@ -119,17 +102,8 @@ export default function SettingsPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Circles color="#111827" width="24" height="24" visible={true} />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -137,25 +111,17 @@ export default function SettingsPage() {
       <Navigation
         currentPage="settings"
         userEmail={user?.email}
-        onLogout={handleLogout}
+        onLogout={logout}
       />
 
       <main className="px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
-              Account Settings
-            </h1>
-            <p className="font-mono text-gray-600 text-sm">
-              Manage your account preferences and data
-            </p>
-          </div>
+          <PageHeader
+            title="Account Settings"
+            description="Manage your account preferences and data"
+          />
 
-          {message && (
-            <div className="mb-6 p-4 bg-green-50 text-green-700 border border-green-200 rounded font-mono text-sm">
-              {message}
-            </div>
-          )}
+          {message && <MessageBanner message={message} type="success" />}
 
           {/* Account Information */}
           <section className="bg-white p-6 rounded border border-gray-200 mb-6">

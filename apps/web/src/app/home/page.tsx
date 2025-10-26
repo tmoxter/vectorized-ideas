@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { TickerBanner } from "@/components/TickerBanner";
+import { NavigationCard } from "@/components/NavigationCard";
+import { useAuth } from "@/hooks/useAuth";
+import { useBannerCounts } from "@/hooks/useBannerCounts";
 import {
   Search,
   Sparkles,
@@ -14,68 +17,14 @@ import {
   SkipForward,
   Clock,
 } from "lucide-react";
-import { Circles, InfinitySpin } from "react-loader-spinner";
 
 export default function HomePage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [bannerData, setBannerData] = useState<{
-    total_profiles: number;
-    related_topics: number;
-  } | null>(null);
   const router = useRouter();
-  const supabase = supabaseClient();
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      router.push("/");
-      return;
-    }
-    setUser(session.user);
-    setIsLoading(false);
-    fetchBannerData(session.access_token);
-  };
-
-  const fetchBannerData = async (token: string) => {
-    try {
-      console.log("[home] Fetching banner data...");
-      const response = await fetch("/api/banner-counts", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        console.error(
-          "[home] Error fetching banner data, status:",
-          response.status
-        );
-        return;
-      }
-      const data = await response.json();
-      setBannerData(data);
-    } catch (error) {
-      console.error("[home] Error fetching banner data:", error);
-    }
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
+  const { user, isLoading, logout } = useAuth();
+  const bannerData = useBannerCounts();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Circles color="#111827" width="24" height="24" visible={true} />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -83,157 +32,66 @@ export default function HomePage() {
       <Navigation
         currentPage="home"
         userEmail={user?.email}
-        onLogout={handleLogout}
+        onLogout={logout}
       />
 
       <main className="px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2"></h1>
           </div>
 
-          {/* Ticker Banner */}
-          {bannerData ? (
-            <div className="mb-8 overflow-hidden">
-              <div className="ticker-animate flex gap-16 whitespace-nowrap">
-                <p className="font-mono text-2xl font-semibold text-gray-800">
-                  Currently, there are {bannerData.total_profiles} profiles
-                  matching your location filter. {bannerData.related_topics} are
-                  working on related topics.
-                </p>
-                <p className="font-mono text-2xl font-semibold text-gray-800">
-                  Currently, there are {bannerData.total_profiles} profiles
-                  matching your location filter. {bannerData.related_topics} are
-                  working on related topics.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="mb-8 flex justify-center">
-              <InfinitySpin color="#c7defb" width="200" />
-            </div>
-          )}
+          <TickerBanner data={bannerData} />
 
-          {/* Navigation Panels */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Discover Profiles */}
-            <button
+            <NavigationCard
+              Icon={Search}
+              title="Discover Profiles"
+              description="browse through semantic similarity matches and find potential co-founders based on your profile and venture ideas"
               onClick={() => router.push("/matches")}
-              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
-                <Search className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                Discover Profiles
-              </h3>
-              <p className="text-gray-600 text-sm font-mono">
-                browse through semantic similarity matches and find potential
-                co-founders based on your profile and venture ideas
-              </p>
-            </button>
+            />
 
-            {/* Pending Requests */}
-            <button
+            <NavigationCard
+              Icon={Clock}
+              title="Pending Requests"
+              description="review and respond to people who have liked your profile and want to connect"
               onClick={() => router.push("/pending-requests")}
-              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                Pending Requests
-              </h3>
-              <p className="text-gray-600 text-sm font-mono">
-                review and respond to people who have liked your profile and
-                want to connect
-              </p>
-            </button>
+            />
 
-            {/* Revisit Skipped Profiles */}
-            <button
+            <NavigationCard
+              Icon={SkipForward}
+              title="Revisit Skipped Profiles"
+              description="review profiles you previously passed on and reconsider potential connections"
               onClick={() => router.push("/skipped")}
-              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
-                <SkipForward className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                Revisit Skipped Profiles
-              </h3>
-              <p className="text-gray-600 text-sm font-mono">
-                review profiles you previously passed on and reconsider
-                potential connections
-              </p>
-            </button>
+            />
 
-            {/* Matches */}
-            <button
+            <NavigationCard
+              Icon={Sparkles}
+              title="Matches"
+              description="view your mutual matches and connect with co-founders who are interested in collaborating"
               onClick={() => router.push("/my-matches")}
-              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                Matches
-              </h3>
-              <p className="text-gray-600 text-sm font-mono">
-                view your mutual matches and connect with co-founders who are
-                interested in collaborating
-              </p>
-            </button>
+            />
 
-            {/* My Profile */}
-            <button
+            <NavigationCard
+              Icon={User}
+              title="My Profile"
+              description="edit your profile, venture ideas, and co-founder preferences to improve matching"
               onClick={() => router.push("/profile")}
-              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                My Profile
-              </h3>
-              <p className="text-gray-600 text-sm font-mono">
-                edit your profile, venture ideas, and co-founder preferences to
-                improve matching
-              </p>
-            </button>
+            />
 
-            {/* Settings */}
-            <button
+            <NavigationCard
+              Icon={Settings}
+              title="Settings"
+              description="manage your account settings, preferences, and blocked profiles"
               onClick={() => router.push("/settings")}
-              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
-                <Settings className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                Settings
-              </h3>
-              <p className="text-gray-600 text-sm font-mono">
-                manage your account settings, preferences, and blocked profiles
-              </p>
-            </button>
+            />
 
-            {/* Analyze */}
-            <button
+            <NavigationCard
+              Icon={BarChart3}
+              title="Analyze"
+              description="view insights and analytics about your matching activity and profile performance"
               onClick={() => router.push("/analyze")}
-              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
-                <BarChart3 className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                Analyze
-              </h3>
-              <p className="text-gray-600 text-sm font-mono">
-                view insights and analytics about your matching activity and
-                profile performance
-              </p>
-            </button>
+            />
           </div>
         </div>
       </main>

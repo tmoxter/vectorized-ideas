@@ -5,7 +5,10 @@ import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Circles } from "react-loader-spinner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { PageHeader } from "@/components/PageHeader";
+import { useAuth } from "@/hooks/useAuth";
+import type { City, ProfileFormData } from "@/types";
 import {
   embedProfile,
   embedIdea,
@@ -14,31 +17,12 @@ import {
 } from "@/lib/embeddings-client";
 import { CityPicker } from "./city_selection";
 
-interface ProfileData {
-  name: string;
-  bio: string;
-  achievements: string;
-  experience: string;
-  education: string;
-  city_id: number | null;
-  venture_title: string;
-  venture_description: string;
-  cofounder_preferences_title: string;
-  cofounder_preferences_description: string;
-}
-
-type City = {
-  id: number;
-  name: string;
-  admin1?: string | null;
-  country: string;
-  iso2: string;
-  label: string;
-  population: number | null;
-};
-
 export default function ProfilePage() {
-  const [profileData, setProfileData] = useState<ProfileData>({
+  const router = useRouter();
+  const { user, isLoading: authLoading, logout } = useAuth();
+  const supabase = supabaseClient();
+
+  const [profileData, setProfileData] = useState<ProfileFormData>({
     name: "",
     bio: "",
     achievements: "",
@@ -52,32 +36,18 @@ export default function ProfilePage() {
   });
 
   const [city, setCity] = useState<City | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const [user, setUser] = useState<any>(null);
-
-  const router = useRouter();
-  const supabase = supabaseClient();
 
   useEffect(() => {
-    checkAuth();
-    loadProfile();
-  }, []);
-
-  const checkAuth = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      router.push("/");
-      return;
+    if (user) {
+      loadProfile();
     }
-    setUser(session.user);
-  };
+  }, [user]);
 
   const loadProfile = async () => {
-    setIsLoading(true);
+    setIsLoadingProfile(true);
     try {
       const {
         data: { session },
@@ -143,11 +113,11 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("Error loading profile:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoadingProfile(false);
     }
   };
 
-  const handleInputChange = (field: keyof ProfileData, value: string) => {
+  const handleInputChange = (field: keyof ProfileFormData, value: string) => {
     setProfileData((prev) => ({
       ...prev,
       [field]: value,
@@ -323,17 +293,8 @@ export default function ProfilePage() {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Circles color="#111827" width="24" height="24" visible={true} />
-      </div>
-    );
+  if (authLoading || isLoadingProfile) {
+    return <LoadingSpinner />;
   }
 
   return (
@@ -341,21 +302,16 @@ export default function ProfilePage() {
       <Navigation
         currentPage="profile"
         userEmail={user?.email}
-        onLogout={handleLogout}
+        onLogout={logout}
       />
 
-      {/* Main Content */}
       <main className="px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
-              <span className="highlight-brush">Profile Setup</span>
-            </h1>
-            <p className="font-mono text-gray-600 text-sm">
-              Describe yourself and what you want to build. This helps the
-              semantic matching algorithm find compatible co-founders.
-            </p>
-          </div>
+          <PageHeader
+            title="Profile Setup"
+            description="Describe yourself and what you want to build. This helps the semantic matching algorithm find compatible co-founders."
+            highlight
+          />
 
           <div className="space-y-8">
             {/* Personal Information */}
