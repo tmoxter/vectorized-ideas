@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { UserX, ShieldX } from "lucide-react";
-import { Circles } from 'react-loader-spinner';
+import { Circles } from "react-loader-spinner";
 
 interface ProfileData {
   user_id: string;
@@ -29,7 +29,9 @@ interface ProfileData {
 
 export default function SkippedProfilesPage() {
   const [skippedProfiles, setSkippedProfiles] = useState<ProfileData[]>([]);
-  const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [message, setMessage] = useState("");
@@ -104,43 +106,45 @@ export default function SkippedProfilesPage() {
               .maybeSingle(),
           ]);
 
-          // Only require profile to exist - venture and preferences are optional
-          if (profileResult.data) {
-            // Fetch city data if city_id exists
-            let city_name: string | undefined;
-            let country: string | undefined;
+        // Only require profile to exist - venture and preferences are optional
+        if (profileResult.data) {
+          // Fetch city data if city_id exists
+          let city_name: string | undefined;
+          let country: string | undefined;
 
-            if (profileResult.data.city_id) {
-              const { data: cityData } = await supabase
-                .from("cities")
-                .select("name, country_name")
-                .eq("id", profileResult.data.city_id)
-                .maybeSingle();
+          if (profileResult.data.city_id) {
+            const { data: cityData } = await supabase
+              .from("cities")
+              .select("name, country_name")
+              .eq("id", profileResult.data.city_id)
+              .maybeSingle();
 
-              if (cityData) {
-                city_name = cityData.name;
-                country = cityData.country_name;
-              }
+            if (cityData) {
+              city_name = cityData.name;
+              country = cityData.country_name;
             }
-
-            return {
-              user_id: skippedUserId,
-              name: profileResult.data.name || "Anonymous",
-              bio: profileResult.data.bio || "",
-              achievements: profileResult.data.achievements || "",
-              experience: profileResult.data.experience || "",
-              education: profileResult.data.education || "",
-              city_name,
-              country,
-              venture: ventureResult.data ? ventureResult.data : undefined,
-              preferences: preferencesResult.data ? preferencesResult.data : undefined,
-            };
           }
 
-          return null;
-        });
-        
-        const allProfiles = await Promise.all(profilesPromises);
+          return {
+            user_id: skippedUserId,
+            name: profileResult.data.name || "Anonymous",
+            bio: profileResult.data.bio || "",
+            achievements: profileResult.data.achievements || "",
+            experience: profileResult.data.experience || "",
+            education: profileResult.data.education || "",
+            city_name,
+            country,
+            venture: ventureResult.data ? ventureResult.data : undefined,
+            preferences: preferencesResult.data
+              ? preferencesResult.data
+              : undefined,
+          };
+        }
+
+        return null;
+      });
+
+      const allProfiles = await Promise.all(profilesPromises);
       const profiles = allProfiles.filter((p) => p !== null) as ProfileData[];
       console.log("Loaded skipped profiles:", profiles.length);
 
@@ -182,7 +186,9 @@ export default function SkippedProfilesPage() {
       });
 
       if (response.ok) {
-        setMessage("User liked! They'll be moved to matches if they like you back.");
+        setMessage(
+          "User liked! They'll be moved to matches if they like you back."
+        );
         // Remove from skipped list
         await loadSkippedProfiles(user.id);
       } else {
@@ -335,9 +341,13 @@ export default function SkippedProfilesPage() {
                             {selectedProfile.name}
                           </h2>
                           <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">
-                            {selectedProfile.city_name && selectedProfile.country && (
-                              <span>📍 {selectedProfile.city_name}, {selectedProfile.country}</span>
-                            )}
+                            {selectedProfile.city_name &&
+                              selectedProfile.country && (
+                                <span>
+                                  📍 {selectedProfile.city_name},{" "}
+                                  {selectedProfile.country}
+                                </span>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -424,7 +434,9 @@ export default function SkippedProfilesPage() {
                         <>
                           <div className="flex justify-center space-x-4">
                             <button
-                              onClick={() => handleLike(selectedProfile.user_id)}
+                              onClick={() =>
+                                handleLike(selectedProfile.user_id)
+                              }
                               disabled={isSubmitting}
                               className="group relative inline-flex items-center justify-center px-6 py-3 rounded-lg font-mono text-sm text-white bg-gray-900 border border-gray-900 shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-transform duration-150 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(0,0,0,0.30)] active:translate-y-0 active:shadow-[0_6px_14px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-900 before:content-[''] before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none before:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.35),rgba(255,255,255,0)_38%)] after:content-[''] after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none after:opacity-0 group-hover:after:opacity-100 after:transition-opacity after:duration-300 after:bg-[radial-gradient(120%_60%_at_50%_-20%,rgba(255,255,255,0.25),rgba(255,255,255,0))]"
                             >
@@ -451,12 +463,15 @@ export default function SkippedProfilesPage() {
                               <strong>Block this user?</strong>
                             </p>
                             <p className="font-mono text-xs text-red-700">
-                              They won't appear in your matches again and you won't see each other.
+                              They won't appear in your matches again and you
+                              won't see each other.
                             </p>
                           </div>
                           <div className="flex justify-center space-x-3">
                             <button
-                              onClick={() => handleBlock(selectedProfile.user_id)}
+                              onClick={() =>
+                                handleBlock(selectedProfile.user_id)
+                              }
                               disabled={isSubmitting}
                               className="px-6 py-2 bg-red-600 text-white rounded font-mono text-sm hover:bg-red-700 transition duration-200 disabled:opacity-50"
                             >

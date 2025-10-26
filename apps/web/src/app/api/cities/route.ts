@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
     p_limit: limit,
   });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({
     items: (data ?? []).map((d: any) => ({
@@ -30,7 +31,8 @@ export async function GET(req: NextRequest) {
       admin1: d.admin1,
       country: d.country_name,
       iso2: d.country_iso2,
-      lat: d.lat, lon: d.lon,
+      lat: d.lat,
+      lon: d.lon,
       population: d.population,
     })),
   });

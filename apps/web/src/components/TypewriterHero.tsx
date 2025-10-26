@@ -64,10 +64,7 @@ export default function TypewriterHero() {
         <span className="relative z-10 inline-block min-w-[1ch] text-black-600">
           {displayedText}
         </span>
-
-
       </div>
-
     </div>
   );
 }

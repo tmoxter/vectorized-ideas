@@ -1,5 +1,5 @@
-import { vi } from 'vitest';
-import { testUsers, generateMockEmbedding } from '../fixtures/users';
+import { vi } from "vitest";
+import { testUsers, generateMockEmbedding } from "../fixtures/users";
 
 export interface MockSupabaseClient {
   from: (table: string) => any;
@@ -12,7 +12,12 @@ export interface MockSupabaseClient {
 }
 
 // Mock database state
-let mockMatches: Array<{ user_a: string; user_b: string; created_at: string; active?: boolean }> = [];
+let mockMatches: Array<{
+  user_a: string;
+  user_b: string;
+  created_at: string;
+  active?: boolean;
+}> = [];
 let mockEmbeddings: Array<{
   entity_type: string;
   entity_id: string;
@@ -23,7 +28,7 @@ let mockInteractions: Array<{
   id: string;
   actor_user: string;
   target_user: string;
-  action: 'like' | 'pass' | 'block';
+  action: "like" | "pass" | "block";
   actor_current_idea: string | null;
   target_current_idea: string | null;
   created_at: string;
@@ -35,7 +40,7 @@ export function initializeMockData() {
   mockMatches = [];
   mockInteractions = [];
   mockEmbeddings = testUsers.map((user, index) => ({
-    entity_type: 'idea',
+    entity_type: "idea",
     entity_id: user.venture.id,
     user_id: user.id,
     vector: generateMockEmbedding(index + 1),
@@ -56,7 +61,9 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 // Create a mock Supabase client
-export function createMockSupabaseClient(currentUserId?: string): MockSupabaseClient {
+export function createMockSupabaseClient(
+  currentUserId?: string
+): MockSupabaseClient {
   const mockFrom = (table: string) => {
     const queryBuilder = {
       select: vi.fn().mockReturnThis(),
@@ -72,13 +79,13 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     };
 
     // Mock profiles table
-    if (table === 'profiles') {
+    if (table === "profiles") {
       queryBuilder.maybeSingle.mockImplementation(() => {
         const userId = (queryBuilder.eq as any).mock.calls.find(
-          (call: any) => call[0] === 'user_id'
+          (call: any) => call[0] === "user_id"
         )?.[1];
 
-        const user = testUsers.find(u => u.id === userId);
+        const user = testUsers.find((u) => u.id === userId);
         if (user) {
           return Promise.resolve({ data: user.profile, error: null });
         }
@@ -87,25 +94,25 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
 
       queryBuilder.single.mockImplementation(() => {
         const userId = (queryBuilder.eq as any).mock.calls.find(
-          (call: any) => call[0] === 'user_id'
+          (call: any) => call[0] === "user_id"
         )?.[1];
 
-        const user = testUsers.find(u => u.id === userId);
+        const user = testUsers.find((u) => u.id === userId);
         if (user) {
           return Promise.resolve({ data: user.profile, error: null });
         }
-        return Promise.resolve({ data: null, error: { message: 'Not found' } });
+        return Promise.resolve({ data: null, error: { message: "Not found" } });
       });
     }
 
     // Mock user_ventures table
-    if (table === 'user_ventures') {
+    if (table === "user_ventures") {
       queryBuilder.maybeSingle.mockImplementation(() => {
         const userId = (queryBuilder.eq as any).mock.calls.find(
-          (call: any) => call[0] === 'user_id'
+          (call: any) => call[0] === "user_id"
         )?.[1];
 
-        const user = testUsers.find(u => u.id === userId);
+        const user = testUsers.find((u) => u.id === userId);
         if (user) {
           return Promise.resolve({ data: user.venture, error: null });
         }
@@ -114,14 +121,14 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
 
       queryBuilder.single.mockImplementation(() => {
         const userId = (queryBuilder.eq as any).mock.calls.find(
-          (call: any) => call[0] === 'user_id'
+          (call: any) => call[0] === "user_id"
         )?.[1];
 
-        const user = testUsers.find(u => u.id === userId);
+        const user = testUsers.find((u) => u.id === userId);
         if (user) {
           return Promise.resolve({ data: user.venture, error: null });
         }
-        return Promise.resolve({ data: null, error: { message: 'Not found' } });
+        return Promise.resolve({ data: null, error: { message: "Not found" } });
       });
 
       // Add select method for when querying specific fields like "id"
@@ -136,13 +143,13 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock user_cofounder_preference table
-    if (table === 'user_cofounder_preference') {
+    if (table === "user_cofounder_preference") {
       queryBuilder.maybeSingle.mockImplementation(() => {
         const userId = (queryBuilder.eq as any).mock.calls.find(
-          (call: any) => call[0] === 'user_id'
+          (call: any) => call[0] === "user_id"
         )?.[1];
 
-        const user = testUsers.find(u => u.id === userId);
+        const user = testUsers.find((u) => u.id === userId);
         if (user) {
           return Promise.resolve({ data: user.preferences, error: null });
         }
@@ -151,19 +158,22 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock cities table
-    if (table === 'cities') {
+    if (table === "cities") {
       queryBuilder.maybeSingle.mockImplementation(() => {
         const cityId = (queryBuilder.eq as any).mock.calls.find(
-          (call: any) => call[0] === 'id'
+          (call: any) => call[0] === "id"
         )?.[1];
 
         // Mock city data
-        const mockCities: Record<number, { id: number; name: string; country_name: string }> = {
-          1: { id: 1, name: 'San Francisco', country_name: 'United States' },
-          2: { id: 2, name: 'Austin', country_name: 'United States' },
-          3: { id: 3, name: 'Seattle', country_name: 'United States' },
-          4: { id: 4, name: 'New York', country_name: 'United States' },
-          5: { id: 5, name: 'Boston', country_name: 'United States' },
+        const mockCities: Record<
+          number,
+          { id: number; name: string; country_name: string }
+        > = {
+          1: { id: 1, name: "San Francisco", country_name: "United States" },
+          2: { id: 2, name: "Austin", country_name: "United States" },
+          3: { id: 3, name: "Seattle", country_name: "United States" },
+          4: { id: 4, name: "New York", country_name: "United States" },
+          5: { id: 5, name: "Boston", country_name: "United States" },
         };
 
         if (cityId && mockCities[cityId]) {
@@ -174,25 +184,28 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock embeddings table
-    if (table === 'embeddings') {
+    if (table === "embeddings") {
       queryBuilder.single.mockImplementation(() => {
         const entityId = (queryBuilder.eq as any).mock.calls.find(
-          (call: any) => call[0] === 'entity_id'
+          (call: any) => call[0] === "entity_id"
         )?.[1];
 
-        const embedding = mockEmbeddings.find(e => e.entity_id === entityId);
+        const embedding = mockEmbeddings.find((e) => e.entity_id === entityId);
         if (embedding) {
           return Promise.resolve({ data: embedding, error: null });
         }
-        return Promise.resolve({ data: null, error: { message: 'Not found' } });
+        return Promise.resolve({ data: null, error: { message: "Not found" } });
       });
 
       queryBuilder.upsert.mockImplementation((data: any) => {
         const existingIndex = mockEmbeddings.findIndex(
-          e => e.entity_id === data.entity_id
+          (e) => e.entity_id === data.entity_id
         );
         if (existingIndex >= 0) {
-          mockEmbeddings[existingIndex] = { ...mockEmbeddings[existingIndex], ...data };
+          mockEmbeddings[existingIndex] = {
+            ...mockEmbeddings[existingIndex],
+            ...data,
+          };
         } else {
           mockEmbeddings.push(data);
         }
@@ -201,7 +214,7 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock matches table
-    if (table === 'matches') {
+    if (table === "matches") {
       queryBuilder.insert.mockImplementation((data: any) => {
         const match = {
           ...data,
@@ -226,13 +239,14 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock interactions table
-    if (table === 'interactions') {
+    if (table === "interactions") {
       queryBuilder.insert.mockImplementation((data: any) => {
         // Check for duplicates
         const exists = mockInteractions.find(
-          i => i.actor_user === data.actor_user &&
-               i.target_user === data.target_user &&
-               i.action === data.action
+          (i) =>
+            i.actor_user === data.actor_user &&
+            i.target_user === data.target_user &&
+            i.action === data.action
         );
 
         if (exists) {
@@ -240,12 +254,17 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           return {
             select: vi.fn().mockResolvedValue({
               data: null,
-              error: { message: 'duplicate key value violates unique constraint' }
+              error: {
+                message: "duplicate key value violates unique constraint",
+              },
             }),
-            then: (resolve: any) => resolve({
-              data: null,
-              error: { message: 'duplicate key value violates unique constraint' }
-            }),
+            then: (resolve: any) =>
+              resolve({
+                data: null,
+                error: {
+                  message: "duplicate key value violates unique constraint",
+                },
+              }),
           };
         }
 
@@ -264,9 +283,10 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
 
       queryBuilder.upsert.mockImplementation((data: any) => {
         const existingIndex = mockInteractions.findIndex(
-          i => i.actor_user === data.actor_user &&
-               i.target_user === data.target_user &&
-               i.action === data.action
+          (i) =>
+            i.actor_user === data.actor_user &&
+            i.target_user === data.target_user &&
+            i.action === data.action
         );
 
         if (existingIndex >= 0) {
@@ -276,8 +296,14 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
             updated_at: new Date().toISOString(),
           };
           return {
-            select: vi.fn().mockResolvedValue({ data: mockInteractions[existingIndex], error: null }),
-            then: (resolve: any) => resolve({ data: mockInteractions[existingIndex], error: null }),
+            select: vi
+              .fn()
+              .mockResolvedValue({
+                data: mockInteractions[existingIndex],
+                error: null,
+              }),
+            then: (resolve: any) =>
+              resolve({ data: mockInteractions[existingIndex], error: null }),
           };
         } else {
           const interaction = {
@@ -288,7 +314,9 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           };
           mockInteractions.push(interaction);
           return {
-            select: vi.fn().mockResolvedValue({ data: interaction, error: null }),
+            select: vi
+              .fn()
+              .mockResolvedValue({ data: interaction, error: null }),
             then: (resolve: any) => resolve({ data: interaction, error: null }),
           };
         }
@@ -300,36 +328,52 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
 
         return {
           eq: vi.fn().mockImplementation((field: string, value: any) => {
-            filteredInteractions = filteredInteractions.filter(i => (i as any)[field] === value);
+            filteredInteractions = filteredInteractions.filter(
+              (i) => (i as any)[field] === value
+            );
             return {
               eq: vi.fn().mockImplementation((field2: string, value2: any) => {
-                filteredInteractions = filteredInteractions.filter(i => (i as any)[field2] === value2);
+                filteredInteractions = filteredInteractions.filter(
+                  (i) => (i as any)[field2] === value2
+                );
                 return {
-                  eq: vi.fn().mockImplementation((field3: string, value3: any) => {
-                    filteredInteractions = filteredInteractions.filter(i => (i as any)[field3] === value3);
-                    return {
-                      limit: vi.fn().mockReturnValue(Promise.resolve({
-                        data: filteredInteractions.slice(0, 1),
-                        error: null,
-                      })),
-                    };
-                  }),
-                  limit: vi.fn().mockReturnValue(Promise.resolve({
-                    data: filteredInteractions.slice(0, 1),
-                    error: null,
-                  })),
+                  eq: vi
+                    .fn()
+                    .mockImplementation((field3: string, value3: any) => {
+                      filteredInteractions = filteredInteractions.filter(
+                        (i) => (i as any)[field3] === value3
+                      );
+                      return {
+                        limit: vi.fn().mockReturnValue(
+                          Promise.resolve({
+                            data: filteredInteractions.slice(0, 1),
+                            error: null,
+                          })
+                        ),
+                      };
+                    }),
+                  limit: vi.fn().mockReturnValue(
+                    Promise.resolve({
+                      data: filteredInteractions.slice(0, 1),
+                      error: null,
+                    })
+                  ),
                 };
               }),
-              limit: vi.fn().mockReturnValue(Promise.resolve({
-                data: filteredInteractions.slice(0, 1),
-                error: null,
-              })),
+              limit: vi.fn().mockReturnValue(
+                Promise.resolve({
+                  data: filteredInteractions.slice(0, 1),
+                  error: null,
+                })
+              ),
             };
           }),
-          limit: vi.fn().mockReturnValue(Promise.resolve({
-            data: filteredInteractions.slice(0, 1),
-            error: null,
-          })),
+          limit: vi.fn().mockReturnValue(
+            Promise.resolve({
+              data: filteredInteractions.slice(0, 1),
+              error: null,
+            })
+          ),
         };
       });
 
@@ -345,8 +389,10 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           then: (resolve: any) => {
             // Actually perform the delete when promise is resolved
             const initialLength = mockInteractions.length;
-            mockInteractions = mockInteractions.filter(i => {
-              return !Object.entries(deleteFilters).every(([field, value]) => (i as any)[field] === value);
+            mockInteractions = mockInteractions.filter((i) => {
+              return !Object.entries(deleteFilters).every(
+                ([field, value]) => (i as any)[field] === value
+              );
             });
             const deletedCount = initialLength - mockInteractions.length;
             return resolve({ data: null, error: null, count: deletedCount });
@@ -367,7 +413,7 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           ? {
               user: {
                 id: currentUserId,
-                email: testUsers.find(u => u.id === currentUserId)?.email,
+                email: testUsers.find((u) => u.id === currentUserId)?.email,
               },
             }
           : null,
@@ -379,7 +425,7 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           data: {
             user: {
               id: currentUserId,
-              email: testUsers.find(u => u.id === currentUserId)?.email,
+              email: testUsers.find((u) => u.id === currentUserId)?.email,
             },
           },
           error: null,
@@ -387,28 +433,42 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
       }
       return Promise.resolve({
         data: { user: null },
-        error: { message: 'Not authenticated' },
+        error: { message: "Not authenticated" },
       });
     }),
     signOut: vi.fn().mockResolvedValue({ error: null }),
   };
 
   const mockRpc = vi.fn().mockImplementation((fn: string, params: any) => {
-    if (fn === 'knn_candidates' || fn === 'knn_candidates_excl' || fn === 'knn_candidates_interact_prefs_applied') {
+    if (
+      fn === "knn_candidates" ||
+      fn === "knn_candidates_excl" ||
+      fn === "knn_candidates_interact_prefs_applied"
+    ) {
       const { p_idea_id, p_limit = 20, p_model, p_version, p_probes } = params;
 
       // Find the embedding for the query idea
-      const queryEmbedding = mockEmbeddings.find(e => e.entity_id === p_idea_id);
+      const queryEmbedding = mockEmbeddings.find(
+        (e) => e.entity_id === p_idea_id
+      );
       if (!queryEmbedding) {
-        return Promise.resolve({ data: null, error: { message: 'Embedding not found' } });
+        return Promise.resolve({
+          data: null,
+          error: { message: "Embedding not found" },
+        });
       }
 
       // Calculate similarities and return simple candidates (API will enrich them)
       const candidates = mockEmbeddings
-        .filter(e => e.entity_id !== p_idea_id)
-        .map(candidateEmb => {
-          const similarity = cosineSimilarity(queryEmbedding.vector, candidateEmb.vector);
-          const user = testUsers.find(u => u.venture.id === candidateEmb.entity_id);
+        .filter((e) => e.entity_id !== p_idea_id)
+        .map((candidateEmb) => {
+          const similarity = cosineSimilarity(
+            queryEmbedding.vector,
+            candidateEmb.vector
+          );
+          const user = testUsers.find(
+            (u) => u.venture.id === candidateEmb.entity_id
+          );
 
           if (!user) return null;
 
@@ -424,7 +484,7 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
             availability_hours: user.availability_hours,
           };
         })
-        .filter(c => c !== null)
+        .filter((c) => c !== null)
         .sort((a, b) => b.similarity_score - a.similarity_score)
         .slice(0, p_limit);
 
@@ -432,14 +492,15 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock insert_like_interaction RPC
-    if (fn === 'insert_like_interaction') {
+    if (fn === "insert_like_interaction") {
       const { p_actor_user, p_target_user } = params;
 
       // Check if already exists
       const exists = mockInteractions.find(
-        i => i.actor_user === p_actor_user &&
-             i.target_user === p_target_user &&
-             (i.action === 'like' || i.action === 'pass')
+        (i) =>
+          i.actor_user === p_actor_user &&
+          i.target_user === p_target_user &&
+          (i.action === "like" || i.action === "pass")
       );
 
       if (!exists) {
@@ -447,7 +508,7 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           id: `interaction-${Date.now()}-${Math.random()}`,
           actor_user: p_actor_user,
           target_user: p_target_user,
-          action: 'like' as const,
+          action: "like" as const,
           actor_current_idea: null,
           target_current_idea: null,
           created_at: new Date().toISOString(),
@@ -460,13 +521,14 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock insert_pass_interaction RPC
-    if (fn === 'insert_pass_interaction') {
+    if (fn === "insert_pass_interaction") {
       const { p_actor_user, p_target_user } = params;
 
       const existingIndex = mockInteractions.findIndex(
-        i => i.actor_user === p_actor_user &&
-             i.target_user === p_target_user &&
-             i.action === 'pass'
+        (i) =>
+          i.actor_user === p_actor_user &&
+          i.target_user === p_target_user &&
+          i.action === "pass"
       );
 
       const now = new Date().toISOString();
@@ -481,7 +543,7 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           id: `interaction-${Date.now()}-${Math.random()}`,
           actor_user: p_actor_user,
           target_user: p_target_user,
-          action: 'pass' as const,
+          action: "pass" as const,
           actor_current_idea: null,
           target_current_idea: null,
           created_at: now,
@@ -494,14 +556,14 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
     }
 
     // Mock block_user RPC
-    if (fn === 'block_user') {
+    if (fn === "block_user") {
       const { p_actor, p_target } = params;
 
       const interaction = {
         id: `interaction-${Date.now()}-${Math.random()}`,
         actor_user: p_actor,
         target_user: p_target,
-        action: 'block' as const,
+        action: "block" as const,
         actor_current_idea: null,
         target_current_idea: null,
         created_at: new Date().toISOString(),
@@ -512,7 +574,10 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
       return Promise.resolve({ data: null, error: null });
     }
 
-    return Promise.resolve({ data: null, error: { message: 'Unknown RPC function' } });
+    return Promise.resolve({
+      data: null,
+      error: { message: "Unknown RPC function" },
+    });
   });
 
   return {
@@ -545,7 +610,7 @@ export function getMockInteractions() {
 export function addMockInteraction(
   actorUser: string,
   targetUser: string,
-  action: 'like' | 'pass' | 'block',
+  action: "like" | "pass" | "block",
   actorCurrentIdea: string | null = null,
   targetCurrentIdea: string | null = null
 ) {

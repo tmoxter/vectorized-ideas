@@ -6,7 +6,7 @@ export default function Footer() {
           <div className="mb-4 md:mb-0">
             <div className="flex items-center space-x-3 mb-2">
               <div className="w-6 h-6 rounded flex items-center justify-center bg-blue-200">
-                <span className="text-black font-mono text">{'\u{1D708}'}</span>
+                <span className="text-black font-mono text">{"\u{1D708}"}</span>
               </div>
               <span className="font-mono text-sm text-gray-700">
                 vectorized-ideas

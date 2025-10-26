@@ -205,13 +205,16 @@ export async function GET(req: NextRequest) {
       typeof embedding.entity_id
     );
 
-    const { data: cands, error: kErr } = await sb.rpc("knn_candidates_interact_prefs_applied", {
-      p_idea_id: embedding.entity_id,
-      p_model: MODEL,
-      p_version: VERSION,
-      p_limit: 100,
-      p_probes: 10,
-    });
+    const { data: cands, error: kErr } = await sb.rpc(
+      "knn_candidates_interact_prefs_applied",
+      {
+        p_idea_id: embedding.entity_id,
+        p_model: MODEL,
+        p_version: VERSION,
+        p_limit: 100,
+        p_probes: 10,
+      }
+    );
 
     console.log("KNN candidates result:", { cands, kErr });
 
@@ -235,27 +238,35 @@ export async function GET(req: NextRequest) {
 
         try {
           // Fetch all data in parallel
-          const [profileResult, ventureResult, preferencesResult] = await Promise.all([
-            sb
-              .from("profiles")
-              .select("name, bio, achievements, experience, education, city_id")
-              .eq("user_id", candidateUserId)
-              .maybeSingle(),
-            sb
-              .from("user_ventures")
-              .select("title, description")
-              .eq("user_id", candidateUserId)
-              .maybeSingle(),
-            sb
-              .from("user_cofounder_preference")
-              .select("title, description")
-              .eq("user_id", candidateUserId)
-              .maybeSingle(),
-          ]);
+          const [profileResult, ventureResult, preferencesResult] =
+            await Promise.all([
+              sb
+                .from("profiles")
+                .select(
+                  "name, bio, achievements, experience, education, city_id"
+                )
+                .eq("user_id", candidateUserId)
+                .maybeSingle(),
+              sb
+                .from("user_ventures")
+                .select("title, description")
+                .eq("user_id", candidateUserId)
+                .maybeSingle(),
+              sb
+                .from("user_cofounder_preference")
+                .select("title, description")
+                .eq("user_id", candidateUserId)
+                .maybeSingle(),
+            ]);
 
           // Fetch city data if city_id exists
           let cityData = null;
-          console.log("API: Profile data for user", candidateUserId, ":", profileResult.data);
+          console.log(
+            "API: Profile data for user",
+            candidateUserId,
+            ":",
+            profileResult.data
+          );
           console.log("API: City ID:", profileResult.data?.city_id);
 
           if (profileResult.data?.city_id) {
@@ -279,15 +290,21 @@ export async function GET(req: NextRequest) {
             timezone: candidate.timezone,
             availability_hours: candidate.availability_hours,
             similarity_score: candidate.idea_sim,
-            profile: profileResult.data ? {
-              ...profileResult.data,
-              ...cityData,
-            } : null,
+            profile: profileResult.data
+              ? {
+                  ...profileResult.data,
+                  ...cityData,
+                }
+              : null,
             venture: ventureResult.data,
             preferences: preferencesResult.data,
           };
         } catch (error) {
-          console.error("Error enriching candidate data:", candidateUserId, error);
+          console.error(
+            "Error enriching candidate data:",
+            candidateUserId,
+            error
+          );
           return null;
         }
       })

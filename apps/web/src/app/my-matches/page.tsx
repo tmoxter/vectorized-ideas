@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Users, ShieldX } from "lucide-react";
-import { Circles } from 'react-loader-spinner';
+import { Circles } from "react-loader-spinner";
 
 interface ProfileData {
   id: string;
@@ -85,36 +85,45 @@ export default function MyMatchesPage() {
 
       // Fetch profile data for all matched users
       const profilesPromises = otherUserIds.map(async (matchedUserId) => {
-        const [profileResult, ventureResult, preferencesResult, userDataResult] =
-          await Promise.all([
-            supabase
-              .from("profiles")
-              .select("name, bio, achievements, experience, education, city_id")
-              .eq("user_id", matchedUserId)
-              .maybeSingle(),
-            supabase
-              .from("user_ventures")
-              .select("title, description")
-              .eq("user_id", matchedUserId)
-              .maybeSingle(),
-            supabase
-              .from("user_cofounder_preference")
-              .select("title, description")
-              .eq("user_id", matchedUserId)
-              .maybeSingle(),
-            supabase
-              .from("user_data")
-              .select("timezone, stage, availability_hours")
-              .eq("user_id", matchedUserId)
-              .maybeSingle(),
-          ]);
+        const [
+          profileResult,
+          ventureResult,
+          preferencesResult,
+          userDataResult,
+        ] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("name, bio, achievements, experience, education, city_id")
+            .eq("user_id", matchedUserId)
+            .maybeSingle(),
+          supabase
+            .from("user_ventures")
+            .select("title, description")
+            .eq("user_id", matchedUserId)
+            .maybeSingle(),
+          supabase
+            .from("user_cofounder_preference")
+            .select("title, description")
+            .eq("user_id", matchedUserId)
+            .maybeSingle(),
+          supabase
+            .from("user_data")
+            .select("timezone, stage, availability_hours")
+            .eq("user_id", matchedUserId)
+            .maybeSingle(),
+        ]);
 
         if (profileResult.data) {
           // Fetch city data if city_id exists
           let city_name: string | undefined;
           let country: string | undefined;
 
-          console.log("Profile data for user", matchedUserId, ":", profileResult.data);
+          console.log(
+            "Profile data for user",
+            matchedUserId,
+            ":",
+            profileResult.data
+          );
           console.log("City ID:", profileResult.data.city_id);
 
           if (profileResult.data.city_id) {
@@ -316,9 +325,13 @@ export default function MyMatchesPage() {
                             {selectedMatch.name}
                           </h2>
                           <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">
-                            {selectedMatch.city_name && selectedMatch.country && (
-                              <span>📍 {selectedMatch.city_name}, {selectedMatch.country}</span>
-                            )}
+                            {selectedMatch.city_name &&
+                              selectedMatch.country && (
+                                <span>
+                                  📍 {selectedMatch.city_name},{" "}
+                                  {selectedMatch.country}
+                                </span>
+                              )}
                             {selectedMatch.timezone && (
                               <span>🕒 {selectedMatch.timezone}</span>
                             )}
@@ -436,7 +449,8 @@ export default function MyMatchesPage() {
                               <strong>Block this user?</strong>
                             </p>
                             <p className="font-mono text-xs text-red-700">
-                              They won't appear in your matches again and you won't see each other.
+                              They won't appear in your matches again and you
+                              won't see each other.
                             </p>
                           </div>
                           <div className="flex justify-center space-x-3">

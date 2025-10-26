@@ -3,15 +3,38 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase";
-import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, User, Home, ChevronDown, Clock } from "lucide-react";
+import {
+  Search,
+  Sparkles,
+  SkipForward,
+  ShieldOff,
+  Settings,
+  LogOut,
+  User,
+  Home,
+  ChevronDown,
+  Clock,
+} from "lucide-react";
 
 interface NavigationProps {
-  currentPage: "home" | "discover" | "my-matches" | "skipped" | "blocked" | "profile" | "settings" | "pending-requests";
+  currentPage:
+    | "home"
+    | "discover"
+    | "my-matches"
+    | "skipped"
+    | "blocked"
+    | "profile"
+    | "settings"
+    | "pending-requests";
   userEmail?: string;
   onLogout: () => void;
 }
 
-export default function Navigation({ currentPage, userEmail, onLogout }: NavigationProps) {
+export default function Navigation({
+  currentPage,
+  userEmail,
+  onLogout,
+}: NavigationProps) {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const router = useRouter();
@@ -103,7 +126,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        {hoveredItem === "discover" && <Search className="w-4 h-4" />}
+                        {hoveredItem === "discover" && (
+                          <Search className="w-4 h-4" />
+                        )}
                         <span>Discover Profiles</span>
                       </button>
                     </div>
@@ -120,7 +145,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
             >
               <button
                 className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
-                  currentPage === "my-matches" || currentPage === "skipped" || currentPage === "pending-requests"
+                  currentPage === "my-matches" ||
+                  currentPage === "skipped" ||
+                  currentPage === "pending-requests"
                     ? "bg-silver text-gray-900 font-semibold"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
@@ -147,7 +174,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        {hoveredItem === "pending-requests" && <Clock className="w-4 h-4" />}
+                        {hoveredItem === "pending-requests" && (
+                          <Clock className="w-4 h-4" />
+                        )}
                         <span>Pending Requests</span>
                       </button>
                       <button
@@ -160,7 +189,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        {hoveredItem === "my-matches" && <Sparkles className="w-4 h-4" />}
+                        {hoveredItem === "my-matches" && (
+                          <Sparkles className="w-4 h-4" />
+                        )}
                         <span>Matches</span>
                       </button>
                       <button
@@ -173,7 +204,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        {hoveredItem === "skipped" && <SkipForward className="w-4 h-4" />}
+                        {hoveredItem === "skipped" && (
+                          <SkipForward className="w-4 h-4" />
+                        )}
                         <span>Skipped Profiles</span>
                       </button>
                     </div>
@@ -190,7 +223,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
             >
               <button
                 className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
-                  currentPage === "profile" || currentPage === "settings" || currentPage === "blocked"
+                  currentPage === "profile" ||
+                  currentPage === "settings" ||
+                  currentPage === "blocked"
                     ? "bg-silver text-gray-900 font-semibold"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
@@ -217,7 +252,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        {hoveredItem === "profile" && <User className="w-4 h-4" />}
+                        {hoveredItem === "profile" && (
+                          <User className="w-4 h-4" />
+                        )}
                         <span>Profile</span>
                       </button>
                       <button
@@ -230,7 +267,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        {hoveredItem === "settings" && <Settings className="w-4 h-4" />}
+                        {hoveredItem === "settings" && (
+                          <Settings className="w-4 h-4" />
+                        )}
                         <span>Account Settings</span>
                       </button>
                       <button
@@ -243,7 +282,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        {hoveredItem === "blocked" && <ShieldOff className="w-4 h-4" />}
+                        {hoveredItem === "blocked" && (
+                          <ShieldOff className="w-4 h-4" />
+                        )}
                         <span>Blocked Profiles</span>
                       </button>
                     </div>
@@ -257,7 +298,9 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
         {/* Right - User Info & Logout */}
         <div className="flex items-center space-x-4">
           {userEmail && (
-            <span className="font-mono text-sm text-gray-600 hidden lg:inline">{userEmail}</span>
+            <span className="font-mono text-sm text-gray-600 hidden lg:inline">
+              {userEmail}
+            </span>
           )}
           <button
             onClick={onLogout}

@@ -5,8 +5,17 @@ import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Search, Sparkles, User, Settings, BarChart3, SkipForward, BookOpenText, Clock } from "lucide-react";
-import { Circles, InfinitySpin } from 'react-loader-spinner';
+import {
+  Search,
+  Sparkles,
+  User,
+  Settings,
+  BarChart3,
+  SkipForward,
+  BookOpenText,
+  Clock,
+} from "lucide-react";
+import { Circles, InfinitySpin } from "react-loader-spinner";
 import Image from "next/image";
 
 export default function HomePage() {
@@ -50,7 +59,10 @@ export default function HomePage() {
       console.log("[home] Response status:", response.status);
 
       if (!response.ok) {
-        console.error("[home] Error fetching banner data, status:", response.status);
+        console.error(
+          "[home] Error fetching banner data, status:",
+          response.status
+        );
         return;
       }
 
@@ -88,8 +100,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">
-            </h1>
+            <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2"></h1>
           </div>
 
           {/* Ticker Banner */}
@@ -97,19 +108,20 @@ export default function HomePage() {
             <div className="mb-8 overflow-hidden">
               <div className="ticker-animate flex gap-16 whitespace-nowrap">
                 <p className="font-mono text-2xl font-semibold text-gray-800">
-                  Currently, there are {bannerData.total_profiles} profiles matching your location filter. {bannerData.related_topics} are working on related topics.
+                  Currently, there are {bannerData.total_profiles} profiles
+                  matching your location filter. {bannerData.related_topics} are
+                  working on related topics.
                 </p>
                 <p className="font-mono text-2xl font-semibold text-gray-800">
-                  Currently, there are {bannerData.total_profiles} profiles matching your location filter. {bannerData.related_topics} are working on related topics.
+                  Currently, there are {bannerData.total_profiles} profiles
+                  matching your location filter. {bannerData.related_topics} are
+                  working on related topics.
                 </p>
               </div>
             </div>
           ) : (
             <div className="mb-8 flex justify-center">
-              <InfinitySpin
-                color="#c7defb"
-                width="200"
-              />
+              <InfinitySpin color="#c7defb" width="200" />
             </div>
           )}
 
@@ -127,7 +139,8 @@ export default function HomePage() {
                 Discover Profiles
               </h3>
               <p className="text-gray-600 text-sm font-mono">
-                browse through semantic similarity matches and find potential co-founders based on your profile and venture ideas
+                browse through semantic similarity matches and find potential
+                co-founders based on your profile and venture ideas
               </p>
             </button>
 
@@ -143,7 +156,8 @@ export default function HomePage() {
                 Pending Requests
               </h3>
               <p className="text-gray-600 text-sm font-mono">
-                review and respond to people who have liked your profile and want to connect
+                review and respond to people who have liked your profile and
+                want to connect
               </p>
             </button>
 
@@ -159,7 +173,8 @@ export default function HomePage() {
                 Revisit Skipped Profiles
               </h3>
               <p className="text-gray-600 text-sm font-mono">
-                review profiles you previously passed on and reconsider potential connections
+                review profiles you previously passed on and reconsider
+                potential connections
               </p>
             </button>
 
@@ -175,7 +190,8 @@ export default function HomePage() {
                 Matches
               </h3>
               <p className="text-gray-600 text-sm font-mono">
-                view your mutual matches and connect with co-founders who are interested in collaborating
+                view your mutual matches and connect with co-founders who are
+                interested in collaborating
               </p>
             </button>
 
@@ -191,7 +207,8 @@ export default function HomePage() {
                 My Profile
               </h3>
               <p className="text-gray-600 text-sm font-mono">
-                edit your profile, venture ideas, and co-founder preferences to improve matching
+                edit your profile, venture ideas, and co-founder preferences to
+                improve matching
               </p>
             </button>
 
@@ -223,7 +240,8 @@ export default function HomePage() {
                 Analyze
               </h3>
               <p className="text-gray-600 text-sm font-mono">
-                view insights and analytics about your matching activity and profile performance
+                view insights and analytics about your matching activity and
+                profile performance
               </p>
             </button>
           </div>

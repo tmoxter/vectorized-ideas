@@ -62,23 +62,26 @@ export async function GET(req: NextRequest) {
         }
 
         try {
-          const [profileResult, ventureResult, preferencesResult] = await Promise.all([
-            sb
-              .from("profiles")
-              .select("name, bio, achievements, experience, education, city_id")
-              .eq("user_id", targetUserId)
-              .maybeSingle(),
-            sb
-              .from("user_ventures")
-              .select("title, description")
-              .eq("user_id", targetUserId)
-              .maybeSingle(),
-            sb
-              .from("user_cofounder_preference")
-              .select("title, description")
-              .eq("user_id", targetUserId)
-              .maybeSingle(),
-          ]);
+          const [profileResult, ventureResult, preferencesResult] =
+            await Promise.all([
+              sb
+                .from("profiles")
+                .select(
+                  "name, bio, achievements, experience, education, city_id"
+                )
+                .eq("user_id", targetUserId)
+                .maybeSingle(),
+              sb
+                .from("user_ventures")
+                .select("title, description")
+                .eq("user_id", targetUserId)
+                .maybeSingle(),
+              sb
+                .from("user_cofounder_preference")
+                .select("title, description")
+                .eq("user_id", targetUserId)
+                .maybeSingle(),
+            ]);
 
           // Fetch city data if city_id exists
           let cityData = null;
@@ -100,15 +103,21 @@ export async function GET(req: NextRequest) {
             timezone: item.timezone,
             availability_hours: item.availability_hours,
             created_at: item.created_at,
-            profile: profileResult.data ? {
-              ...profileResult.data,
-              ...cityData,
-            } : null,
+            profile: profileResult.data
+              ? {
+                  ...profileResult.data,
+                  ...cityData,
+                }
+              : null,
             venture: ventureResult.data,
             preferences: preferencesResult.data,
           };
         } catch (error) {
-          console.error("Error enriching pending request data:", targetUserId, error);
+          console.error(
+            "Error enriching pending request data:",
+            targetUserId,
+            error
+          );
           return null;
         }
       })

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { Circles } from 'react-loader-spinner';
+import { Circles } from "react-loader-spinner";
 
 export default function AuthCallback() {
   const [isChecking, setIsChecking] = useState(true);

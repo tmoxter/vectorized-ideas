@@ -1,28 +1,28 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { NextRequest } from 'next/server';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 // Mock @supabase/supabase-js
 const mockCreateClient = vi.hoisted(() => vi.fn());
-vi.mock('@supabase/supabase-js', () => ({
+vi.mock("@supabase/supabase-js", () => ({
   createClient: mockCreateClient,
 }));
 
 // Import after mocks are set up
-const { GET } = await import('../route');
+const { GET } = await import("../route");
 
-describe('GET /api/banner-counts', () => {
-  const testUserId = 'test-user-123';
-  const testVentureId = 'venture-456';
+describe("GET /api/banner-counts", () => {
+  const testUserId = "test-user-123";
+  const testVentureId = "venture-456";
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Setup environment variables
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-role-key";
   });
 
-  it('should return 401 when authorization header is missing', async () => {
+  it("should return 401 when authorization header is missing", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn(),
@@ -30,39 +30,39 @@ describe('GET /api/banner-counts', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts');
+    const request = new NextRequest("http://localhost/api/banner-counts");
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(401);
-    expect(data.error).toBe('No authorization header');
+    expect(data.error).toBe("No authorization header");
     expect(mockClient.auth.getUser).not.toHaveBeenCalled();
   });
 
-  it('should return 401 when user is not authenticated', async () => {
+  it("should return 401 when user is not authenticated", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
           data: { user: null },
-          error: { message: 'Invalid token' },
+          error: { message: "Invalid token" },
         }),
       },
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer invalid-token',
+        Authorization: "Bearer invalid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(401);
-    expect(data.error).toBe('User not authenticated');
+    expect(data.error).toBe("User not authenticated");
   });
 
-  it('should return default counts when user has no venture', async () => {
+  it("should return default counts when user has no venture", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -71,7 +71,7 @@ describe('GET /api/banner-counts', () => {
         }),
       },
       from: vi.fn((table: string) => {
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -88,9 +88,9 @@ describe('GET /api/banner-counts', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -103,7 +103,7 @@ describe('GET /api/banner-counts', () => {
     });
   });
 
-  it('should return banner counts successfully', async () => {
+  it("should return banner counts successfully", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -112,7 +112,7 @@ describe('GET /api/banner-counts', () => {
         }),
       },
       from: vi.fn((table: string) => {
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -121,20 +121,20 @@ describe('GET /api/banner-counts', () => {
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
                 id: testVentureId,
-                title: 'Test Venture',
-                created_at: '2025-01-01T00:00:00Z',
+                title: "Test Venture",
+                created_at: "2025-01-01T00:00:00Z",
               },
               error: null,
             }),
           };
         }
-        if (table === 'embeddings') {
+        if (table === "embeddings") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                version: '1',
+                version: "1",
               },
               error: null,
             }),
@@ -154,9 +154,9 @@ describe('GET /api/banner-counts', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -167,15 +167,15 @@ describe('GET /api/banner-counts', () => {
       total_profiles: 42,
       related_topics: 15,
     });
-    expect(mockClient.rpc).toHaveBeenCalledWith('banner_counts', {
+    expect(mockClient.rpc).toHaveBeenCalledWith("banner_counts", {
       p_user: testUserId,
       p_idea_id: testVentureId,
-      p_model: 'text-embedding-3-small',
-      p_version: '1',
+      p_model: "text-embedding-3-small",
+      p_version: "1",
     });
   });
 
-  it('should use default version when no embedding found', async () => {
+  it("should use default version when no embedding found", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -184,7 +184,7 @@ describe('GET /api/banner-counts', () => {
         }),
       },
       from: vi.fn((table: string) => {
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -193,14 +193,14 @@ describe('GET /api/banner-counts', () => {
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
                 id: testVentureId,
-                title: 'Test Venture',
-                created_at: '2025-01-01T00:00:00Z',
+                title: "Test Venture",
+                created_at: "2025-01-01T00:00:00Z",
               },
               error: null,
             }),
           };
         }
-        if (table === 'embeddings') {
+        if (table === "embeddings") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -219,22 +219,22 @@ describe('GET /api/banner-counts', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     await GET(request);
 
-    expect(mockClient.rpc).toHaveBeenCalledWith('banner_counts', {
+    expect(mockClient.rpc).toHaveBeenCalledWith("banner_counts", {
       p_user: testUserId,
       p_idea_id: testVentureId,
-      p_model: 'text-embedding-3-small',
-      p_version: '1', // default version
+      p_model: "text-embedding-3-small",
+      p_version: "1", // default version
     });
   });
 
-  it('should handle RPC errors gracefully', async () => {
+  it("should handle RPC errors gracefully", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -243,47 +243,53 @@ describe('GET /api/banner-counts', () => {
         }),
       },
       from: vi.fn((table: string) => {
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             order: vi.fn().mockReturnThis(),
             limit: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
-              data: { id: testVentureId, title: 'Test', created_at: '2025-01-01T00:00:00Z' },
+              data: {
+                id: testVentureId,
+                title: "Test",
+                created_at: "2025-01-01T00:00:00Z",
+              },
               error: null,
             }),
           };
         }
-        if (table === 'embeddings') {
+        if (table === "embeddings") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
-            maybeSingle: vi.fn().mockResolvedValue({ data: { version: '1' }, error: null }),
+            maybeSingle: vi
+              .fn()
+              .mockResolvedValue({ data: { version: "1" }, error: null }),
           };
         }
         return {};
       }),
       rpc: vi.fn().mockResolvedValue({
         data: null,
-        error: { message: 'RPC function error' },
+        error: { message: "RPC function error" },
       }),
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('RPC function error');
+    expect(data.error).toBe("RPC function error");
   });
 
-  it('should return default counts when RPC returns empty data', async () => {
+  it("should return default counts when RPC returns empty data", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -292,23 +298,29 @@ describe('GET /api/banner-counts', () => {
         }),
       },
       from: vi.fn((table: string) => {
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             order: vi.fn().mockReturnThis(),
             limit: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
-              data: { id: testVentureId, title: 'Test', created_at: '2025-01-01T00:00:00Z' },
+              data: {
+                id: testVentureId,
+                title: "Test",
+                created_at: "2025-01-01T00:00:00Z",
+              },
               error: null,
             }),
           };
         }
-        if (table === 'embeddings') {
+        if (table === "embeddings") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
-            maybeSingle: vi.fn().mockResolvedValue({ data: { version: '1' }, error: null }),
+            maybeSingle: vi
+              .fn()
+              .mockResolvedValue({ data: { version: "1" }, error: null }),
           };
         }
         return {};
@@ -320,9 +332,9 @@ describe('GET /api/banner-counts', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -335,7 +347,7 @@ describe('GET /api/banner-counts', () => {
     });
   });
 
-  it('should handle venture query errors', async () => {
+  it("should handle venture query errors", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -344,7 +356,7 @@ describe('GET /api/banner-counts', () => {
         }),
       },
       from: vi.fn((table: string) => {
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
@@ -352,7 +364,7 @@ describe('GET /api/banner-counts', () => {
             limit: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: null,
-              error: { message: 'Database error' },
+              error: { message: "Database error" },
             }),
           };
         }
@@ -361,33 +373,33 @@ describe('GET /api/banner-counts', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Error fetching user venture');
+    expect(data.error).toBe("Error fetching user venture");
   });
 
-  it('should handle missing environment variables', async () => {
+  it("should handle missing environment variables", async () => {
     delete process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    const request = new NextRequest('http://localhost/api/banner-counts', {
+    const request = new NextRequest("http://localhost/api/banner-counts", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Missing Supabase configuration');
+    expect(data.error).toBe("Missing Supabase configuration");
 
     // Restore for other tests
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
   });
 });

@@ -22,7 +22,11 @@ export async function POST(request: NextRequest) {
 
     if (!["like", "pass", "block", "unblock"].includes(action)) {
       return NextResponse.json(
-        { success: false, error: "Invalid action. Must be 'like', 'pass', 'block', or 'unblock'" },
+        {
+          success: false,
+          error:
+            "Invalid action. Must be 'like', 'pass', 'block', or 'unblock'",
+        },
         { status: 400 }
       );
     }
@@ -112,8 +116,8 @@ export async function POST(request: NextRequest) {
         .eq("target_user", user.id)
         .eq("action", "like")
         .limit(1);
-      
-        console.log("Reciprocal like check:", reciprocal);
+
+      console.log("Reciprocal like check:", reciprocal);
 
       // If there's a reciprocal like, create a match
       if (reciprocal && reciprocal.length > 0) {
@@ -125,7 +129,7 @@ export async function POST(request: NextRequest) {
             active: true,
           })
           .select();
-          console.log("Match creation result:", matchError);
+        console.log("Match creation result:", matchError);
 
         if (matchError && !matchError.message.includes("duplicate")) {
           console.error("Error creating match:", matchError);
@@ -137,16 +141,14 @@ export async function POST(request: NextRequest) {
       // For 'pass': insert or update created_at if already exists
       const { error: upsertError } = await supabase
         .from("interactions")
-        .upsert(
-          {
-            actor_user: user.id,
-            target_user: targetUserId,
-            action: "pass",
-            actor_current_idea: actorCurrentIdea,
-            target_current_idea: targetCurrentIdea,
-            created_at: new Date().toISOString(),
-          },
-        )
+        .upsert({
+          actor_user: user.id,
+          target_user: targetUserId,
+          action: "pass",
+          actor_current_idea: actorCurrentIdea,
+          target_current_idea: targetCurrentIdea,
+          created_at: new Date().toISOString(),
+        })
         .select();
 
       if (upsertError) {

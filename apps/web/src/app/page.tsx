@@ -5,7 +5,13 @@ import Image from "next/image";
 import { supabaseClient } from "@/lib/supabase";
 import TypewriterHero from "@/components/TypewriterHero";
 import Footer from "@/components/Footer";
-import { ArrowUpZA, Telescope, Handshake, Map, ChevronDown } from "lucide-react";
+import {
+  ArrowUpZA,
+  Telescope,
+  Handshake,
+  Map,
+  ChevronDown,
+} from "lucide-react";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -129,7 +135,9 @@ export default function Home() {
               className="flex items-center space-x-3 hover:opacity-80"
             >
               <div className="w-6 h-6 icon-gradient rounded flex items-center justify-center">
-                <span className="text-white font-mono text-xl">{'\u{1D708}'}</span>
+                <span className="text-white font-mono text-xl">
+                  {"\u{1D708}"}
+                </span>
               </div>
               <span className="font-mono text-lg text-gray-900">
                 vectorized-ideas
@@ -147,9 +155,10 @@ export default function Home() {
               <div className="flex-1 max-w-4xl">
                 <TypewriterHero />
                 <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
-                  Use your projects and venture ideas to find
-                  collaborators with conceptually similar visions and connect with those
-                  who want to work on related challenges or are already tackling the same problems as you.
+                  Use your projects and venture ideas to find collaborators with
+                  conceptually similar visions and connect with those who want
+                  to work on related challenges or are already tackling the same
+                  problems as you.
                 </p>
               </div>
               <div className="hidden lg:block lg:w-80 lg:flex-shrink-0">
@@ -175,9 +184,10 @@ export default function Home() {
                     Semantic Similarity
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Describe what you are working on, embed your ideas as semantic vectors, and search through
-                    profiles of others who are either already working on similar ideas or want to
-                    solve the same problems.
+                    Describe what you are working on, embed your ideas as
+                    semantic vectors, and search through profiles of others who
+                    are either already working on similar ideas or want to solve
+                    the same problems.
                   </p>
                 </div>
 
@@ -189,9 +199,11 @@ export default function Home() {
                     Visibility
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    You share your first name and region, and give an overview over your background, skills,
-                    and accomplishments. Of course, you also get to see each other's project ideas along some optional
-                    co-founder preferences. Please don't share any sensitive information.
+                    You share your first name and region, and give an overview
+                    over your background, skills, and accomplishments. Of
+                    course, you also get to see each other's project ideas along
+                    some optional co-founder preferences. Please don't share any
+                    sensitive information.
                   </p>
                 </div>
 
@@ -203,8 +215,9 @@ export default function Home() {
                     Connect on LinkedIn
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    If both parties are interested, your LinkedIn profiles are shared to
-                    connect directly. We don't have a chat feature for now to keep it lightweight. <br />
+                    If both parties are interested, your LinkedIn profiles are
+                    shared to connect directly. We don't have a chat feature for
+                    now to keep it lightweight. <br />
                   </p>
                 </div>
 
@@ -216,134 +229,135 @@ export default function Home() {
                     Compare
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Get aggregated insights into how much attention your field is getting. Your ideas are
-                    only shared with potential matches you'll soon see a map of venture ideas and how you fit in it.<br />
+                    Get aggregated insights into how much attention your field
+                    is getting. Your ideas are only shared with potential
+                    matches you'll soon see a map of venture ideas and how you
+                    fit in it.
+                    <br />
                   </p>
                 </div>
               </div>
 
-              
-
-
-
               {/* Sign Up / Login Form */}
               <div className="lg:w-96">
-              <div className="bg-white p-6 rounded border border-gray-200">
-                <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
-                  {isLoginMode ? "welcome back" : "Join the search"}
-                </h2>
+                <div className="bg-white p-6 rounded border border-gray-200">
+                  <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
+                    {isLoginMode ? "welcome back" : "Join the search"}
+                  </h2>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <input
-                      type="email"
-                      placeholder="email address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                    />
-                  </div>
-
-                  <div>
-                    <input
-                      type="password"
-                      placeholder={
-                        isLoginMode ? "password" : "password (min 6 characters)"
-                      }
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={isLoginMode ? 1 : 6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoading || !email || !password}
-                    className="w-full bg-black text-white py-3 px-4 rounded font-mono hover:bg-gray-800 transition duration-200 disabled:opacity-50"
-                  >
-                    {isLoading
-                      ? isLoginMode
-                        ? "logging in..."
-                        : "creating account..."
-                      : isLoginMode
-                        ? "log in"
-                        : "create account"}
-                  </button>
-                </form>
-
-                <div className="mt-4">
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300" />
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                      <input
+                        type="email"
+                        placeholder="email address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                      />
                     </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">or</span>
-                    </div>
-                  </div>
 
-                  <div className="mt-4 space-y-3">
-                    <button
-                      onClick={handleGoogleSignIn}
-                      className="w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded font-mono hover:bg-gray-50 transition duration-200"
-                    >
-                      continue with google
-                    </button>
+                    <div>
+                      <input
+                        type="password"
+                        placeholder={
+                          isLoginMode
+                            ? "password"
+                            : "password (min 6 characters)"
+                        }
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        minLength={isLoginMode ? 1 : 6}
+                        className="w-full px-4 py-3 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                      />
+                    </div>
 
                     <button
-                      onClick={handleAppleSignIn}
-                      className="w-full bg-black border border-black text-white py-3 px-4 rounded font-mono hover:bg-gray-800 transition duration-200"
+                      type="submit"
+                      disabled={isLoading || !email || !password}
+                      className="w-full bg-black text-white py-3 px-4 rounded font-mono hover:bg-gray-800 transition duration-200 disabled:opacity-50"
                     >
-                      continue with apple
+                      {isLoading
+                        ? isLoginMode
+                          ? "logging in..."
+                          : "creating account..."
+                        : isLoginMode
+                          ? "log in"
+                          : "create account"}
+                    </button>
+                  </form>
+
+                  <div className="mt-4">
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300" />
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">or</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 space-y-3">
+                      <button
+                        onClick={handleGoogleSignIn}
+                        className="w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded font-mono hover:bg-gray-50 transition duration-200"
+                      >
+                        continue with google
+                      </button>
+
+                      <button
+                        onClick={handleAppleSignIn}
+                        className="w-full bg-black border border-black text-white py-3 px-4 rounded font-mono hover:bg-gray-800 transition duration-200"
+                      >
+                        continue with apple
+                      </button>
+                    </div>
+                  </div>
+
+                  {message && (
+                    <div
+                      className={`mt-4 p-3 rounded text-sm font-mono ${
+                        message.includes("Error")
+                          ? "bg-red-50 text-red-600 border border-red-200"
+                          : "bg-green-50 text-green-600 border border-green-200"
+                      }`}
+                    >
+                      {message}
+                    </div>
+                  )}
+
+                  {/* Toggle between login and signup */}
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={() => {
+                        setIsLoginMode(!isLoginMode);
+                        setMessage("");
+                        setEmail("");
+                        setPassword("");
+                      }}
+                      className="font-mono text-sm text-gray-600 hover:text-gray-900 underline"
+                    >
+                      {isLoginMode
+                        ? "need an account? sign up"
+                        : "already have an account? log in"}
                     </button>
                   </div>
-                </div>
-
-                {message && (
-                  <div
-                    className={`mt-4 p-3 rounded text-sm font-mono ${
-                      message.includes("Error")
-                        ? "bg-red-50 text-red-600 border border-red-200"
-                        : "bg-green-50 text-green-600 border border-green-200"
-                    }`}
-                  >
-                    {message}
-                  </div>
-                )}
-
-                {/* Toggle between login and signup */}
-                <div className="mt-6 text-center">
-                  <button
-                    onClick={() => {
-                      setIsLoginMode(!isLoginMode);
-                      setMessage("");
-                      setEmail("");
-                      setPassword("");
-                    }}
-                    className="font-mono text-sm text-gray-600 hover:text-gray-900 underline"
-                  >
-                    {isLoginMode
-                      ? "need an account? sign up"
-                      : "already have an account? log in"}
-                  </button>
                 </div>
               </div>
             </div>
-            </div>
-
 
             {/* Technical Note */}
             <div className="max-w-4xl">
-
               {/* FAQ Section */}
               <div className="mt-12">
                 <div className="space-y-4">
                   {/* FAQ Item 1 */}
                   <div className="bg-white rounded border border-gray-200 overflow-hidden">
                     <button
-                      onClick={() => setExpandedFaq(expandedFaq === 0 ? null : 0)}
+                      onClick={() =>
+                        setExpandedFaq(expandedFaq === 0 ? null : 0)
+                      }
                       className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition duration-200"
                     >
                       <span className="font-mono font-semibold text-gray-900">
@@ -358,7 +372,8 @@ export default function Home() {
                     {expandedFaq === 0 && (
                       <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
                         <p className="font-mono text-sm text-gray-700">
-                          Yes, but I found it hard to find people with aligned visions on them.
+                          Yes, but I found it hard to find people with aligned
+                          visions on them.
                         </p>
                       </div>
                     )}
@@ -367,7 +382,9 @@ export default function Home() {
                   {/* FAQ Item 2 */}
                   <div className="bg-white rounded border border-gray-200 overflow-hidden">
                     <button
-                      onClick={() => setExpandedFaq(expandedFaq === 1 ? null : 1)}
+                      onClick={() =>
+                        setExpandedFaq(expandedFaq === 1 ? null : 1)
+                      }
                       className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition duration-200"
                     >
                       <span className="font-mono font-semibold text-gray-900">
@@ -382,7 +399,9 @@ export default function Home() {
                     {expandedFaq === 1 && (
                       <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
                         <p className="font-mono text-sm text-gray-700">
-                          First time founders tend to be secretive about their ideas, second-time founders shout them from the rooftops :).
+                          First time founders tend to be secretive about their
+                          ideas, second-time founders shout them from the
+                          rooftops :).
                         </p>
                       </div>
                     )}
@@ -392,8 +411,10 @@ export default function Home() {
 
               <div className="mt-12 p-4 bg-gray-50 rounded border-l-4 border-blue-950">
                 <p className="text-sm font-mono text-gray-00">
-                  <strong>Note:</strong> Vectorizied-ideas is completely free to use and in an experimental
-                  state. If you find any bugs or have suggestions, please open an issue or even better a PR on GitHub.
+                  <strong>Note:</strong> Vectorizied-ideas is completely free to
+                  use and in an experimental state. If you find any bugs or have
+                  suggestions, please open an issue or even better a PR on
+                  GitHub.
                   <a
                     href="https://github.com"
                     className="text-blue-950 hover:underline ml-1"
@@ -402,7 +423,6 @@ export default function Home() {
                   </a>
                 </p>
               </div>
-
             </div>
           </div>
         </div>

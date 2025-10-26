@@ -5,7 +5,7 @@ import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Circles } from 'react-loader-spinner';
+import { Circles } from "react-loader-spinner";
 import {
   embedProfile,
   embedIdea,
@@ -28,7 +28,11 @@ interface ProfileData {
 }
 
 type City = {
-  id: number; name: string; admin1?: string | null; country: string; iso2: string;
+  id: number;
+  name: string;
+  admin1?: string | null;
+  country: string;
+  iso2: string;
   label: string;
   population: number | null;
 };
@@ -219,94 +223,92 @@ export default function ProfilePage() {
           try {
             const embeddingPromises = [];
 
-          // Generate profile embedding if profile data exists
-          if (
-            profileData.name ||
-            profileData.bio ||
-            profileData.achievements ||
-            city
-          ) {
-            const profileText = createProfileEmbeddingText({
-              name: profileData.name,
-              bio: profileData.bio,
-              achievements: profileData.achievements,
-              region: city?.label || "",
-            });
-            if (profileText.trim()) {
-              embeddingPromises.push(embedProfile(user.id, profileText));
-            }
-          }
-
-          // Generate venture embedding if venture data exists - need to get the venture ID
-          if (profileData.venture_title || profileData.venture_description) {
-            // Get the venture ID from the venture result (which was just saved)
-            const ventureText = createVentureEmbeddingText({
-              title: profileData.venture_title,
-              description: profileData.venture_description,
-            });
-            if (ventureText.trim()) {
-              // We need to get the venture ID that was just created/updated
-              // Let's fetch the most recent venture for this user
-              const { data: recentVenture } = await supabase
-                .from("user_ventures")
-                .select("id")
-                .eq("user_id", user.id)
-                .order("updated_at", { ascending: false })
-                .limit(1)
-                .single();
-
-              if (recentVenture) {
-                embeddingPromises.push(
-                  embedIdea(recentVenture.id, ventureText)
-                );
+            // Generate profile embedding if profile data exists
+            if (
+              profileData.name ||
+              profileData.bio ||
+              profileData.achievements ||
+              city
+            ) {
+              const profileText = createProfileEmbeddingText({
+                name: profileData.name,
+                bio: profileData.bio,
+                achievements: profileData.achievements,
+                region: city?.label || "",
+              });
+              if (profileText.trim()) {
+                embeddingPromises.push(embedProfile(user.id, profileText));
               }
             }
-          }
 
-          // Execute all embedding operations
-          if (embeddingPromises.length > 0) {
-            const embeddingResults = await Promise.all(embeddingPromises);
-            const embeddingErrors = embeddingResults.filter(
-              (result) => !result.success
-            );
+            // Generate venture embedding if venture data exists - need to get the venture ID
+            if (profileData.venture_title || profileData.venture_description) {
+              // Get the venture ID from the venture result (which was just saved)
+              const ventureText = createVentureEmbeddingText({
+                title: profileData.venture_title,
+                description: profileData.venture_description,
+              });
+              if (ventureText.trim()) {
+                // We need to get the venture ID that was just created/updated
+                // Let's fetch the most recent venture for this user
+                const { data: recentVenture } = await supabase
+                  .from("user_ventures")
+                  .select("id")
+                  .eq("user_id", user.id)
+                  .order("updated_at", { ascending: false })
+                  .limit(1)
+                  .single();
 
-            if (embeddingErrors.length > 0) {
-              const errorMessages = embeddingErrors
-                .map((e) => e.error)
-                .join(", ");
+                if (recentVenture) {
+                  embeddingPromises.push(
+                    embedIdea(recentVenture.id, ventureText)
+                  );
+                }
+              }
+            }
+
+            // Execute all embedding operations
+            if (embeddingPromises.length > 0) {
+              const embeddingResults = await Promise.all(embeddingPromises);
+              const embeddingErrors = embeddingResults.filter(
+                (result) => !result.success
+              );
+
+              if (embeddingErrors.length > 0) {
+                const errorMessages = embeddingErrors
+                  .map((e) => e.error)
+                  .join(", ");
+                setMessage(
+                  publish
+                    ? `Profile published! Embedding errors: ${errorMessages}`
+                    : `Profile saved! Embedding errors: ${errorMessages}`
+                );
+              } else {
+                if (publish) {
+                  setMessage(
+                    "Profile published successfully! Redirecting to matches..."
+                  );
+                  // Redirect to matches page after successful publish
+                  setTimeout(() => {
+                    router.push("/matches");
+                  }, 1500);
+                } else {
+                  setMessage("Profile saved as draft!");
+                }
+              }
+            } else {
               setMessage(
                 publish
-                  ? `Profile published! Embedding errors: ${errorMessages}`
-                  : `Profile saved! Embedding errors: ${errorMessages}`
+                  ? "Profile published successfully!"
+                  : "Profile saved as draft!"
               );
-            } else {
-              if (publish) {
-                setMessage(
-                  "Profile published successfully! Redirecting to matches..."
-                );
-                // Redirect to matches page after successful publish
-                setTimeout(() => {
-                  router.push("/matches");
-                }, 1500);
-              } else {
-                setMessage("Profile saved as draft!");
-              }
             }
-          } else {
-            setMessage(
-              publish
-                ? "Profile published successfully!"
-                : "Profile saved as draft!"
-            );
-          }
           } catch (embeddingError) {
             const errorMsg =
               embeddingError instanceof Error
                 ? embeddingError.message
                 : String(embeddingError);
-            setMessage(
-              `Profile published! Embedding error: ${errorMsg}`
-            );
+            setMessage(`Profile published! Embedding error: ${errorMsg}`);
           }
         } else {
           // Draft save - no embeddings generated

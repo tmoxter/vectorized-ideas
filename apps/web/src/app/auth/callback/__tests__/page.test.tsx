@@ -1,36 +1,36 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 
 // Mock Next.js router
 const mockPush = vi.fn();
 const mockRouter = {
   push: mockPush,
-  pathname: '/auth/callback',
+  pathname: "/auth/callback",
 };
 
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => mockRouter,
 }));
 
 // Mock Supabase client
 const mockSupabaseClient = vi.fn();
-vi.mock('@/lib/supabase', () => ({
+vi.mock("@/lib/supabase", () => ({
   supabaseClient: mockSupabaseClient,
 }));
 
 // Import the component after all mocks are set up
-const AuthCallback = await import('../page').then(m => m.default);
+const AuthCallback = await import("../page").then((m) => m.default);
 
-describe('AuthCallback Routing Logic', () => {
-  const testUserId = 'test-user-123';
-  const testUserEmail = 'test@example.com';
+describe("AuthCallback Routing Logic", () => {
+  const testUserId = "test-user-123";
+  const testUserEmail = "test@example.com";
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockPush.mockClear();
   });
 
-  it('should render loading state initially', () => {
+  it("should render loading state initially", () => {
     // Mock authenticated user with profile
     const mockClient = {
       auth: {
@@ -38,7 +38,7 @@ describe('AuthCallback Routing Logic', () => {
           data: {
             session: {
               user: { id: testUserId, email: testUserEmail },
-              access_token: 'mock-token',
+              access_token: "mock-token",
             },
           },
         }),
@@ -57,10 +57,10 @@ describe('AuthCallback Routing Logic', () => {
 
     render(<AuthCallback />);
     // Check for the loading spinner instead of text
-    expect(screen.getByTestId('circles-loader')).toBeInTheDocument();
+    expect(screen.getByTestId("circles-loader")).toBeInTheDocument();
   });
 
-  it('should redirect to /home when user has a profile', async () => {
+  it("should redirect to /home when user has a profile", async () => {
     // Mock authenticated user with profile
     const mockClient = {
       auth: {
@@ -68,7 +68,7 @@ describe('AuthCallback Routing Logic', () => {
           data: {
             session: {
               user: { id: testUserId, email: testUserEmail },
-              access_token: 'mock-token',
+              access_token: "mock-token",
             },
           },
         }),
@@ -88,11 +88,11 @@ describe('AuthCallback Routing Logic', () => {
     render(<AuthCallback />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/home');
+      expect(mockPush).toHaveBeenCalledWith("/home");
     });
   });
 
-  it('should redirect to /profile when user does not have a profile', async () => {
+  it("should redirect to /profile when user does not have a profile", async () => {
     // Mock authenticated user without profile
     const mockClient = {
       auth: {
@@ -100,7 +100,7 @@ describe('AuthCallback Routing Logic', () => {
           data: {
             session: {
               user: { id: testUserId, email: testUserEmail },
-              access_token: 'mock-token',
+              access_token: "mock-token",
             },
           },
         }),
@@ -120,11 +120,11 @@ describe('AuthCallback Routing Logic', () => {
     render(<AuthCallback />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/profile');
+      expect(mockPush).toHaveBeenCalledWith("/profile");
     });
   });
 
-  it('should redirect to / when user is not authenticated', async () => {
+  it("should redirect to / when user is not authenticated", async () => {
     // Mock unauthenticated state
     const mockClient = {
       auth: {
@@ -139,11 +139,11 @@ describe('AuthCallback Routing Logic', () => {
     render(<AuthCallback />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/');
+      expect(mockPush).toHaveBeenCalledWith("/");
     });
   });
 
-  it('should redirect to /profile when there is an error checking profile', async () => {
+  it("should redirect to /profile when there is an error checking profile", async () => {
     // Mock authenticated user but database error
     const mockClient = {
       auth: {
@@ -151,7 +151,7 @@ describe('AuthCallback Routing Logic', () => {
           data: {
             session: {
               user: { id: testUserId, email: testUserEmail },
-              access_token: 'mock-token',
+              access_token: "mock-token",
             },
           },
         }),
@@ -161,7 +161,7 @@ describe('AuthCallback Routing Logic', () => {
         eq: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
-          error: { message: 'Database connection failed' },
+          error: { message: "Database connection failed" },
         }),
       })),
     };
@@ -171,15 +171,15 @@ describe('AuthCallback Routing Logic', () => {
     render(<AuthCallback />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/profile');
+      expect(mockPush).toHaveBeenCalledWith("/profile");
     });
   });
 
-  it('should redirect to /profile when there is an unexpected error', async () => {
+  it("should redirect to /profile when there is an unexpected error", async () => {
     // Mock authenticated user but unexpected error
     const mockClient = {
       auth: {
-        getSession: vi.fn().mockRejectedValue(new Error('Network error')),
+        getSession: vi.fn().mockRejectedValue(new Error("Network error")),
       },
     };
 
@@ -188,11 +188,11 @@ describe('AuthCallback Routing Logic', () => {
     render(<AuthCallback />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/profile');
+      expect(mockPush).toHaveBeenCalledWith("/profile");
     });
   });
 
-  it('should query the profiles table with correct user_id', async () => {
+  it("should query the profiles table with correct user_id", async () => {
     const mockFrom = vi.fn();
     const mockSelect = vi.fn().mockReturnThis();
     const mockEq = vi.fn().mockReturnThis();
@@ -207,7 +207,7 @@ describe('AuthCallback Routing Logic', () => {
           data: {
             session: {
               user: { id: testUserId, email: testUserEmail },
-              access_token: 'mock-token',
+              access_token: "mock-token",
             },
           },
         }),
@@ -224,9 +224,9 @@ describe('AuthCallback Routing Logic', () => {
     render(<AuthCallback />);
 
     await waitFor(() => {
-      expect(mockFrom).toHaveBeenCalledWith('profiles');
-      expect(mockSelect).toHaveBeenCalledWith('user_id');
-      expect(mockEq).toHaveBeenCalledWith('user_id', testUserId);
+      expect(mockFrom).toHaveBeenCalledWith("profiles");
+      expect(mockSelect).toHaveBeenCalledWith("user_id");
+      expect(mockEq).toHaveBeenCalledWith("user_id", testUserId);
       expect(mockMaybeSingle).toHaveBeenCalled();
     });
   });

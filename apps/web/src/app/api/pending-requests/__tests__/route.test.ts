@@ -1,28 +1,28 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { NextRequest } from 'next/server';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 // Mock @supabase/supabase-js
 const mockCreateClient = vi.hoisted(() => vi.fn());
-vi.mock('@supabase/supabase-js', () => ({
+vi.mock("@supabase/supabase-js", () => ({
   createClient: mockCreateClient,
 }));
 
 // Import after mocks are set up
-const { GET } = await import('../route');
+const { GET } = await import("../route");
 
-describe('GET /api/pending-requests', () => {
-  const testUserId = 'test-user-123';
-  const targetUserId = 'target-user-456';
+describe("GET /api/pending-requests", () => {
+  const testUserId = "test-user-123";
+  const targetUserId = "target-user-456";
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Setup environment variables
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
-    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-role-key";
   });
 
-  it('should return 401 when authorization header is missing', async () => {
+  it("should return 401 when authorization header is missing", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn(),
@@ -30,57 +30,57 @@ describe('GET /api/pending-requests', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests');
+    const request = new NextRequest("http://localhost/api/pending-requests");
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(401);
-    expect(data.error).toBe('No authorization header');
+    expect(data.error).toBe("No authorization header");
     expect(mockClient.auth.getUser).not.toHaveBeenCalled();
   });
 
-  it('should return 401 when user is not authenticated', async () => {
+  it("should return 401 when user is not authenticated", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
           data: { user: null },
-          error: { message: 'Invalid token' },
+          error: { message: "Invalid token" },
         }),
       },
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer invalid-token',
+        Authorization: "Bearer invalid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(401);
-    expect(data.error).toBe('User not authenticated');
+    expect(data.error).toBe("User not authenticated");
   });
 
-  it('should return 500 when environment variables are missing', async () => {
+  it("should return 500 when environment variables are missing", async () => {
     delete process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Missing Supabase configuration');
+    expect(data.error).toBe("Missing Supabase configuration");
 
     // Restore for other tests
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";
   });
 
-  it('should fetch pending requests with default limit and offset', async () => {
+  it("should fetch pending requests with default limit and offset", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -96,21 +96,21 @@ describe('GET /api/pending-requests', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     await GET(request);
 
-    expect(mockClient.rpc).toHaveBeenCalledWith('pending_requests', {
+    expect(mockClient.rpc).toHaveBeenCalledWith("pending_requests", {
       p_user: testUserId,
       p_limit: 50,
       p_offset: 0,
     });
   });
 
-  it('should respect custom limit and offset parameters', async () => {
+  it("should respect custom limit and offset parameters", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -126,28 +126,31 @@ describe('GET /api/pending-requests', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests?limit=10&offset=20', {
-      headers: {
-        'Authorization': 'Bearer valid-token',
-      },
-    });
+    const request = new NextRequest(
+      "http://localhost/api/pending-requests?limit=10&offset=20",
+      {
+        headers: {
+          Authorization: "Bearer valid-token",
+        },
+      }
+    );
     await GET(request);
 
-    expect(mockClient.rpc).toHaveBeenCalledWith('pending_requests', {
+    expect(mockClient.rpc).toHaveBeenCalledWith("pending_requests", {
       p_user: testUserId,
       p_limit: 10,
       p_offset: 20,
     });
   });
 
-  it('should enrich pending requests with profile, venture, and preferences', async () => {
+  it("should enrich pending requests with profile, venture, and preferences", async () => {
     const mockRpcData = [
       {
         user_id: targetUserId,
-        stage: 'MVP',
-        timezone: 'America/Los_Angeles',
-        availability_hours: '30+ hours/week',
-        created_at: '2025-01-01T00:00:00Z',
+        stage: "MVP",
+        timezone: "America/Los_Angeles",
+        availability_hours: "30+ hours/week",
+        created_at: "2025-01-01T00:00:00Z",
       },
     ];
 
@@ -163,57 +166,57 @@ describe('GET /api/pending-requests', () => {
         error: null,
       }),
       from: vi.fn((table: string) => {
-        if (table === 'profiles') {
+        if (table === "profiles") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                name: 'John Doe',
-                bio: 'Software engineer',
-                achievements: 'Built 3 startups',
-                experience: '10 years',
-                education: 'MIT',
+                name: "John Doe",
+                bio: "Software engineer",
+                achievements: "Built 3 startups",
+                experience: "10 years",
+                education: "MIT",
                 city_id: 1,
               },
               error: null,
             }),
           };
         }
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                title: 'AI Platform',
-                description: 'Building an AI-powered tool',
+                title: "AI Platform",
+                description: "Building an AI-powered tool",
               },
               error: null,
             }),
           };
         }
-        if (table === 'user_cofounder_preference') {
+        if (table === "user_cofounder_preference") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                title: 'Technical Co-founder',
-                description: 'Looking for ML expertise',
+                title: "Technical Co-founder",
+                description: "Looking for ML expertise",
               },
               error: null,
             }),
           };
         }
-        if (table === 'cities') {
+        if (table === "cities") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                name: 'San Francisco',
-                country_name: 'United States',
+                name: "San Francisco",
+                country_name: "United States",
               },
               error: null,
             }),
@@ -224,9 +227,9 @@ describe('GET /api/pending-requests', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -236,39 +239,39 @@ describe('GET /api/pending-requests', () => {
     expect(data.items).toHaveLength(1);
     expect(data.items[0]).toEqual({
       id: targetUserId,
-      stage: 'MVP',
-      timezone: 'America/Los_Angeles',
-      availability_hours: '30+ hours/week',
-      created_at: '2025-01-01T00:00:00Z',
+      stage: "MVP",
+      timezone: "America/Los_Angeles",
+      availability_hours: "30+ hours/week",
+      created_at: "2025-01-01T00:00:00Z",
       profile: {
-        name: 'John Doe',
-        bio: 'Software engineer',
-        achievements: 'Built 3 startups',
-        experience: '10 years',
-        education: 'MIT',
+        name: "John Doe",
+        bio: "Software engineer",
+        achievements: "Built 3 startups",
+        experience: "10 years",
+        education: "MIT",
         city_id: 1,
-        city_name: 'San Francisco',
-        country: 'United States',
+        city_name: "San Francisco",
+        country: "United States",
       },
       venture: {
-        title: 'AI Platform',
-        description: 'Building an AI-powered tool',
+        title: "AI Platform",
+        description: "Building an AI-powered tool",
       },
       preferences: {
-        title: 'Technical Co-founder',
-        description: 'Looking for ML expertise',
+        title: "Technical Co-founder",
+        description: "Looking for ML expertise",
       },
     });
   });
 
-  it('should handle profiles without city_id', async () => {
+  it("should handle profiles without city_id", async () => {
     const mockRpcData = [
       {
         user_id: targetUserId,
-        stage: 'Ideation',
-        timezone: 'UTC',
-        availability_hours: '20 hours/week',
-        created_at: '2025-01-01T00:00:00Z',
+        stage: "Ideation",
+        timezone: "UTC",
+        availability_hours: "20 hours/week",
+        created_at: "2025-01-01T00:00:00Z",
       },
     ];
 
@@ -284,44 +287,44 @@ describe('GET /api/pending-requests', () => {
         error: null,
       }),
       from: vi.fn((table: string) => {
-        if (table === 'profiles') {
+        if (table === "profiles") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                name: 'Jane Smith',
-                bio: 'Product manager',
-                achievements: 'PM at Google',
-                experience: '5 years',
-                education: 'Stanford',
+                name: "Jane Smith",
+                bio: "Product manager",
+                achievements: "PM at Google",
+                experience: "5 years",
+                education: "Stanford",
                 city_id: null,
               },
               error: null,
             }),
           };
         }
-        if (table === 'user_ventures') {
+        if (table === "user_ventures") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                title: 'SaaS Platform',
-                description: 'Building B2B SaaS',
+                title: "SaaS Platform",
+                description: "Building B2B SaaS",
               },
               error: null,
             }),
           };
         }
-        if (table === 'user_cofounder_preference') {
+        if (table === "user_cofounder_preference") {
           return {
             select: vi.fn().mockReturnThis(),
             eq: vi.fn().mockReturnThis(),
             maybeSingle: vi.fn().mockResolvedValue({
               data: {
-                title: 'Engineering Co-founder',
-                description: 'Need technical expertise',
+                title: "Engineering Co-founder",
+                description: "Need technical expertise",
               },
               error: null,
             }),
@@ -332,9 +335,9 @@ describe('GET /api/pending-requests', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -347,11 +350,29 @@ describe('GET /api/pending-requests', () => {
     expect(data.items[0].profile.country).toBeUndefined();
   });
 
-  it('should filter out null entries when enrichment fails', async () => {
+  it("should filter out null entries when enrichment fails", async () => {
     const mockRpcData = [
-      { user_id: 'user-1', stage: 'MVP', timezone: 'UTC', availability_hours: '30h', created_at: '2025-01-01' },
-      { user_id: null, stage: 'MVP', timezone: 'UTC', availability_hours: '30h', created_at: '2025-01-01' }, // No user_id
-      { user_id: 'user-3', stage: 'MVP', timezone: 'UTC', availability_hours: '30h', created_at: '2025-01-01' },
+      {
+        user_id: "user-1",
+        stage: "MVP",
+        timezone: "UTC",
+        availability_hours: "30h",
+        created_at: "2025-01-01",
+      },
+      {
+        user_id: null,
+        stage: "MVP",
+        timezone: "UTC",
+        availability_hours: "30h",
+        created_at: "2025-01-01",
+      }, // No user_id
+      {
+        user_id: "user-3",
+        stage: "MVP",
+        timezone: "UTC",
+        availability_hours: "30h",
+        created_at: "2025-01-01",
+      },
     ];
 
     const mockClient = {
@@ -369,16 +390,16 @@ describe('GET /api/pending-requests', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockResolvedValue({
-          data: { name: 'Test User' },
+          data: { name: "Test User" },
           error: null,
         }),
       })),
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -389,7 +410,7 @@ describe('GET /api/pending-requests', () => {
     expect(data.items).toHaveLength(2);
   });
 
-  it('should handle RPC errors', async () => {
+  it("should handle RPC errors", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -399,31 +420,31 @@ describe('GET /api/pending-requests', () => {
       },
       rpc: vi.fn().mockResolvedValue({
         data: null,
-        error: { message: 'RPC function error' },
+        error: { message: "RPC function error" },
       }),
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('RPC function error');
+    expect(data.error).toBe("RPC function error");
   });
 
-  it('should handle enrichment errors gracefully', async () => {
+  it("should handle enrichment errors gracefully", async () => {
     const mockRpcData = [
       {
         user_id: targetUserId,
-        stage: 'MVP',
-        timezone: 'UTC',
-        availability_hours: '30h',
-        created_at: '2025-01-01',
+        stage: "MVP",
+        timezone: "UTC",
+        availability_hours: "30h",
+        created_at: "2025-01-01",
       },
     ];
 
@@ -441,14 +462,14 @@ describe('GET /api/pending-requests', () => {
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        maybeSingle: vi.fn().mockRejectedValue(new Error('Database error')),
+        maybeSingle: vi.fn().mockRejectedValue(new Error("Database error")),
       })),
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -459,7 +480,7 @@ describe('GET /api/pending-requests', () => {
     expect(data.items).toHaveLength(0);
   });
 
-  it('should handle empty RPC response', async () => {
+  it("should handle empty RPC response", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -475,9 +496,9 @@ describe('GET /api/pending-requests', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
@@ -487,27 +508,27 @@ describe('GET /api/pending-requests', () => {
     expect(data.items).toEqual([]);
   });
 
-  it('should handle unexpected errors', async () => {
+  it("should handle unexpected errors", async () => {
     const mockClient = {
       auth: {
-        getUser: vi.fn().mockRejectedValue(new Error('Network error')),
+        getUser: vi.fn().mockRejectedValue(new Error("Network error")),
       },
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toContain('Server error');
+    expect(data.error).toContain("Server error");
   });
 
-  it('should handle null RPC data', async () => {
+  it("should handle null RPC data", async () => {
     const mockClient = {
       auth: {
         getUser: vi.fn().mockResolvedValue({
@@ -523,9 +544,9 @@ describe('GET /api/pending-requests', () => {
     };
     mockCreateClient.mockReturnValue(mockClient);
 
-    const request = new NextRequest('http://localhost/api/pending-requests', {
+    const request = new NextRequest("http://localhost/api/pending-requests", {
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: "Bearer valid-token",
       },
     });
     const response = await GET(request);

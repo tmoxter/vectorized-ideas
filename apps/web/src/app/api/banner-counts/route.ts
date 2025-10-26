@@ -47,7 +47,10 @@ export async function GET(req: NextRequest) {
       .maybeSingle();
 
     console.log("[banner-counts] User ID:", user.id);
-    console.log("[banner-counts] Venture query result:", { venture, ventureError });
+    console.log("[banner-counts] Venture query result:", {
+      venture,
+      ventureError,
+    });
 
     if (ventureError) {
       console.error("Error fetching user venture:", ventureError);
@@ -74,7 +77,10 @@ export async function GET(req: NextRequest) {
       .eq("entity_type", "idea")
       .maybeSingle();
 
-    console.log("[banner-counts] Embedding query result:", { embedding, embeddingError });
+    console.log("[banner-counts] Embedding query result:", {
+      embedding,
+      embeddingError,
+    });
 
     // Default to "1" if no embedding found
     const version = embedding?.version || "1";
@@ -102,7 +108,9 @@ export async function GET(req: NextRequest) {
     }
 
     if (!data || data.length === 0) {
-      console.log("[banner-counts] RPC returned no data, returning default counts");
+      console.log(
+        "[banner-counts] RPC returned no data, returning default counts"
+      );
       return NextResponse.json({
         total_profiles: 0,
         related_topics: 0,

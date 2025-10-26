@@ -2,7 +2,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type City = {
-  id: number; name: string; admin1?: string | null; country: string; iso2: string;
+  id: number;
+  name: string;
+  admin1?: string | null;
+  country: string;
+  iso2: string;
   label: string; // `${name}, ${admin1} (${country})`
   population: number | null;
 };
@@ -38,13 +42,17 @@ export function CityPicker({
   useEffect(() => {
     const q = query.trim();
     if (q.length < 2) {
-      setItems([]); setOpen(false); setActiveIdx(-1);
+      setItems([]);
+      setOpen(false);
+      setActiveIdx(-1);
       return;
     }
     debouncedFetch(q, async () => {
       const key = `${countryIso2 ?? ""}|${q.toLowerCase()}`;
       if (cache.current.has(key)) {
-        setItems(cache.current.get(key)!); setOpen(true); setLoading(false);
+        setItems(cache.current.get(key)!);
+        setOpen(true);
+        setLoading(false);
         return;
       }
       setLoading(true);
@@ -105,13 +113,18 @@ export function CityPicker({
         className="w-full rounded border p-2"
         placeholder="Type your city"
         value={query}
-        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+        }}
         onKeyDown={onKeyDown}
         onFocus={() => items.length && setOpen(true)}
         onBlur={onBlur}
         aria-autocomplete="list"
         aria-controls="city-listbox"
-        aria-activedescendant={activeIdx >= 0 ? `city-opt-${items[activeIdx].id}` : undefined}
+        aria-activedescendant={
+          activeIdx >= 0 ? `city-opt-${items[activeIdx].id}` : undefined
+        }
       />
       {/* hidden field to submit city_id in forms */}
       <input type="hidden" name="city_id" value={selected?.id ?? ""} />
@@ -122,7 +135,9 @@ export function CityPicker({
           ref={listRef}
           className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded border bg-white shadow"
         >
-          {loading && <li className="px-3 py-2 text-sm text-gray-500">Searching…</li>}
+          {loading && (
+            <li className="px-3 py-2 text-sm text-gray-500">Searching…</li>
+          )}
           {!loading && items.length === 0 && query.trim().length >= 2 && (
             <li className="px-3 py-2 text-sm text-gray-500">No matches</li>
           )}
@@ -132,7 +147,10 @@ export function CityPicker({
               key={it.id}
               role="option"
               aria-selected={idx === activeIdx}
-              onMouseDown={(e) => { e.preventDefault(); commitSelection(it); }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                commitSelection(it);
+              }}
               className={
                 "cursor-pointer px-3 py-2 text-sm hover:bg-gray-50 " +
                 (idx === activeIdx ? "bg-gray-100" : "")
@@ -140,14 +158,18 @@ export function CityPicker({
             >
               <div>{it.label}</div>
               <div className="text-xs text-gray-500">
-                {it.iso2}{it.admin1 ? ` — ${it.admin1}` : ""} · {new Intl.NumberFormat().format(it.population || 0)}
+                {it.iso2}
+                {it.admin1 ? ` — ${it.admin1}` : ""} ·{" "}
+                {new Intl.NumberFormat().format(it.population || 0)}
               </div>
             </li>
           ))}
         </ul>
       )}
       {required && !selected && query === "" && (
-        <p className="mt-1 text-xs text-red-600">Please choose a city from the list.</p>
+        <p className="mt-1 text-xs text-red-600">
+          Please choose a city from the list.
+        </p>
       )}
     </div>
   );

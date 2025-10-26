@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { ShieldOff } from "lucide-react";
-import { Circles } from 'react-loader-spinner';
+import { Circles } from "react-loader-spinner";
 
 interface ProfileData {
   id: string;
@@ -30,7 +30,9 @@ interface ProfileData {
 
 export default function BlockedProfilesPage() {
   const [blockedProfiles, setBlockedProfiles] = useState<ProfileData[]>([]);
-  const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [message, setMessage] = useState("");
@@ -79,29 +81,33 @@ export default function BlockedProfilesPage() {
       const profilesPromises = interactionsData.map(async (interaction) => {
         const blockedUserId = interaction.target_user;
 
-        const [profileResult, ventureResult, preferencesResult, userDataResult] =
-          await Promise.all([
-            supabase
-              .from("profiles")
-              .select("name, bio, achievements, city_id")
-              .eq("user_id", blockedUserId)
-              .maybeSingle(),
-            supabase
-              .from("user_ventures")
-              .select("title, description")
-              .eq("user_id", blockedUserId)
-              .maybeSingle(),
-            supabase
-              .from("user_cofounder_preference")
-              .select("title, description")
-              .eq("user_id", blockedUserId)
-              .maybeSingle(),
-            supabase
-              .from("user_data")
-              .select("timezone, stage, availability_hours")
-              .eq("user_id", blockedUserId)
-              .maybeSingle(),
-          ]);
+        const [
+          profileResult,
+          ventureResult,
+          preferencesResult,
+          userDataResult,
+        ] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("name, bio, achievements, city_id")
+            .eq("user_id", blockedUserId)
+            .maybeSingle(),
+          supabase
+            .from("user_ventures")
+            .select("title, description")
+            .eq("user_id", blockedUserId)
+            .maybeSingle(),
+          supabase
+            .from("user_cofounder_preference")
+            .select("title, description")
+            .eq("user_id", blockedUserId)
+            .maybeSingle(),
+          supabase
+            .from("user_data")
+            .select("timezone, stage, availability_hours")
+            .eq("user_id", blockedUserId)
+            .maybeSingle(),
+        ]);
 
         if (profileResult.data) {
           // Fetch city data if city_id exists
@@ -228,7 +234,10 @@ export default function BlockedProfilesPage() {
           {blockedProfiles.length === 0 ? (
             <div className="text-center py-16">
               <div className="flex justify-center mb-6">
-                <ShieldOff className="w-24 h-24 text-gray-400" strokeWidth={1.5} />
+                <ShieldOff
+                  className="w-24 h-24 text-gray-400"
+                  strokeWidth={1.5}
+                />
               </div>
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-2">
                 no blocked profiles
@@ -292,9 +301,13 @@ export default function BlockedProfilesPage() {
                             {selectedProfile.name}
                           </h2>
                           <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">
-                            {selectedProfile.city_name && selectedProfile.country && (
-                              <span>📍 {selectedProfile.city_name}, {selectedProfile.country}</span>
-                            )}
+                            {selectedProfile.city_name &&
+                              selectedProfile.country && (
+                                <span>
+                                  📍 {selectedProfile.city_name},{" "}
+                                  {selectedProfile.country}
+                                </span>
+                              )}
                             {selectedProfile.timezone && (
                               <span>🕒 {selectedProfile.timezone}</span>
                             )}

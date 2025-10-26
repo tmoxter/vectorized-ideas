@@ -10,7 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-silver: #DFEBFF;
+  --color-silver: #dfebff;
   --color-typewriter: #c7defb;
 }
 
@@ -34,10 +34,7 @@
 }
 
 .bg-gradient-breathe {
-  background: linear-gradient(
-    -45deg,
-    #b7a7f80b, #6ba9f420, #fdbfac2a
-  );
+  background: linear-gradient(-45deg, #b7a7f80b, #6ba9f420, #fdbfac2a);
   background-size: 100% 100%;
 }
 
@@ -53,45 +50,58 @@ body {
   display: inline-block;
   isolation: isolate; /* create stacking context so ::before can sit behind safely */
   z-index: 0;
-  transition: transform 200ms cubic-bezier(.2,.8,.2,1);
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .highlight-brush::before {
   content: "";
   position: absolute;
-  left: -0.08em;          /* small overflow for organic edge */
+  left: -0.08em; /* small overflow for organic edge */
   right: -0.08em;
-  bottom: 0.06em;         /* sit just under the baseline */
-  height: 0.78em;         /* roughly x-height */
-  background: sky-100;    /* Tailwind yellow-300 */
-  border-radius: 0.15em;  /* soft corners */
-  z-index: -1;            /* behind the text */
-  filter: blur(0.6px);    /* soften the fill to feel brushy */
+  bottom: 0.06em; /* sit just under the baseline */
+  height: 0.78em; /* roughly x-height */
+  background: sky-100; /* Tailwind yellow-300 */
+  border-radius: 0.15em; /* soft corners */
+  z-index: -1; /* behind the text */
+  filter: blur(0.6px); /* soften the fill to feel brushy */
   transform: translateY(0) scaleX(1);
-  transition: transform 400ms cubic-bezier(.2,.8,.2,1);
+  transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* Tiny inertial motion on hover */
-.highlight-brush:hover { transform: scaleY(1.01) scaleX(1.01); }
+.highlight-brush:hover {
+  transform: scaleY(1.01) scaleX(1.01);
+}
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  .highlight-brush { transition: none; }
-  .highlight-brush::before { transition: none; }
+  .highlight-brush {
+    transition: none;
+  }
+  .highlight-brush::before {
+    transition: none;
+  }
 }
 
 ::selection {
   background-color: #bedbff; /* Tailwind's yellow-200 equivalent */
-  color: #000000;            /* text color when highlighted */
+  color: #000000; /* text color when highlighted */
 }
 
 @keyframes drift {
-  0% { background-position: 0 0; }
-  100% { background-position: 50px 50px; }
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 50px 50px;
+  }
 }
 
 .bg-dotted-animated {
-  background-image: radial-gradient(rgba(48, 39, 219, 0.375) 1.1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(48, 39, 219, 0.375) 1.1px,
+    transparent 1px
+  );
   background-size: 40px 40px;
   animation: drift 12s linear infinite;
 }

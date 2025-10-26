@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Trash2, AlertTriangle, ChevronDown } from "lucide-react";
-import { Circles } from 'react-loader-spinner';
+import { Circles } from "react-loader-spinner";
 
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
@@ -67,7 +67,7 @@ export default function SettingsPage() {
     try {
       // TODO: Save preferences to database
       // For now, just simulate saving
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       setMessage("Preferences saved successfully!");
       setTimeout(() => setMessage(""), 3000);
     } catch (error) {
@@ -195,7 +195,9 @@ export default function SettingsPage() {
                   Region Filter
                 </label>
                 <button
-                  onClick={() => setOpenDropdown(openDropdown === "region" ? null : "region")}
+                  onClick={() =>
+                    setOpenDropdown(openDropdown === "region" ? null : "region")
+                  }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm font-mono text-sm focus:ring-2 focus:ring-silver focus:border-transparent outline-none bg-white hover:bg-gray-50 transition duration-200 flex items-center justify-between text-left"
                 >
                   <span>{regionFilter}</span>
@@ -205,7 +207,12 @@ export default function SettingsPage() {
                   <div className="absolute top-full mt-2 left-0 right-0 z-50">
                     <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
                       <div className="p-2">
-                        {["Only in my city", "Only in my country", "Only on my continent", "Worldwide"].map((option) => (
+                        {[
+                          "Only in my city",
+                          "Only in my country",
+                          "Only on my continent",
+                          "Worldwide",
+                        ].map((option) => (
                           <button
                             key={option}
                             onClick={() => {
@@ -236,7 +243,11 @@ export default function SettingsPage() {
                   Similarity Level
                 </label>
                 <button
-                  onClick={() => setOpenDropdown(openDropdown === "similarity" ? null : "similarity")}
+                  onClick={() =>
+                    setOpenDropdown(
+                      openDropdown === "similarity" ? null : "similarity"
+                    )
+                  }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm font-mono text-sm focus:ring-2 focus:ring-silver focus:border-transparent outline-none bg-white hover:bg-gray-50 transition duration-200 flex items-center justify-between text-left"
                 >
                   <span>{similarityLevel}</span>
@@ -246,7 +257,12 @@ export default function SettingsPage() {
                   <div className="absolute top-full mt-2 left-0 right-0 z-50">
                     <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
                       <div className="p-2">
-                        {["Highly similar (stricter)", "Similar", "Broadly similar", "Vaguely similar (less strict)"].map((option) => (
+                        {[
+                          "Highly similar (stricter)",
+                          "Similar",
+                          "Broadly similar",
+                          "Vaguely similar (less strict)",
+                        ].map((option) => (
                           <button
                             key={option}
                             onClick={() => {
@@ -267,7 +283,9 @@ export default function SettingsPage() {
                   </div>
                 )}
                 <p className="mt-2 font-mono text-xs text-gray-500">
-                  Stricter thresholds lead to fewer profiles to discover. Profiles will be sorted by similarity in any case so that the most similar profiles will appear first.
+                  Stricter thresholds lead to fewer profiles to discover.
+                  Profiles will be sorted by similarity in any case so that the
+                  most similar profiles will appear first.
                 </p>
               </div>
 
