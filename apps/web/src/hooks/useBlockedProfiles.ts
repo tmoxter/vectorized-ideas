@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
-import type { ProfileWithDetails } from "@/types";
+import type { ProfileWithDetails, ProfileData } from "@/types";
 
 export function useBlockedProfiles(userId: string | undefined) {
   const [profiles, setProfiles] = useState<ProfileWithDetails[]>([]);
@@ -21,12 +21,13 @@ export function useBlockedProfiles(userId: string | undefined) {
     setError("");
 
     try {
-      const { data: interactionsData, error: interactionsError } = await supabase
-        .from("interactions")
-        .select("target_user, created_at")
-        .eq("actor_user", userId)
-        .eq("action", "block")
-        .order("created_at", { ascending: false });
+      const { data: interactionsData, error: interactionsError } =
+        await supabase
+          .from("interactions")
+          .select("target_user, created_at")
+          .eq("actor_user", userId)
+          .eq("action", "block")
+          .order("created_at", { ascending: false });
 
       if (interactionsError) throw interactionsError;
 
@@ -82,14 +83,16 @@ export function useBlockedProfiles(userId: string | undefined) {
               country = cityData.country_name;
             }
           }
-
-          return {
-            id: blockedUserId,
-            name: profileResult.data.name || "Anonymous",
+          const profileData: ProfileData = {
+            name: profileResult.data.name || "Unknown",
             bio: profileResult.data.bio || "",
             achievements: profileResult.data.achievements || "",
             city_name,
             country,
+          };
+          return {
+            id: blockedUserId,
+            profile: profileData,
             timezone: userDataResult.data?.timezone,
             stage: userDataResult.data?.stage,
             availability_hours: userDataResult.data?.availability_hours,
@@ -101,7 +104,9 @@ export function useBlockedProfiles(userId: string | undefined) {
       });
 
       const allProfiles = await Promise.all(profilesPromises);
-      const validProfiles = allProfiles.filter((p) => p !== null) as ProfileWithDetails[];
+      const validProfiles = allProfiles.filter(
+        (p) => p !== null
+      ) as ProfileWithDetails[];
 
       setProfiles(validProfiles);
     } catch (err) {

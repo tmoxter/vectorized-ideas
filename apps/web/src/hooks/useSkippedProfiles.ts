@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
-import type { ProfileWithDetails } from "@/types";
+import type { ProfileWithDetails, ProfileData } from "@/types";
 
 export function useSkippedProfiles(userId: string | undefined) {
   const [profiles, setProfiles] = useState<ProfileWithDetails[]>([]);
@@ -21,12 +21,13 @@ export function useSkippedProfiles(userId: string | undefined) {
     setError("");
 
     try {
-      const { data: interactionsData, error: interactionsError } = await supabase
-        .from("interactions")
-        .select("target_user, created_at")
-        .eq("actor_user", userId)
-        .eq("action", "pass")
-        .order("created_at", { ascending: false });
+      const { data: interactionsData, error: interactionsError } =
+        await supabase
+          .from("interactions")
+          .select("target_user, created_at")
+          .eq("actor_user", userId)
+          .eq("action", "pass")
+          .order("created_at", { ascending: false });
 
       if (interactionsError) throw interactionsError;
 
@@ -78,16 +79,18 @@ export function useSkippedProfiles(userId: string | undefined) {
               country = cityData.country_name;
             }
           }
-
-          return {
-            id: skippedUserId,
-            name: profileResult.data.name || "Anonymous",
+          const profile: ProfileData = {
+            name: profileResult.data.name || "Unknown",
             bio: profileResult.data.bio || "",
             achievements: profileResult.data.achievements || "",
             experience: profileResult.data.experience || "",
             education: profileResult.data.education || "",
             city_name,
             country,
+          };
+          return {
+            id: skippedUserId,
+            profile: profile,
             venture: ventureResult.data || undefined,
             preferences: preferencesResult.data || undefined,
           };
@@ -97,7 +100,9 @@ export function useSkippedProfiles(userId: string | undefined) {
       });
 
       const allProfiles = await Promise.all(profilesPromises);
-      const validProfiles = allProfiles.filter((p) => p !== null) as ProfileWithDetails[];
+      const validProfiles = allProfiles.filter(
+        (p) => p !== null
+      ) as ProfileWithDetails[];
 
       console.log("[skipped] Loaded skipped profiles:", validProfiles.length);
       setProfiles(validProfiles);

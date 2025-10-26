@@ -1,6 +1,10 @@
 import { ProfileHeader } from "./ProfileHeader";
 import { ProfileSection } from "./ProfileSection";
-import type { ProfileWithDetails, MatchCandidate, PendingRequest } from "@/types";
+import type {
+  ProfileWithDetails,
+  MatchCandidate,
+  PendingRequest,
+} from "@/types";
 
 interface ProfileDetailProps {
   profile: ProfileWithDetails | MatchCandidate | PendingRequest | null;
@@ -22,52 +26,66 @@ export function ProfileDetail({ profile }: ProfileDetailProps) {
 
   return (
     console.log(profile),
-    <>
-      <ProfileHeader
-        name={profile.name}
-        cityName={profile.city_name}
-        country={profile.country}
-        similarityScore={
-          isCandidateProfile(profile) ? profile.similarity_score : undefined
-        }
-        requestDate={
-          isPendingRequestProfile(profile) ? profile.created_at : undefined
-        }
-      />
+    (
+      <>
+        <ProfileHeader
+          name={profile.profile.name}
+          cityName={profile.profile.city_name}
+          country={profile.profile.country}
+          similarityScore={
+            isCandidateProfile(profile) ? profile.similarity_score : undefined
+          }
+          requestDate={
+            isPendingRequestProfile(profile) ? profile.created_at : undefined
+          }
+        />
 
-      <div className="p-6 space-y-8 max-h-[calc(100vh-400px)] overflow-y-auto">
-        <ProfileSection title="Bio" content={profile.bio} />
+        <div className="p-6 space-y-8 max-h-[calc(100vh-400px)] overflow-y-auto">
+          <ProfileSection title="Bio" content={profile.profile.bio} />
 
-        <ProfileSection title="Personal Achievement" content={profile.achievements} />
-
-        {profile.experience && (
-          <ProfileSection title="Experience" content={profile.experience} />
-        )}
-
-        {profile.education && (
-          <ProfileSection title="Education" content={profile.education} />
-        )}
-
-        {profile.venture && (
           <ProfileSection
-            title="Venture Idea"
-            subtitle={profile.venture.title}
-            content={profile.venture.description}
+            title="Personal Achievement"
+            content={profile.profile.achievements}
           />
-        )}
 
-        {profile.preferences && (
-          <ProfileSection
-            title="looking for"
-            subtitle={profile.preferences.title}
-            content={profile.preferences.description}
-          />
-        )}
+          {profile.profile.experience && (
+            <ProfileSection
+              title="Experience"
+              content={profile.profile.experience}
+            />
+          )}
 
-        {profile.availability_hours && (
-          <ProfileSection title="availability" content={profile.availability_hours} />
-        )}
-      </div>
-    </>
+          {profile.profile.education && (
+            <ProfileSection
+              title="Education"
+              content={profile.profile.education}
+            />
+          )}
+
+          {profile.venture && (
+            <ProfileSection
+              title="Venture Idea"
+              subtitle={profile.venture.title}
+              content={profile.venture.description}
+            />
+          )}
+
+          {profile.preferences && (
+            <ProfileSection
+              title="looking for"
+              subtitle={profile.preferences.title}
+              content={profile.preferences.description}
+            />
+          )}
+
+          {profile.availability_hours && (
+            <ProfileSection
+              title="availability"
+              content={profile.availability_hours}
+            />
+          )}
+        </div>
+      </>
+    )
   );
 }

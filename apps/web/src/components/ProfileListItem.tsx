@@ -21,11 +21,11 @@ export function ProfileListItem({
       }`}
     >
       <div className="font-mono font-semibold text-gray-900">
-        {profile.name}
+        {profile.profile.name}
       </div>
-      {profile.city_name && profile.country && (
+      {profile.profile.city_name && profile.profile.country && (
         <div className="font-mono text-sm text-gray-600 mt-1">
-          📍 {profile.city_name}, {profile.country}
+          📍 {profile.profile.city_name}, {profile.profile.country}
         </div>
       )}
       {profile.venture && (

@@ -36,6 +36,7 @@ vi.mock("@/components/Footer", () => ({
 import { useAuth } from "@/hooks/useAuth";
 import { useMatches } from "@/hooks/useMatches";
 import { useInteraction } from "@/hooks/useInteraction";
+import { profile } from "console";
 
 const MatchesPage = await import("../page").then((m) => m.default);
 
@@ -43,11 +44,13 @@ describe("MatchesPage Integration Tests", () => {
   const currentUser = testUsers[0];
   const mockCandidates = testUsers.slice(1, 4).map((candidate, index) => ({
     id: candidate.id,
-    name: candidate.profile.name,
-    bio: candidate.profile.bio,
-    achievements: candidate.profile.achievements,
-    city_name: candidate.profile.region,
-    country: "Test Country",
+    profile: {
+      name: candidate.profile.name,
+      bio: candidate.profile.bio,
+      achievements: candidate.profile.achievements,
+      city_name: candidate.profile.region,
+      country: "Test Country",
+    },
     timezone: candidate.profile.timezone,
     stage: candidate.stage,
     availability_hours: candidate.availability_hours,
@@ -104,8 +107,12 @@ describe("MatchesPage Integration Tests", () => {
   it("should load and display candidate matches after authentication", async () => {
     render(<MatchesPage />);
 
-    expect(screen.getByText(mockCandidates[0].name)).toBeInTheDocument();
-    expect(screen.getByText(mockCandidates[0].venture.title)).toBeInTheDocument();
+    expect(
+      screen.getByText(mockCandidates[0].profile.name)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(mockCandidates[0].venture.title)
+    ).toBeInTheDocument();
   });
 
   it("should display all candidate profile sections", async () => {
@@ -113,12 +120,20 @@ describe("MatchesPage Integration Tests", () => {
 
     const firstCandidate = mockCandidates[0];
 
-    expect(screen.getByText(firstCandidate.name)).toBeInTheDocument();
-    expect(screen.getByText(firstCandidate.bio)).toBeInTheDocument();
-    expect(screen.getByText(firstCandidate.achievements)).toBeInTheDocument();
-    expect(screen.getByText(firstCandidate.venture.description)).toBeInTheDocument();
-    expect(screen.getByText(firstCandidate.preferences.description)).toBeInTheDocument();
-    expect(screen.getByText(firstCandidate.availability_hours)).toBeInTheDocument();
+    expect(screen.getByText(firstCandidate.profile.name)).toBeInTheDocument();
+    expect(screen.getByText(firstCandidate.profile.bio)).toBeInTheDocument();
+    expect(
+      screen.getByText(firstCandidate.profile.achievements)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(firstCandidate.venture.description)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(firstCandidate.preferences.description)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(firstCandidate.availability_hours)
+    ).toBeInTheDocument();
   });
 
   it("should display page header with description", async () => {
@@ -140,14 +155,18 @@ describe("MatchesPage Integration Tests", () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
-    expect(screen.getByText(mockCandidates[0].name)).toBeInTheDocument();
+    expect(
+      screen.getByText(mockCandidates[0].profile.name)
+    ).toBeInTheDocument();
 
     const skipButton = screen.getByRole("button", { name: /skip/i });
     await user.click(skipButton);
 
     await waitFor(
       () => {
-        expect(screen.getByText(mockCandidates[1].name)).toBeInTheDocument();
+        expect(
+          screen.getByText(mockCandidates[1].profile.name)
+        ).toBeInTheDocument();
       },
       { timeout: 2000 }
     );
@@ -157,7 +176,9 @@ describe("MatchesPage Integration Tests", () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
-    expect(screen.getByText(mockCandidates[0].name)).toBeInTheDocument();
+    expect(
+      screen.getByText(mockCandidates[0].profile.name)
+    ).toBeInTheDocument();
 
     const connectButton = screen.getByRole("button", {
       name: /let's connect/i,
@@ -166,7 +187,9 @@ describe("MatchesPage Integration Tests", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText(mockCandidates[1].name)).toBeInTheDocument();
+        expect(
+          screen.getByText(mockCandidates[1].profile.name)
+        ).toBeInTheDocument();
       },
       { timeout: 2000 }
     );
@@ -265,7 +288,9 @@ describe("MatchesPage Integration Tests", () => {
     const user = userEvent.setup();
     render(<MatchesPage />);
 
-    expect(screen.getByText(mockCandidates[0].name)).toBeInTheDocument();
+    expect(
+      screen.getByText(mockCandidates[0].profile.name)
+    ).toBeInTheDocument();
 
     const connectButton = screen.getByRole("button", {
       name: /let's connect/i,
@@ -274,7 +299,9 @@ describe("MatchesPage Integration Tests", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText(mockCandidates[1].name)).toBeInTheDocument();
+        expect(
+          screen.getByText(mockCandidates[1].profile.name)
+        ).toBeInTheDocument();
       },
       { timeout: 2000 }
     );

@@ -89,8 +89,10 @@ describe("PendingRequestsPage", () => {
     const mockRequests = [
       {
         id: "user-1",
-        name: "Test User",
-        bio: "Test bio",
+        profile: {
+          name: "Test User",
+          bio: "Test bio",
+        },
         achievements: "Test achievements",
         created_at: new Date().toISOString(),
       },

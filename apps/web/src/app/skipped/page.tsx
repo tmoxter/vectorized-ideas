@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -18,12 +18,40 @@ import { UserX } from "lucide-react";
 export default function SkippedProfilesPage() {
   const router = useRouter();
   const { user, isLoading, logout } = useAuth();
-  const { profiles, isLoading: profilesLoading, error, reload } = useSkippedProfiles(user?.id);
+  const {
+    profiles,
+    isLoading: profilesLoading,
+    error,
+    reload,
+  } = useSkippedProfiles(user?.id);
   const { recordInteraction, isSubmitting } = useInteraction();
-
-  const [selectedProfile, setSelectedProfile] = useState(profiles[0] || null);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+    null
+  );
   const [message, setMessage] = useState("");
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+  const selectedProfile = useMemo(
+    () => profiles.find((m) => m.id === selectedProfileId) ?? null,
+    [profiles, selectedProfileId]
+  );
+
+  useEffect(() => {
+    if (profilesLoading) return;
+
+    if (selectedProfileId && profiles.some((m) => m.id === selectedProfileId)) {
+      return; // still valid, keep it
+    }
+    if (profiles.length > 0) {
+      setSelectedProfileId(profiles[0].id);
+    } else {
+      setSelectedProfileId(null);
+    }
+  }, [profiles, profilesLoading, selectedProfileId]);
+
+  // Hard gate rendering until user + matches ready (prevents hydration mismatch)
+  if (isLoading || profilesLoading) {
+    return <LoadingSpinner />;
+  }
 
   const handleLike = async () => {
     if (!selectedProfile) return;
@@ -35,7 +63,9 @@ export default function SkippedProfilesPage() {
       return;
     }
 
-    setMessage("User liked! They'll be moved to matches if they like you back.");
+    setMessage(
+      "User liked! They'll be moved to matches if they like you back."
+    );
     await reload();
   };
 
@@ -86,7 +116,7 @@ export default function SkippedProfilesPage() {
             <ProfileListLayout
               profiles={profiles}
               selectedProfile={selectedProfile}
-              onSelectProfile={setSelectedProfile}
+              onSelectProfile={(m) => setSelectedProfileId(m.id)}
             >
               <div className="p-6 bg-gray-50 border-t border-gray-100">
                 {!showBlockConfirm ? (

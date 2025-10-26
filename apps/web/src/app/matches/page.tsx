@@ -19,7 +19,11 @@ import { SearchX } from "lucide-react";
 export default function MatchesPage() {
   const router = useRouter();
   const { user, isLoading, logout } = useAuth();
-  const { candidates, isLoading: matchesLoading, error: matchesError } = useMatches(user?.id);
+  const {
+    candidates,
+    isLoading: matchesLoading,
+    error: matchesError,
+  } = useMatches(user?.id);
   const { recordInteraction, isSubmitting } = useInteraction();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,7 +52,9 @@ export default function MatchesPage() {
     }
 
     if (action === "like") {
-      setMessage("Like recorded! If they like you back, you'll be matched automatically.");
+      setMessage(
+        "Like recorded! If they like you back, you'll be matched automatically."
+      );
     }
 
     setTimeout(() => {
@@ -96,7 +102,9 @@ export default function MatchesPage() {
           />
 
           {message && <MessageBanner message={message} />}
-          {matchesError && <MessageBanner message={matchesError} type="error" />}
+          {matchesError && (
+            <MessageBanner message={matchesError} type="error" />
+          )}
 
           {candidates.length === 0 ? (
             <EmptyState

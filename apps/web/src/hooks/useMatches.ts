@@ -17,7 +17,9 @@ export function useMatches(userId: string | undefined, limit = 20) {
     setError("");
 
     try {
-      const response = await fetch(`/api/embeddings?userId=${userId}&limit=${limit}`);
+      const response = await fetch(
+        `/api/embeddings?userId=${userId}&limit=${limit}`
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

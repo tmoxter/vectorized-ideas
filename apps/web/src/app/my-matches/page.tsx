@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -18,32 +18,51 @@ import { Users } from "lucide-react";
 export default function MyMatchesPage() {
   const router = useRouter();
   const { user, isLoading, logout } = useAuth();
-  const { matches, isLoading: matchesLoading, error, reload } = useMyMatches(user?.id);
+  const {
+    matches,
+    isLoading: matchesLoading,
+    error,
+    reload,
+  } = useMyMatches(user?.id);
   const { recordInteraction, isSubmitting } = useInteraction();
-
-  const [selectedMatch, setSelectedMatch] = useState(matches[0] || null);
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+  const selectedMatch = useMemo(
+    () => matches.find((m) => m.id === selectedMatchId) ?? null,
+    [matches, selectedMatchId]
+  );
+
+  useEffect(() => {
+    if (matchesLoading) return;
+
+    if (selectedMatchId && matches.some((m) => m.id === selectedMatchId)) {
+      return; // still valid, keep it
+    }
+    if (matches.length > 0) {
+      setSelectedMatchId(matches[0].id);
+    } else {
+      setSelectedMatchId(null);
+    }
+  }, [matches, matchesLoading, selectedMatchId]);
+
+  // Hard gate rendering until user + matches ready (prevents hydration mismatch)
+  if (isLoading || matchesLoading) {
+    return <LoadingSpinner />;
+  }
 
   const handleBlock = async () => {
     if (!selectedMatch) return;
-
     const success = await recordInteraction(selectedMatch.id, "block");
-
     if (!success) {
       setMessage("Failed to block user");
       setShowBlockConfirm(false);
       return;
     }
-
     setMessage("User blocked successfully");
     setShowBlockConfirm(false);
     await reload();
   };
-
-  if (isLoading || matchesLoading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-breathe pb-10">
@@ -72,7 +91,7 @@ export default function MyMatchesPage() {
             <ProfileListLayout
               profiles={matches}
               selectedProfile={selectedMatch}
-              onSelectProfile={setSelectedMatch}
+              onSelectProfile={(m) => setSelectedMatchId(m.id)}
             >
               <div className="p-6 bg-gray-50 border-t border-gray-100">
                 {!showBlockConfirm ? (

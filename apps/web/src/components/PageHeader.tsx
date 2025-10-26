@@ -4,7 +4,11 @@ interface PageHeaderProps {
   highlight?: boolean;
 }
 
-export function PageHeader({ title, description, highlight = false }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  highlight = false,
+}: PageHeaderProps) {
   return (
     <div className="mb-8">
       <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2">

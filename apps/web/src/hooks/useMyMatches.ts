@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
-import type { ProfileWithDetails } from "@/types";
+import type { ProfileWithDetails, ProfileData } from "@/types";
 
 export function useMyMatches(userId: string | undefined) {
   const [matches, setMatches] = useState<ProfileWithDetails[]>([]);
@@ -84,16 +84,18 @@ export function useMyMatches(userId: string | undefined) {
               country = cityData.country_name;
             }
           }
-
-          return {
-            id: matchedUserId,
-            name: profileResult.data.name || "Anonymous",
+          const profile: ProfileData = {
+            name: profileResult.data.name || "Unknown",
             bio: profileResult.data.bio || "",
             achievements: profileResult.data.achievements || "",
             experience: profileResult.data.experience || "",
             education: profileResult.data.education || "",
             city_name,
             country,
+          };
+          return {
+            id: matchedUserId,
+            profile: profile,
             timezone: userDataResult.data?.timezone,
             stage: userDataResult.data?.stage,
             availability_hours: userDataResult.data?.availability_hours,

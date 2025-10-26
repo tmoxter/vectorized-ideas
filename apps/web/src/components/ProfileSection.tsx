@@ -4,7 +4,11 @@ interface ProfileSectionProps {
   subtitle?: string;
 }
 
-export function ProfileSection({ title, content, subtitle }: ProfileSectionProps) {
+export function ProfileSection({
+  title,
+  content,
+  subtitle,
+}: ProfileSectionProps) {
   if (!content && !subtitle) return null;
 
   return (
