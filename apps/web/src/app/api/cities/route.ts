@@ -10,7 +10,8 @@ export async function GET(req: NextRequest) {
   const limit = Number(req.nextUrl.searchParams.get("limit") || 10);
 
   if (q.length < 2) {
-    return NextResponse.json({ items: [] }); // keep it quiet for short inputs
+    // Keep it quiet for a bit, start guessing at 3 chars (maybe even later?)
+    return NextResponse.json({ items: [] });
   }
 
   const sb = createClient(url, anon, { auth: { persistSession: false } });

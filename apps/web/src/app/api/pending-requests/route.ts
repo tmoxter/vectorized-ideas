@@ -14,8 +14,6 @@ export async function GET(req: NextRequest) {
     }
 
     const sb = createClient(url, serviceRoleKey);
-
-    // Get user from auth header
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {
       return NextResponse.json(
@@ -23,7 +21,6 @@ export async function GET(req: NextRequest) {
         { status: 401 }
       );
     }
-
     const token = authHeader.replace("Bearer ", "");
     const {
       data: { user },
@@ -41,12 +38,14 @@ export async function GET(req: NextRequest) {
     const limit = Number(params.get("limit") ?? 50);
     const offset = Number(params.get("offset") ?? 0);
 
+    console.log(
+      `[pending-requests] Fetching pending requests for user ID: ${user.id}, limit: ${limit}, offset: ${offset}`
+    );
     const { data, error } = await sb.rpc("pending_requests", {
       p_user: user.id,
       p_limit: limit,
       p_offset: offset,
     });
-
     if (error) {
       console.error("Error fetching pending requests:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -83,7 +82,6 @@ export async function GET(req: NextRequest) {
                 .maybeSingle(),
             ]);
 
-          // Fetch city data if city_id exists
           let cityData = null;
           if (profileResult.data?.city_id) {
             const { data: city } = await sb

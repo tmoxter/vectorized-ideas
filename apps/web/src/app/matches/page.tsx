@@ -83,11 +83,7 @@ export default function MatchesPage() {
 
       const result = await response.json();
       const matchCandidates = result?.items || [];
-
-      console.log("Match candidates received:", matchCandidates);
       console.log("Number of candidates:", matchCandidates.length);
-
-      // Handle empty candidate set
       if (!matchCandidates || matchCandidates.length === 0) {
         console.log("No candidates found");
         setCandidates([]);
@@ -143,6 +139,7 @@ export default function MatchesPage() {
     }
   };
 
+  // Navigate through profiles
   const goToNext = () => {
     if (currentIndex < candidates.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -158,7 +155,6 @@ export default function MatchesPage() {
     setUserActions((prev) => ({ ...prev, [candidateId]: action }));
 
     try {
-      // Map UI actions to database interaction types
       let interactionAction: "like" | "pass" | "block";
       if (action === "like") {
         interactionAction = "like";
@@ -185,7 +181,6 @@ export default function MatchesPage() {
             "Like recorded! If they like you back, you'll be matched automatically."
           );
         }
-        // Move to next candidate immediately
         setTimeout(() => {
           goToNext();
           setIsSubmitting(false);
@@ -212,7 +207,6 @@ export default function MatchesPage() {
         setIsSubmitting(false);
       } else {
         setMessage("User blocked successfully.");
-        // Move to next candidate immediately
         setTimeout(() => {
           goToNext();
           setIsSubmitting(false);
@@ -237,7 +231,6 @@ export default function MatchesPage() {
       </div>
     );
   }
-
   const currentCandidate = candidates[currentIndex];
 
   return (

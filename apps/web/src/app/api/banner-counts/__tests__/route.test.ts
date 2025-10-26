@@ -230,7 +230,7 @@ describe("GET /api/banner-counts", () => {
       p_user: testUserId,
       p_idea_id: testVentureId,
       p_model: "text-embedding-3-small",
-      p_version: "1", // default version
+      p_version: "0",
     });
   });
 

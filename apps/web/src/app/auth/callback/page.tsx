@@ -14,18 +14,17 @@ export default function AuthCallback() {
       const supabase = supabaseClient();
 
       try {
-        // Get the current session
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
         if (!session) {
-          // No session, redirect to home
+          // Allways go back to landing page if there's no session
           router.push("/");
           return;
         }
 
-        // Check if user has a profile in the profiles table
+        // If users have a profile, redirect to home, else to profile setup
         const { data: profileData, error } = await supabase
           .from("profiles")
           .select("user_id")
@@ -38,9 +37,6 @@ export default function AuthCallback() {
           router.push("/profile");
           return;
         }
-
-        // If profile exists, redirect to home page
-        // Otherwise, redirect to profile setup page
         if (profileData) {
           router.push("/home");
         } else {

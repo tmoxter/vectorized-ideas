@@ -110,7 +110,6 @@ export default function BlockedProfilesPage() {
         ]);
 
         if (profileResult.data) {
-          // Fetch city data if city_id exists
           let city_name: string | undefined;
           let country: string | undefined;
 

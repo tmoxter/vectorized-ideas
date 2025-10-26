@@ -61,7 +61,6 @@ export default function SkippedProfilesPage() {
   const loadSkippedProfiles = async (userId: string) => {
     setIsLoading(true);
     try {
-      // Get all pass interactions from this user
       const { data: interactionsData, error } = await supabase
         .from("interactions")
         .select("target_user, created_at")
@@ -77,8 +76,6 @@ export default function SkippedProfilesPage() {
         setIsLoading(false);
         return;
       }
-
-      // Fetch profile data for all skipped users
       const profilesPromises = interactionsData.map(async (interaction) => {
         const skippedUserId = interaction.target_user;
 
@@ -106,9 +103,7 @@ export default function SkippedProfilesPage() {
               .maybeSingle(),
           ]);
 
-        // Only require profile to exist - venture and preferences are optional
         if (profileResult.data) {
-          // Fetch city data if city_id exists
           let city_name: string | undefined;
           let country: string | undefined;
 
@@ -146,7 +141,7 @@ export default function SkippedProfilesPage() {
 
       const allProfiles = await Promise.all(profilesPromises);
       const profiles = allProfiles.filter((p) => p !== null) as ProfileData[];
-      console.log("Loaded skipped profiles:", profiles.length);
+      console.log("[skipped] Loaded skipped profiles:", profiles.length);
 
       setSkippedProfiles(profiles);
       if (profiles.length > 0) {

@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
     if (!["like", "pass", "block", "unblock"].includes(action)) {
       return NextResponse.json(
         {
@@ -31,7 +30,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get authenticated user
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
       return NextResponse.json(
@@ -39,13 +37,10 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-
-    // Create supabase client for auth check
     const supabaseAuth = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-
     const token = authHeader.replace("Bearer ", "");
     const {
       data: { user },
@@ -65,7 +60,6 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Get current venture IDs for both actor and target users
     const [actorVenture, targetVenture] = await Promise.all([
       supabase
         .from("user_ventures")
@@ -86,9 +80,8 @@ export async function POST(request: NextRequest) {
     const actorCurrentIdea = actorVenture.data?.id || null;
     const targetCurrentIdea = targetVenture.data?.id || null;
 
-    // Handle different interaction types with the provided SQL logic
+    // Handle different interaction types
     if (action === "like") {
-      // For 'like': insert or do nothing if already exists
       const { error: insertError } = await supabase
         .from("interactions")
         .insert({
@@ -101,7 +94,10 @@ export async function POST(request: NextRequest) {
         .select();
 
       if (insertError && !insertError.message.includes("duplicate")) {
-        console.error("Error inserting like interaction:", insertError);
+        console.error(
+          "[interactions] Error inserting like interaction:",
+          insertError
+        );
         return NextResponse.json(
           { success: false, error: `Database error: ${insertError.message}` },
           { status: 500 }
@@ -117,9 +113,6 @@ export async function POST(request: NextRequest) {
         .eq("action", "like")
         .limit(1);
 
-      console.log("Reciprocal like check:", reciprocal);
-
-      // If there's a reciprocal like, create a match
       if (reciprocal && reciprocal.length > 0) {
         const { error: matchError } = await supabase
           .from("matches")
@@ -132,13 +125,12 @@ export async function POST(request: NextRequest) {
         console.log("Match creation result:", matchError);
 
         if (matchError && !matchError.message.includes("duplicate")) {
-          console.error("Error creating match:", matchError);
+          console.error("[interactions] Error creating match:", matchError);
           // Don't fail the request if match creation fails
-          // The like was still recorded successfully
         }
       }
     } else if (action === "pass") {
-      // For 'pass': insert or update created_at if already exists
+      // For 'pass': insert or update created_at if already exists which we will need for cooldown
       const { error: upsertError } = await supabase
         .from("interactions")
         .upsert({
@@ -159,7 +151,7 @@ export async function POST(request: NextRequest) {
         );
       }
     } else if (action === "block") {
-      // For 'block': use RPC function to handle blocking logic
+      // Blocking logic lives on the database
       const { error } = await supabase.rpc("block_user", {
         p_actor: user.id,
         p_target: targetUserId,
@@ -173,7 +165,7 @@ export async function POST(request: NextRequest) {
         );
       }
     } else if (action === "unblock") {
-      // For 'unblock': delete the block interaction
+      // For now, delete the block interaction, we may want to introduce an unblock interaction and archive all
       const { error: deleteError } = await supabase
         .from("interactions")
         .delete()

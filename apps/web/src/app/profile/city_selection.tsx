@@ -78,7 +78,7 @@ export function CityPicker({
   }
 
   function onBlur() {
-    // Enforce selection: if typed text doesn’t match selected label, clear.
+    // Enforce selection: if typed text doesn’t match selected label, clear
     if (!selected || selected.label !== query) {
       setSelected(null);
       onChange(null);

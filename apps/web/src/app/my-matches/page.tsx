@@ -9,6 +9,7 @@ import { Users, ShieldX } from "lucide-react";
 import { Circles } from "react-loader-spinner";
 
 interface ProfileData {
+  // TODO: align with candidate interface in matches/page.tsx?
   id: string;
   name: string;
   bio: string;
@@ -78,12 +79,9 @@ export default function MyMatchesPage() {
         return;
       }
 
-      // Extract the other user's ID from each match
       const otherUserIds = matchesData.map((match) =>
         match.user_a === userId ? match.user_b : match.user_a
       );
-
-      // Fetch profile data for all matched users
       const profilesPromises = otherUserIds.map(async (matchedUserId) => {
         const [
           profileResult,
@@ -114,7 +112,6 @@ export default function MyMatchesPage() {
         ]);
 
         if (profileResult.data) {
-          // Fetch city data if city_id exists
           let city_name: string | undefined;
           let country: string | undefined;
 

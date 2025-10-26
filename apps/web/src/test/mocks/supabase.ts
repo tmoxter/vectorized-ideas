@@ -296,12 +296,10 @@ export function createMockSupabaseClient(
             updated_at: new Date().toISOString(),
           };
           return {
-            select: vi
-              .fn()
-              .mockResolvedValue({
-                data: mockInteractions[existingIndex],
-                error: null,
-              }),
+            select: vi.fn().mockResolvedValue({
+              data: mockInteractions[existingIndex],
+              error: null,
+            }),
             then: (resolve: any) =>
               resolve({ data: mockInteractions[existingIndex], error: null }),
           };

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+// Switch to small HF model maybe? Might need to serve it elsewhere considering vercel is serverless
+// and we will need to cold start and load the model on every request
 import OpenAI from "openai";
 import { supabaseClient } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
-//import { rescoreBlend } from "@/server/matching";
 
 export type EntityType = "idea" | "profile";
 
@@ -11,19 +12,20 @@ interface EmbedRequest {
   entityId: string;
   text: string;
 }
+// tied, regenerate all embeddings and incrementing version if changing model
+const MODEL = "text-embedding-3-small";
+const VERSION = "v1";
 
 export async function POST(request: NextRequest) {
   try {
     const { entityType, entityId, text }: EmbedRequest = await request.json();
 
-    // Validate inputs
     if (!entityType || !entityId || !text) {
       return NextResponse.json(
         { success: false, error: "Missing required parameters" },
         { status: 400 }
       );
     }
-
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
         { success: false, error: "OpenAI API key not configured" },
@@ -31,24 +33,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user from session (server-side)
     const supabase = supabaseClient();
     const authHeader = request.headers.get("authorization");
-
     if (!authHeader) {
       return NextResponse.json(
         { success: false, error: "No authorization header" },
         { status: 401 }
       );
     }
-
-    // Set the session from the authorization header
     const token = authHeader.replace("Bearer ", "");
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser(token);
-
     if (userError || !user) {
       return NextResponse.json(
         { success: false, error: "User not authenticated" },
@@ -56,45 +53,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize OpenAI client
+    // Generate embeddings
     const client = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-
-    // Call OpenAI embeddings API
     const response = await client.embeddings.create({
-      model: "text-embedding-3-small",
+      model: MODEL,
       input: text,
     });
-
     if (!response.data || response.data.length === 0) {
       return NextResponse.json(
-        { success: false, error: "No embedding data received from OpenAI" },
+        { success: false, error: "No embedding received" },
         { status: 500 }
       );
     }
-
     let embedding = response.data[0].embedding;
-
-    // Validate embedding dimensions
-    if (embedding.length !== 1536) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Invalid embedding dimensions: expected 1536, got ${embedding.length}`,
-        },
-        { status: 500 }
-      );
-    }
+    // Normalize embedding
     const norm = Math.hypot(...embedding);
     if (norm > 0) embedding = embedding.map((x) => x / norm);
+    console.log("[embeddings] Generated embedding for", entityType, entityId);
 
-    // Upsert to Supabase embeddings table
     const { error: upsertError } = await supabase.from("embeddings").upsert({
       entity_type: entityType,
       entity_id: entityId,
       user_id: user.id,
-      model: "text-embedding-3-small",
+      model: MODEL,
       vector: embedding,
       updated_at: new Date().toISOString(),
     });
@@ -105,7 +88,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
+    console.log(
+      `[embeddings] Upserted embedding for ${entityType} ID: ${entityId}`
+    );
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error("Error in embedding API:", error);
@@ -116,7 +101,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
     return NextResponse.json(
       {
         success: false,
@@ -127,21 +111,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-const MODEL = "text-embedding-3-small";
-const VERSION = "v1";
-
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const userId = url.searchParams.get("userId");
     const limit = Number(url.searchParams.get("limit") ?? "20");
-
-    console.log(
-      "GET /api/embeddings called with userId:",
-      userId,
-      "limit:",
-      limit
-    );
 
     if (!userId)
       return NextResponse.json({ error: "userId required" }, { status: 400 });
@@ -152,7 +126,6 @@ export async function GET(req: NextRequest) {
     );
 
     // Get the user's most recent venture from user_ventures table
-    console.log("Fetching user venture for userId:", userId);
     const { data: userVenture, error: ventureErr } = await sb
       .from("user_ventures")
       .select("id, title, description, created_at, user_id")
@@ -161,20 +134,13 @@ export async function GET(req: NextRequest) {
       .limit(1)
       .single();
 
-    console.log("User venture query result:", { userVenture, ventureErr });
-
     if (ventureErr || !userVenture) {
-      console.log("No venture found for user:", userId, "Error:", ventureErr);
       return NextResponse.json(
         { error: "No venture found for user" },
         { status: 404 }
       );
     }
-
     const ideaId = userVenture.id;
-    console.log("Using ideaId for KNN search:", ideaId);
-
-    // Check if we have an embedding for this idea
     const { data: embedding, error: embErr } = await sb
       .from("embeddings")
       .select("entity_id, entity_type")
@@ -182,10 +148,7 @@ export async function GET(req: NextRequest) {
       .eq("entity_id", ideaId.toString())
       .single();
 
-    console.log("Embedding check result:", { embedding, embErr });
-
     if (embErr || !embedding) {
-      console.log("No embedding found for idea:", ideaId);
       return NextResponse.json(
         {
           error:
@@ -196,37 +159,34 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Use the corrected knn_candidates function
-    console.log("Attempting KNN search with corrected function...");
     console.log(
-      "entity_id from embeddings:",
-      embedding.entity_id,
-      "type:",
-      typeof embedding.entity_id
+      "[embeddings] Sucessfully retrieved latest venture and embedding for user:",
+      userId,
+      " Calling KNN query in DB"
     );
-
     const { data: cands, error: kErr } = await sb.rpc(
       "knn_candidates_interact_prefs_applied",
       {
         p_idea_id: embedding.entity_id,
         p_model: MODEL,
         p_version: VERSION,
+        // For now just overfetch a bit and limit after enrichment
         p_limit: 100,
         p_probes: 10,
       }
     );
-
-    console.log("KNN candidates result:", { cands, kErr });
-
     if (kErr) {
       console.error("KNN function error:", kErr);
       return NextResponse.json({ error: kErr.message }, { status: 500 });
     }
-
-    const limitedCands = Array.isArray(cands) ? cands.slice(0, limit) : [];
-    console.log("Returning limited candidates:", limitedCands.length, "items");
+    console.log(
+      "[embeddings] Retrieved",
+      Array.isArray(cands) ? cands.length : 0,
+      "candidates from KNN query"
+    );
 
     // Enrich candidate data with profile, venture, and preferences
+    const limitedCands = Array.isArray(cands) ? cands.slice(0, limit) : [];
     const enrichedCandidates = await Promise.all(
       limitedCands.map(async (candidate: any) => {
         const candidateUserId = candidate.user_id;
@@ -237,7 +197,6 @@ export async function GET(req: NextRequest) {
         }
 
         try {
-          // Fetch all data in parallel
           const [profileResult, ventureResult, preferencesResult] =
             await Promise.all([
               sb
@@ -261,14 +220,6 @@ export async function GET(req: NextRequest) {
 
           // Fetch city data if city_id exists
           let cityData = null;
-          console.log(
-            "API: Profile data for user",
-            candidateUserId,
-            ":",
-            profileResult.data
-          );
-          console.log("API: City ID:", profileResult.data?.city_id);
-
           if (profileResult.data?.city_id) {
             const { data: city, error: cityError } = await sb
               .from("cities")
@@ -276,11 +227,8 @@ export async function GET(req: NextRequest) {
               .eq("id", profileResult.data.city_id)
               .maybeSingle();
 
-            console.log("API: City data:", city, "City error:", cityError);
-
             if (city) {
               cityData = { city_name: city.name, country: city.country_name };
-              console.log("API: Set cityData:", cityData);
             }
           }
 
@@ -301,7 +249,7 @@ export async function GET(req: NextRequest) {
           };
         } catch (error) {
           console.error(
-            "Error enriching candidate data:",
+            "[embeddings] Error enriching candidate data:",
             candidateUserId,
             error
           );
@@ -312,13 +260,10 @@ export async function GET(req: NextRequest) {
 
     // Filter out null candidates (failed to load)
     const validCandidates = enrichedCandidates.filter((c) => c !== null);
-
     const response = {
       items: validCandidates,
-      baseVenture: userVenture, // Include the base venture info for reference
+      baseVenture: userVenture,
     };
-
-    console.log("Final response with enriched data:", response);
     return NextResponse.json(response);
   } catch (error) {
     console.error("GET /api/embeddings error:", error);

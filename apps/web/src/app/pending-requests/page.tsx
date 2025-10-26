@@ -84,9 +84,10 @@ export default function PendingRequestsPage() {
 
       const result = await response.json();
       const pendingRequests = result?.items || [];
-
-      console.log("Pending requests received:", pendingRequests);
-      console.log("Number of requests:", pendingRequests.length);
+      console.log(
+        "[pending-requests] Number of requests:",
+        pendingRequests.length
+      );
 
       if (!pendingRequests || pendingRequests.length === 0) {
         console.log("No pending requests found");

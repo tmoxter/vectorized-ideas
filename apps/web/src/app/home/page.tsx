@@ -12,11 +12,9 @@ import {
   Settings,
   BarChart3,
   SkipForward,
-  BookOpenText,
   Clock,
 } from "lucide-react";
 import { Circles, InfinitySpin } from "react-loader-spinner";
-import Image from "next/image";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -42,8 +40,6 @@ export default function HomePage() {
     }
     setUser(session.user);
     setIsLoading(false);
-
-    // Fetch banner data
     fetchBannerData(session.access_token);
   };
 
@@ -55,9 +51,6 @@ export default function HomePage() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("[home] Response status:", response.status);
-
       if (!response.ok) {
         console.error(
           "[home] Error fetching banner data, status:",
@@ -65,11 +58,8 @@ export default function HomePage() {
         );
         return;
       }
-
       const data = await response.json();
-      console.log("[home] Received banner data:", data);
       setBannerData(data);
-      console.log("[home] Banner data set to state:", data);
     } catch (error) {
       console.error("[home] Error fetching banner data:", error);
     }

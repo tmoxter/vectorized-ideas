@@ -93,7 +93,6 @@ export default function SettingsPage() {
       } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Call API to delete user account
       const response = await fetch("/api/delete-account", {
         method: "DELETE",
         headers: {
@@ -101,7 +100,6 @@ export default function SettingsPage() {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
-
       if (response.ok) {
         setMessage("Account deleted successfully. Redirecting...");
         // Sign out and redirect
