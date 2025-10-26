@@ -9,13 +9,19 @@ import {
   addMockInteraction,
 } from "@/test/mocks/supabase";
 
-// Mock @supabase/supabase-js - use vi.hoisted to avoid hoisting issues
 const mockCreateClient = vi.hoisted(() => vi.fn());
+const mockExtractBearerToken = vi.hoisted(() => vi.fn());
+const mockAuthenticateUser = vi.hoisted(() => vi.fn());
+
 vi.mock("@supabase/supabase-js", () => ({
   createClient: mockCreateClient,
 }));
 
-// Import after mocks are set up
+vi.mock("@/server/logic/auth", () => ({
+  extractBearerToken: mockExtractBearerToken,
+  authenticateUser: mockAuthenticateUser,
+}));
+
 const { POST } = await import("../route");
 
 describe("Interactions API Route", () => {
@@ -27,13 +33,17 @@ describe("Interactions API Route", () => {
     resetMockData();
     initializeMockData();
 
-    // Mock createClient to return our mock Supabase client
+    mockExtractBearerToken.mockImplementation((header: string | null) => {
+      if (!header) return null;
+      return header.replace("Bearer ", "");
+    });
+
+    mockAuthenticateUser.mockResolvedValue({
+      user: { id: currentUser.id },
+      error: null,
+    });
+
     mockCreateClient.mockImplementation((url: string, key: string) => {
-      // For service role client
-      if (key === process.env.SUPABASE_SERVICE_ROLE_KEY) {
-        return createMockSupabaseClient(currentUser.id);
-      }
-      // For anon key client (auth check)
       return createMockSupabaseClient(currentUser.id);
     });
   });
@@ -317,9 +327,9 @@ describe("Interactions API Route", () => {
     });
 
     it("should return 401 when user is not authenticated", async () => {
-      // Mock unauthenticated state
-      mockCreateClient.mockImplementation(() => {
-        return createMockSupabaseClient(undefined);
+      mockAuthenticateUser.mockResolvedValue({
+        user: null,
+        error: new Error("Invalid token"),
       });
 
       const request = new Request("http://localhost/api/interactions", {

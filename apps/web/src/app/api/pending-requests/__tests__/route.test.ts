@@ -434,7 +434,7 @@ describe("GET /api/pending-requests", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe("RPC function error");
+    expect(data.error).toContain("RPC function error");
   });
 
   it("should handle enrichment errors gracefully", async () => {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { searchCities } from "@/server/services/cities.service";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -9,32 +10,19 @@ export async function GET(req: NextRequest) {
   const country = req.nextUrl.searchParams.get("country") || null;
   const limit = Number(req.nextUrl.searchParams.get("limit") || 10);
 
+  // Keep it quiet for a bit, start guessing at 3 chars (maybe even later?)
   if (q.length < 2) {
-    // Keep it quiet for a bit, start guessing at 3 chars (maybe even later?)
     return NextResponse.json({ items: [] });
   }
 
-  const sb = createClient(url, anon, { auth: { persistSession: false } });
-  const { data, error } = await sb.rpc("search_cities", {
-    p_q: q,
-    p_country_iso2: country,
-    p_limit: limit,
-  });
-
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
-
-  return NextResponse.json({
-    items: (data ?? []).map((d: any) => ({
-      id: d.id,
-      label: `${d.name}${d.admin1 ? `, ${d.admin1}` : ""} (${d.country_name})`,
-      name: d.name,
-      admin1: d.admin1,
-      country: d.country_name,
-      iso2: d.country_iso2,
-      lat: d.lat,
-      lon: d.lon,
-      population: d.population,
-    })),
-  });
+  try {
+    const sb = createClient(url, anon, { auth: { persistSession: false } });
+    const result = await searchCities(sb, q, country, limit);
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
 }

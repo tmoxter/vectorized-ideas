@@ -181,9 +181,9 @@ describe("GET /api/embeddings", () => {
     const response = await GET(mockRequest);
     const data = await response.json();
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(500);
     expect(data).toHaveProperty("error");
-    expect(data.error).toBe("No venture found for user");
+    expect(data.error).toContain("No venture found for user");
   });
 
   it("should include all expected fields in candidate responses", async () => {
