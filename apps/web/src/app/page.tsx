@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { supabaseClient } from "@/lib/supabase";
 import TypewriterHero from "@/components/TypewriterHero";
-import { ArrowUpZA, Telescope, Handshake, Map } from "lucide-react";
+import { ArrowUpZA, Telescope, Handshake, Map, ChevronDown } from "lucide-react";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -13,6 +13,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [isLoginMode, setIsLoginMode] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -331,10 +332,65 @@ export default function Home() {
             </div>
             </div>
 
+
             {/* Technical Note */}
             <div className="max-w-4xl">
-              <div className="mt-12 p-4 bg-gray-100 rounded border-l-4 border-blue-950">
-                <p className="text-sm font-mono text-gray-700">
+
+              {/* FAQ Section */}
+              <div className="mt-12">
+                <div className="space-y-4">
+                  {/* FAQ Item 1 */}
+                  <div className="bg-white rounded border border-gray-200 overflow-hidden">
+                    <button
+                      onClick={() => setExpandedFaq(expandedFaq === 0 ? null : 0)}
+                      className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition duration-200"
+                    >
+                      <span className="font-mono font-semibold text-gray-900">
+                        Aren't there already alternative platforms out there?
+                      </span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                          expandedFaq === 0 ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {expandedFaq === 0 && (
+                      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                        <p className="font-mono text-sm text-gray-700">
+                          Yes, but I found it hard to find people with aligned visions on them.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* FAQ Item 2 */}
+                  <div className="bg-white rounded border border-gray-200 overflow-hidden">
+                    <button
+                      onClick={() => setExpandedFaq(expandedFaq === 1 ? null : 1)}
+                      className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition duration-200"
+                    >
+                      <span className="font-mono font-semibold text-gray-900">
+                        Won't other users steal my venture ideas?
+                      </span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                          expandedFaq === 1 ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {expandedFaq === 1 && (
+                      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                        <p className="font-mono text-sm text-gray-700">
+                          First time founders tend to be secretive about their ideas, second-time founders shout them from the rooftops :).
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-12 p-4 bg-gray-50 rounded border-l-4 border-blue-950">
+                <p className="text-sm font-mono text-gray-00">
                   <strong>Note:</strong> Vectorizied-ideas is completely free to use and in an experimental
                   state. If you find any bugs or have suggestions, please open an issue or even better a PR on GitHub.
                   <a
@@ -345,18 +401,19 @@ export default function Home() {
                   </a>
                 </p>
               </div>
+
             </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-8 px-6 mt-20">
+      <footer className="border-t border-gray-300 py-8 px-6 mt-20">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div className="mb-4 md:mb-0">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-6 h-6 rounded flex items-center justify-center bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-blue-200">
                   <span className="text-black font-mono text">{'\u{1D708}'}</span>
                 </div>
                 <span className="font-mono text-sm text-gray-700">
@@ -375,9 +432,9 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 mt-6 pt-6 text-center">
+          <div className="border-t border-gray-300 mt-6 pt-6 text-center">
             <p className="text-gray-400 text-xs font-mono">
-              built with love
+              built with care and spare time
             </p>
           </div>
         </div>
