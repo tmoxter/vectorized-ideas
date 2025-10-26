@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase";
-import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, User, Home, ChevronDown, ChevronUp, Clock } from "lucide-react";
+import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, User, Home, ChevronDown, Clock } from "lucide-react";
 
 interface NavigationProps {
   currentPage: "home" | "discover" | "my-matches" | "skipped" | "blocked" | "profile" | "settings" | "pending-requests";
@@ -69,11 +69,11 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                 }`}
               >
                 <span>Discover</span>
-                {activeDropdown === "discover" ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform duration-200 ${
+                    activeDropdown === "discover" ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {activeDropdown === "discover" && (
@@ -126,11 +126,11 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                 }`}
               >
                 <span>History</span>
-                {activeDropdown === "history" ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform duration-200 ${
+                    activeDropdown === "history" ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {activeDropdown === "history" && (
@@ -196,11 +196,11 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
                 }`}
               >
                 <span>Account</span>
-                {activeDropdown === "account" ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform duration-200 ${
+                    activeDropdown === "account" ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {activeDropdown === "account" && (
