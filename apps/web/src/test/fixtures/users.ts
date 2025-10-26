@@ -8,6 +8,9 @@ export interface TestUser {
     achievements: string;
     region: string;
     timezone: string;
+    city_id?: number;
+    experience?: string;
+    education?: string;
   };
   venture: {
     id: string;
@@ -36,6 +39,9 @@ export const testUsers: TestUser[] = [
       achievements: 'Led engineering team at Series B startup. Built developer platform used by 10k+ engineers.',
       region: 'San Francisco, CA',
       timezone: 'America/Los_Angeles',
+      city_id: 1,
+      experience: '8 years in software engineering',
+      education: 'BS Computer Science, Stanford University',
     },
     venture: {
       id: 'venture-1',

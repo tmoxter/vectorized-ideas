@@ -12,7 +12,7 @@ export interface MockSupabaseClient {
 }
 
 // Mock database state
-let mockMatches: Array<{ user_a: string; user_b: string; created_at: string }> = [];
+let mockMatches: Array<{ user_a: string; user_b: string; created_at: string; active?: boolean }> = [];
 let mockEmbeddings: Array<{
   entity_type: string;
   entity_id: string;
@@ -123,6 +123,16 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
         }
         return Promise.resolve({ data: null, error: { message: 'Not found' } });
       });
+
+      // Add select method for when querying specific fields like "id"
+      const originalSelect = queryBuilder.select;
+      queryBuilder.select = vi.fn().mockImplementation((fields?: string) => {
+        // Return chainable builder that supports eq, order, limit
+        return {
+          ...queryBuilder,
+          select: originalSelect,
+        };
+      });
     }
 
     // Mock user_cofounder_preference table
@@ -135,6 +145,29 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
         const user = testUsers.find(u => u.id === userId);
         if (user) {
           return Promise.resolve({ data: user.preferences, error: null });
+        }
+        return Promise.resolve({ data: null, error: null });
+      });
+    }
+
+    // Mock cities table
+    if (table === 'cities') {
+      queryBuilder.maybeSingle.mockImplementation(() => {
+        const cityId = (queryBuilder.eq as any).mock.calls.find(
+          (call: any) => call[0] === 'id'
+        )?.[1];
+
+        // Mock city data
+        const mockCities: Record<number, { id: number; name: string; country_name: string }> = {
+          1: { id: 1, name: 'San Francisco', country_name: 'United States' },
+          2: { id: 2, name: 'Austin', country_name: 'United States' },
+          3: { id: 3, name: 'Seattle', country_name: 'United States' },
+          4: { id: 4, name: 'New York', country_name: 'United States' },
+          5: { id: 5, name: 'Boston', country_name: 'United States' },
+        };
+
+        if (cityId && mockCities[cityId]) {
+          return Promise.resolve({ data: mockCities[cityId], error: null });
         }
         return Promise.resolve({ data: null, error: null });
       });
@@ -361,8 +394,8 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
   };
 
   const mockRpc = vi.fn().mockImplementation((fn: string, params: any) => {
-    if (fn === 'knn_candidates' || fn === 'knn_candidates_excl') {
-      const { p_idea_id, p_limit = 20 } = params;
+    if (fn === 'knn_candidates' || fn === 'knn_candidates_excl' || fn === 'knn_candidates_interact_prefs_applied') {
+      const { p_idea_id, p_limit = 20, p_model, p_version, p_probes } = params;
 
       // Find the embedding for the query idea
       const queryEmbedding = mockEmbeddings.find(e => e.entity_id === p_idea_id);
@@ -380,10 +413,12 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           if (!user) return null;
 
           // Return simple candidate structure - API will enrich it
+          // For the new function, use 'idea_sim' instead of 'similarity_score' to match actual DB response
           return {
             user_id: user.id,
             venture_id: candidateEmb.entity_id,
             similarity_score: similarity,
+            idea_sim: similarity, // Add this field for the new function
             stage: user.stage,
             timezone: user.profile.timezone,
             availability_hours: user.availability_hours,
@@ -413,6 +448,8 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           actor_user: p_actor_user,
           target_user: p_target_user,
           action: 'like' as const,
+          actor_current_idea: null,
+          target_current_idea: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -445,6 +482,8 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
           actor_user: p_actor_user,
           target_user: p_target_user,
           action: 'pass' as const,
+          actor_current_idea: null,
+          target_current_idea: null,
           created_at: now,
           updated_at: now,
         };
@@ -463,6 +502,8 @@ export function createMockSupabaseClient(currentUserId?: string): MockSupabaseCl
         actor_user: p_actor,
         target_user: p_target,
         action: 'block' as const,
+        actor_current_idea: null,
+        target_current_idea: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

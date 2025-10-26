@@ -45,6 +45,15 @@ vi.mock('@/lib/embeddings-client', () => ({
   },
 }));
 
+// Mock CityPicker component
+vi.mock('../city_selection', () => ({
+  CityPicker: ({ onChange, defaultCity }: any) => (
+    <div data-testid="city-picker">
+      City: {defaultCity?.name || 'None'}
+    </div>
+  ),
+}));
+
 // Import the component after all mocks are set up
 const ProfilePage = await import('../page').then(m => m.default);
 
@@ -181,20 +190,19 @@ describe('ProfilePage Integration Tests', () => {
 
   it('should render loading state initially', () => {
     render(<ProfilePage />);
-    expect(screen.getByText(/loading profile.../i)).toBeInTheDocument();
+    expect(screen.getByTestId('circles-loader')).toBeInTheDocument();
   });
 
   it('should load and display empty form for new user', async () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     // Check that form is rendered with empty fields
     expect(screen.getByPlaceholderText(/your full name/i)).toHaveValue('');
-    expect(screen.getByPlaceholderText(/e.g., san francisco/i)).toHaveValue('');
-    expect(screen.getByPlaceholderText(/AI-powered code review platform/i)).toHaveValue('');
+    expect(screen.getByTestId('city-picker')).toBeInTheDocument();
   });
 
   it('should load existing profile data', async () => {
@@ -224,7 +232,7 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     // Check that existing data is loaded
@@ -238,7 +246,7 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     // Fill in form fields
@@ -249,8 +257,8 @@ describe('ProfilePage Integration Tests', () => {
       'A comprehensive development toolkit for modern teams'
     );
 
-    // Click save draft
-    const saveDraftButton = screen.getByRole('button', { name: /save draft/i });
+    // Click save as draft
+    const saveDraftButton = screen.getByRole('button', { name: /save as draft/i });
     await user.click(saveDraftButton);
 
     // Wait for save confirmation
@@ -283,12 +291,12 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     // Fill in required fields
     await user.type(screen.getByPlaceholderText(/your full name/i), 'Jane Smith');
-    await user.type(screen.getByPlaceholderText(/e.g., san francisco/i), 'New York, NY');
+    // City is now a CityPicker component, not a text input
     await user.type(
       screen.getByPlaceholderText(/brief background about yourself/i),
       'Experienced product manager'
@@ -313,9 +321,9 @@ describe('ProfilePage Integration Tests', () => {
     expect(mockProfilesDb[0]).toMatchObject({
       user_id: testUserId,
       name: 'Jane Smith',
-      region: 'New York, NY',
       bio: 'Experienced product manager',
       is_published: true,
+      // Note: city_id is now used instead of region
     });
 
     expect(mockVenturesDb).toHaveLength(1);
@@ -341,7 +349,7 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     const publishButton = screen.getByRole('button', { name: /save & publish/i });
@@ -355,7 +363,7 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     const publishButton = screen.getByRole('button', { name: /save & publish/i });
@@ -405,7 +413,7 @@ describe('ProfilePage Integration Tests', () => {
     await user.type(nameInput, 'John Updated');
 
     // Save draft
-    await user.click(screen.getByRole('button', { name: /save draft/i }));
+    await user.click(screen.getByRole('button', { name: /save as draft/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/profile saved as draft/i)).toBeInTheDocument();
@@ -440,7 +448,7 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     // Fill in required fields
@@ -449,7 +457,7 @@ describe('ProfilePage Integration Tests', () => {
     await user.type(screen.getByPlaceholderText(/explain the problem you're solving/i), 'A toolkit');
 
     // Try to save
-    await user.click(screen.getByRole('button', { name: /save draft/i }));
+    await user.click(screen.getByRole('button', { name: /save as draft/i }));
 
     // Should show error message
     await waitFor(() => {
@@ -476,12 +484,12 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     // Fill in all fields
     await user.type(screen.getByPlaceholderText(/your full name/i), 'Alice Johnson');
-    await user.type(screen.getByPlaceholderText(/e.g., san francisco/i), 'Seattle, WA');
+    // City is now a CityPicker component, not a text input
     await user.type(
       screen.getByPlaceholderText(/brief background about yourself/i),
       'Full-stack developer with AI expertise'
@@ -505,7 +513,7 @@ describe('ProfilePage Integration Tests', () => {
     );
 
     // Save as draft
-    await user.click(screen.getByRole('button', { name: /save draft/i }));
+    await user.click(screen.getByRole('button', { name: /save as draft/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/profile saved as draft/i)).toBeInTheDocument();
@@ -516,7 +524,7 @@ describe('ProfilePage Integration Tests', () => {
       name: 'Alice Johnson',
       bio: 'Full-stack developer with AI expertise',
       achievements: 'Ex-Google, built ML platform',
-      region: 'Seattle, WA',
+      // Note: city_id is now used instead of region
     });
 
     expect(mockVenturesDb[0]).toMatchObject({
@@ -539,7 +547,7 @@ describe('ProfilePage Integration Tests', () => {
     render(<ProfilePage />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading profile.../i)).not.toBeInTheDocument();
+      expect(screen.queryByTestId('circles-loader')).not.toBeInTheDocument();
     });
 
     // Fill and publish

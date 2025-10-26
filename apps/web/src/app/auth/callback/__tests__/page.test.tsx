@@ -56,10 +56,11 @@ describe('AuthCallback Routing Logic', () => {
     mockSupabaseClient.mockReturnValue(mockClient);
 
     render(<AuthCallback />);
-    expect(screen.getByText(/checking your profile.../i)).toBeInTheDocument();
+    // Check for the loading spinner instead of text
+    expect(screen.getByTestId('circles-loader')).toBeInTheDocument();
   });
 
-  it('should redirect to /matches when user has a profile', async () => {
+  it('should redirect to /home when user has a profile', async () => {
     // Mock authenticated user with profile
     const mockClient = {
       auth: {
@@ -87,7 +88,7 @@ describe('AuthCallback Routing Logic', () => {
     render(<AuthCallback />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/matches');
+      expect(mockPush).toHaveBeenCalledWith('/home');
     });
   });
 
