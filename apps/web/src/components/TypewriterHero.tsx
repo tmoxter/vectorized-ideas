@@ -6,7 +6,6 @@ const phrases = [
   "your venture ideas",
   "your side-projects",
   "your research interests",
-  "your vision",
 ];
 
 export default function TypewriterHero() {
@@ -57,7 +56,7 @@ export default function TypewriterHero() {
         {/* Highlighter */}
         <span
           aria-hidden
-          className="absolute left-0 top-[0.15em] h-[1em] z-0 block bg-yellow-200 transition-all duration-200 ease-out rounded-sm pointer-events-none"
+          className="absolute left-0 top-[0.15em] h-[1em] z-0 block bg-typewriter transition-all duration-200 ease-out rounded-sm pointer-events-none"
           style={{ width: displayedText ? `${displayedText.length}ch` : "0ch" }}
         />
 

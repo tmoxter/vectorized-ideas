@@ -248,7 +248,7 @@ export default function SkippedProfilesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-breathe pb-10">
       <Navigation
         currentPage="skipped"
         userEmail={user?.email}
@@ -262,7 +262,7 @@ export default function SkippedProfilesPage() {
           </h1>
 
           {message && (
-            <div className="mb-6 p-4 bg-blue-50 text-blue-700 border border-blue-200 rounded font-mono text-sm">
+            <div className="mb-6 p-4 bg-blue-50 text-blue-700 border border-yellow-200 rounded font-mono text-sm">
               {message}
             </div>
           )}

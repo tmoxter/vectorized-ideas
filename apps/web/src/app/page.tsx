@@ -112,7 +112,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-breathe pb-10">
       {/* Header */}
       <header className="px-6 py-4 border-b border-gray-200">
         <nav className="flex items-center justify-between max-w-6xl mx-auto">
@@ -127,8 +127,8 @@ export default function Home() {
               }}
               className="flex items-center space-x-3 hover:opacity-80"
             >
-              <div className="w-8 h-8 bg-yellow-200 rounded flex items-center justify-center">
-                <span className="text-black font-mono text-2xl">{'\u{1D708}'}</span>
+              <div className="w-6 h-6 icon-gradient rounded flex items-center justify-center">
+                <span className="text-white font-mono text-xl">{'\u{1D708}'}</span>
               </div>
               <span className="font-mono text-lg text-gray-900">
                 vectorized-ideas
@@ -151,9 +151,9 @@ export default function Home() {
                   who want to work on related challenges or are already tackling the same problems as you.
                 </p>
               </div>
-              <div className="hidden lg:block lg:w-75 lg:flex-shrink-0">
+              <div className="hidden lg:block lg:w-80 lg:flex-shrink-0">
                 <Image
-                  src="/bubble.svg"
+                  src="/rocket.svg"
                   alt="Light bulb illustration"
                   width={256}
                   height={256}
@@ -167,8 +167,8 @@ export default function Home() {
               {/* How it works */}
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
-                    <ArrowUpZA className="w-5 h-5 text-black" />
+                  <div className="w-11 h-11 rounded flex items-center justify-center mb-4 icon-gradient">
+                    <ArrowUpZA className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Semantic Similarity
@@ -181,8 +181,8 @@ export default function Home() {
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
-                    <Telescope className="w-5 h-5 text-black" />
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient">
+                    <Telescope className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Visibility
@@ -195,8 +195,8 @@ export default function Home() {
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
-                    <Handshake className="w-5 h-5 text-black" />
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient">
+                    <Handshake className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Connect on LinkedIn
@@ -208,8 +208,8 @@ export default function Home() {
                 </div>
 
                 <div className="p-6 bg-white rounded border border-gray-200">
-                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-yellow-200 via-yellow-200 to-indigo-400">
-                    <Map className="w-5 h-5 text-black" />
+                  <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient">
+                    <Map className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Compare

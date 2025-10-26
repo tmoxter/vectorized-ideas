@@ -230,7 +230,7 @@ export default function MyMatchesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-breathe pb-10">
       <Navigation
         currentPage="my-matches"
         userEmail={user?.email}

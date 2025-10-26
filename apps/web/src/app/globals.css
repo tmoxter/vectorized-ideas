@@ -10,11 +10,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-silver: #DFEBFF;
+  --color-typewriter: #c7defb;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #cbd1e5;
     --foreground: #ededed;
   }
 }
@@ -34,10 +36,9 @@
 .bg-gradient-breathe {
   background: linear-gradient(
     -45deg,
-    #fff7ed, #fef3c7, #fde68a, #fff7ed
+    #b7a7f80b, #6ba9f420, #fdbfac2a
   );
-  background-size: 400% 400%;
-  animation: gradient-breathe 20s ease-in-out infinite;
+  background-size: 100% 100%;
 }
 
 body {
@@ -62,7 +63,7 @@ body {
   right: -0.08em;
   bottom: 0.06em;         /* sit just under the baseline */
   height: 0.78em;         /* roughly x-height */
-  background: #fdf7c4;    /* Tailwind yellow-300 */
+  background: sky-100;    /* Tailwind yellow-300 */
   border-radius: 0.15em;  /* soft corners */
   z-index: -1;            /* behind the text */
   filter: blur(0.6px);    /* soften the fill to feel brushy */
@@ -80,6 +81,36 @@ body {
 }
 
 ::selection {
-  background-color: #fdf7c4; /* Tailwind's yellow-200 equivalent */
+  background-color: #bedbff; /* Tailwind's yellow-200 equivalent */
   color: #000000;            /* text color when highlighted */
+}
+
+@keyframes drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 50px 50px; }
+}
+
+.bg-dotted-animated {
+  background-image: radial-gradient(rgba(48, 39, 219, 0.375) 1.1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: drift 12s linear infinite;
+}
+
+/* Icon gradient for feature cards */
+.icon-gradient {
+  background: linear-gradient(to bottom right, #b7a7f8, #6ba8f4, #fdbfac);
+}
+
+/* Ticker animation for scrolling text */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-animate {
+  animation: ticker-scroll 20s linear infinite;
 }

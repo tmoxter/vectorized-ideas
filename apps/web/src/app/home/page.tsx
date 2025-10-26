@@ -44,7 +44,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-white to-white">
+    <div className="min-h-screen bg-gradient-breathe pb-10">
       <Navigation
         currentPage="home"
         userEmail={user?.email}
@@ -64,10 +64,10 @@ export default function HomePage() {
             <div className="ticker-animate flex gap-16 whitespace-nowrap">
               <p className="font-mono text-2xl font-semibold text-gray-800">
                 Currently, there are 734 profiles matching your location filter. 19 are working on related topics.
-                </p>
+              </p>
               <p className="font-mono text-2xl font-semibold text-gray-800">
-                  Currently, there are 734 profiles matching your location filter. 19 are working on related topics.
-                </p>
+                Currently, there are 734 profiles matching your location filter. 19 are working on related topics.
+              </p>
             </div>
           </div>
 
@@ -78,8 +78,8 @@ export default function HomePage() {
               onClick={() => router.push("/matches")}
               className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
             >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-violet-100 via-blue-200 to-rose-100 group-hover:scale-110 transition-transform duration-200">
-                <Search className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
+                <Search className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                 Discover Profiles
@@ -110,8 +110,8 @@ export default function HomePage() {
               onClick={() => router.push("/skipped")}
               className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
             >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-violet-100 via-blue-200 to-rose-100 group-hover:scale-110 transition-transform duration-200">
-                <SkipForward className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
+                <SkipForward className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                 Revisit Skipped Profiles
@@ -126,8 +126,8 @@ export default function HomePage() {
               onClick={() => router.push("/my-matches")}
               className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
             >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-violet-100 via-blue-200 to-rose-100 group-hover:scale-110 transition-transform duration-200">
-                <Sparkles className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                 Matches
@@ -142,8 +142,8 @@ export default function HomePage() {
               onClick={() => router.push("/profile")}
               className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
             >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-violet-100 via-blue-200 to-rose-100 group-hover:scale-110 transition-transform duration-200">
-                <User className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
+                <User className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                 My Profile
@@ -158,8 +158,8 @@ export default function HomePage() {
               onClick={() => router.push("/settings")}
               className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
             >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-violet-100 via-blue-200 to-rose-100 group-hover:scale-110 transition-transform duration-200">
-                <Settings className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
+                <Settings className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                 Settings
@@ -174,8 +174,8 @@ export default function HomePage() {
               onClick={() => router.push("/analyze")}
               className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
             >
-              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 bg-gradient-to-br from-violet-100 via-blue-200 to-rose-100 group-hover:scale-110 transition-transform duration-200">
-                <BarChart3 className="w-5 h-5 text-black" />
+              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
+                <BarChart3 className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                 Analyze
