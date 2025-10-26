@@ -6,12 +6,16 @@ import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Search, Sparkles, User, Settings, BarChart3, SkipForward, BookOpenText, Clock } from "lucide-react";
-import { Circles } from 'react-loader-spinner';
+import { Circles, InfinitySpin } from 'react-loader-spinner';
 import Image from "next/image";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [bannerData, setBannerData] = useState<{
+    total_profiles: number;
+    related_topics: number;
+  } | null>(null);
   const router = useRouter();
   const supabase = supabaseClient();
 
@@ -29,6 +33,34 @@ export default function HomePage() {
     }
     setUser(session.user);
     setIsLoading(false);
+
+    // Fetch banner data
+    fetchBannerData(session.access_token);
+  };
+
+  const fetchBannerData = async (token: string) => {
+    try {
+      console.log("[home] Fetching banner data...");
+      const response = await fetch("/api/banner-counts", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("[home] Response status:", response.status);
+
+      if (!response.ok) {
+        console.error("[home] Error fetching banner data, status:", response.status);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("[home] Received banner data:", data);
+      setBannerData(data);
+      console.log("[home] Banner data set to state:", data);
+    } catch (error) {
+      console.error("[home] Error fetching banner data:", error);
+    }
   };
 
   const handleLogout = async () => {
@@ -61,16 +93,25 @@ export default function HomePage() {
           </div>
 
           {/* Ticker Banner */}
-          <div className="mb-8 overflow-hidden">
-            <div className="ticker-animate flex gap-16 whitespace-nowrap">
-              <p className="font-mono text-2xl font-semibold text-gray-800">
-                Currently, there are 734 profiles matching your location filter. 19 are working on related topics.
-              </p>
-              <p className="font-mono text-2xl font-semibold text-gray-800">
-                Currently, there are 734 profiles matching your location filter. 19 are working on related topics.
-              </p>
+          {bannerData ? (
+            <div className="mb-8 overflow-hidden">
+              <div className="ticker-animate flex gap-16 whitespace-nowrap">
+                <p className="font-mono text-2xl font-semibold text-gray-800">
+                  Currently, there are {bannerData.total_profiles} profiles matching your location filter. {bannerData.related_topics} are working on related topics.
+                </p>
+                <p className="font-mono text-2xl font-semibold text-gray-800">
+                  Currently, there are {bannerData.total_profiles} profiles matching your location filter. {bannerData.related_topics} are working on related topics.
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="mb-8 flex justify-center">
+              <InfinitySpin
+                color="#c7defb"
+                width="200"
+              />
+            </div>
+          )}
 
           {/* Navigation Panels */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
