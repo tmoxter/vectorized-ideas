@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation";
-import { Search, Sparkles, User, Settings, BarChart3, SkipForward, BookOpenText } from "lucide-react";
+import { Search, Sparkles, User, Settings, BarChart3, SkipForward, BookOpenText, Clock } from "lucide-react";
 import { Circles } from 'react-loader-spinner';
 import Image from "next/image";
 
@@ -59,20 +59,15 @@ export default function HomePage() {
             </h1>
           </div>
 
-          {/* Summary Panel */}
-          <div className="mb-6 p-6 bg-white rounded border border-gray-200">
-            <div className="flex items-center gap-6">
-              <div className="flex-1">
-                <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                  How it works
-                </h3>
-                <p className="font-mono text-sm text-gray-700">
-                  Click on Discover Profiles to view other users working on related topics. You may skip profiles to revisit them later. Update your own profile any time if your information changes or you wish to add more detail.
+          {/* Ticker Banner */}
+          <div className="mb-8 overflow-hidden">
+            <div className="ticker-animate flex gap-16 whitespace-nowrap">
+              <p className="font-mono text-2xl font-semibold text-gray-800">
+                Currently, there are 734 profiles matching your location filter. 19 are working on related topics.
                 </p>
-                <p className="font-mono text-sm text-gray-700 mb-4">
+              <p className="font-mono text-2xl font-semibold text-gray-800">
                   Currently, there are 734 profiles matching your location filter. 19 are working on related topics.
                 </p>
-              </div>
             </div>
           </div>
 
@@ -91,6 +86,22 @@ export default function HomePage() {
               </h3>
               <p className="text-gray-600 text-sm font-mono">
                 browse through semantic similarity matches and find potential co-founders based on your profile and venture ideas
+              </p>
+            </button>
+
+            {/* Pending Requests */}
+            <button
+              onClick={() => router.push("/pending-requests")}
+              className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
+            >
+              <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
+                Pending Requests
+              </h3>
+              <p className="text-gray-600 text-sm font-mono">
+                review and respond to people who have liked your profile and want to connect
               </p>
             </button>
 

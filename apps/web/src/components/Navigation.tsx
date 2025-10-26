@@ -3,16 +3,17 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase";
-import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, User, Home } from "lucide-react";
+import { Search, Sparkles, SkipForward, ShieldOff, Settings, LogOut, User, Home, ChevronDown, ChevronUp, Clock } from "lucide-react";
 
 interface NavigationProps {
-  currentPage: "home" | "discover" | "my-matches" | "skipped" | "blocked" | "profile" | "settings";
+  currentPage: "home" | "discover" | "my-matches" | "skipped" | "blocked" | "profile" | "settings" | "pending-requests";
   userEmail?: string;
   onLogout: () => void;
 }
 
 export default function Navigation({ currentPage, userEmail, onLogout }: NavigationProps) {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -47,9 +48,6 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
             }}
             className="flex items-center space-x-3 hover:opacity-80"
           >
-            <div className="w-8 h-8 bg-yellow-200 rounded flex items-center justify-center">
-              <span className="text-black font-mono text-2xl">{'\u{1D708}'}</span>
-            </div>
             <span className="font-mono text-lg text-gray-900 hidden sm:inline">
               vectorized-ideas
             </span>
@@ -64,39 +62,48 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button
-                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md ${
+                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
                   currentPage === "home" || currentPage === "discover"
-                    ? "bg-yellow-200 text-gray-900 font-semibold"
+                    ? "bg-silver text-gray-900 font-semibold"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                Discover
+                <span>Discover</span>
+                {activeDropdown === "discover" ? (
+                  <ChevronUp className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3" />
+                )}
               </button>
 
               {activeDropdown === "discover" && (
-                <div className="absolute top-full pt-2 left-0 w-56 z-50">
-                  <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
+                <div className="absolute top-full pt-2 left-0 w-76 z-70">
+                  <div className="bg-white border border-gray-200 rounded-sm shadow-xl overflow-hidden">
                     <div className="p-2">
                       <button
                         onClick={() => navigate("/home")}
-                        className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                        onMouseEnter={() => setHoveredItem("home")}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        className={`w-full text-left px-4 py-3 rounded-sm font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "home"
-                            ? "bg-yellow-200 text-gray-900 font-semibold"
+                            ? "bg-silver text-gray-900 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <Home className="w-4 h-4" />
+                        {hoveredItem === "home" && <Home className="w-4 h-4" />}
                         <span>Dashboard</span>
                       </button>
                       <button
                         onClick={() => navigate("/matches")}
+                        onMouseEnter={() => setHoveredItem("discover")}
+                        onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "discover"
-                            ? "bg-yellow-200 text-gray-900 font-semibold"
+                            ? "bg-silver text-gray-900 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <Search className="w-4 h-4" />
+                        {hoveredItem === "discover" && <Search className="w-4 h-4" />}
                         <span>Discover Profiles</span>
                       </button>
                     </div>
@@ -112,39 +119,61 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button
-                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md ${
-                  currentPage === "my-matches" || currentPage === "skipped"
-                    ? "bg-yellow-200 text-gray-900 font-semibold"
+                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
+                  currentPage === "my-matches" || currentPage === "skipped" || currentPage === "pending-requests"
+                    ? "bg-silver text-gray-900 font-semibold"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                History
+                <span>History</span>
+                {activeDropdown === "history" ? (
+                  <ChevronUp className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3" />
+                )}
               </button>
 
               {activeDropdown === "history" && (
-                <div className="absolute top-full pt-2 left-0 w-56 z-50">
-                  <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
+                <div className="absolute top-full pt-2 left-0 w-76 z-60">
+                  <div className="bg-white border border-gray-200 rounded-sm shadow-xl overflow-hidden">
                     <div className="p-2">
                       <button
-                        onClick={() => navigate("/my-matches")}
+                        onClick={() => navigate("/pending-requests")}
+                        onMouseEnter={() => setHoveredItem("pending-requests")}
+                        onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
-                          currentPage === "my-matches"
-                            ? "bg-yellow-200 text-gray-900 font-semibold"
+                          currentPage === "pending-requests"
+                            ? "bg-silver text-gray-900 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <Sparkles className="w-4 h-4" />
+                        {hoveredItem === "pending-requests" && <Clock className="w-4 h-4" />}
+                        <span>Pending Requests</span>
+                      </button>
+                      <button
+                        onClick={() => navigate("/my-matches")}
+                        onMouseEnter={() => setHoveredItem("my-matches")}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
+                          currentPage === "my-matches"
+                            ? "bg-silver text-gray-900 font-semibold"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        {hoveredItem === "my-matches" && <Sparkles className="w-4 h-4" />}
                         <span>Matches</span>
                       </button>
                       <button
                         onClick={() => navigate("/skipped")}
+                        onMouseEnter={() => setHoveredItem("skipped")}
+                        onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "skipped"
-                            ? "bg-yellow-200 text-gray-900 font-semibold"
+                            ? "bg-silver text-gray-900 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <SkipForward className="w-4 h-4" />
+                        {hoveredItem === "skipped" && <SkipForward className="w-4 h-4" />}
                         <span>Skipped Profiles</span>
                       </button>
                     </div>
@@ -160,50 +189,61 @@ export default function Navigation({ currentPage, userEmail, onLogout }: Navigat
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button
-                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md ${
+                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
                   currentPage === "profile" || currentPage === "settings" || currentPage === "blocked"
-                    ? "bg-yellow-200 text-gray-900 font-semibold"
+                    ? "bg-silver text-gray-900 font-semibold"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                Account
+                <span>Account</span>
+                {activeDropdown === "account" ? (
+                  <ChevronUp className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3" />
+                )}
               </button>
 
               {activeDropdown === "account" && (
-                <div className="absolute top-full pt-2 left-0 w-56 z-50">
-                  <div className="bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
+                <div className="absolute top-full pt-2 left-0 w-76 z-60">
+                  <div className="bg-white border border-gray-200 rounded-sm shadow-xl overflow-hidden">
                     <div className="p-2">
                       <button
                         onClick={() => navigate("/profile")}
+                        onMouseEnter={() => setHoveredItem("profile")}
+                        onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "profile"
-                            ? "bg-yellow-200 text-gray-900 font-semibold"
+                            ? "bg-silver text-gray-900 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <User className="w-4 h-4" />
+                        {hoveredItem === "profile" && <User className="w-4 h-4" />}
                         <span>Profile</span>
                       </button>
                       <button
                         onClick={() => navigate("/settings")}
+                        onMouseEnter={() => setHoveredItem("settings")}
+                        onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "settings"
-                            ? "bg-yellow-200 text-gray-900 font-semibold"
+                            ? "bg-silver text-gray-900 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <Settings className="w-4 h-4" />
+                        {hoveredItem === "settings" && <Settings className="w-4 h-4" />}
                         <span>Account Settings</span>
                       </button>
                       <button
                         onClick={() => navigate("/blocked")}
+                        onMouseEnter={() => setHoveredItem("blocked")}
+                        onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "blocked"
-                            ? "bg-yellow-200 text-gray-900 font-semibold"
+                            ? "bg-silver text-gray-900 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
-                        <ShieldOff className="w-4 h-4" />
+                        {hoveredItem === "blocked" && <ShieldOff className="w-4 h-4" />}
                         <span>Blocked Profiles</span>
                       </button>
                     </div>
