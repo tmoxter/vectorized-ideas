@@ -1,3 +1,4 @@
+import "server-only";
 import { SupabaseClient } from "@supabase/supabase-js";
 import * as interactionsRepo from "../repos/interactions.repo";
 import * as profilesRepo from "../repos/profiles.repo";

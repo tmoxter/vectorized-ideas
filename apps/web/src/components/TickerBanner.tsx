@@ -1,3 +1,4 @@
+"use client";
 import { InfinitySpin } from "react-loader-spinner";
 import type { BannerData } from "@/types";
 

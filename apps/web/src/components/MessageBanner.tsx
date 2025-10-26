@@ -1,3 +1,5 @@
+"use client";
+
 interface MessageBannerProps {
   message: string;
   type?: "info" | "success" | "error";

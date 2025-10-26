@@ -1,3 +1,4 @@
+import "server-only";
 import { SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import * as embeddingsRepo from "../repos/embeddings.repo";

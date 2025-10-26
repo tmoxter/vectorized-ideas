@@ -1,3 +1,4 @@
+import "server-only";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export type InteractionAction = "like" | "pass" | "block" | "unblock";

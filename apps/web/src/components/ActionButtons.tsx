@@ -1,3 +1,5 @@
+"use client";
+
 interface ActionButtonsProps {
   onLike: () => void;
   onSkip: () => void;

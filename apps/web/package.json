@@ -24,7 +24,8 @@
     "postgres": "^3.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-loader-spinner": "^7.0.3"
+    "react-loader-spinner": "^7.0.3",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

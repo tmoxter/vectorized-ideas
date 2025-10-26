@@ -1,3 +1,5 @@
+"use client";
+
 interface ProfileHeaderProps {
   name: string;
   cityName?: string;

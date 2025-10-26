@@ -1,3 +1,4 @@
+"use client";
 import { ProfileListItem } from "./ProfileListItem";
 import { ProfileDetail } from "./ProfileDetail";
 import type { ProfileWithDetails } from "@/types";

@@ -1,3 +1,5 @@
+"use client";
+
 interface ProfileSectionProps {
   title: string;
   content?: string;

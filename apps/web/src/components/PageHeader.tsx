@@ -1,3 +1,5 @@
+"use client";
+
 interface PageHeaderProps {
   title: string;
   description?: string;
