@@ -17,12 +17,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.3.0
-          cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: true
+      - name: Install pnpm
+        run: npm install -g pnpm@10
+
+      - name: Install deps
+        run: pnpm install
 
       - name: Run tests
         run: pnpm --filter ./apps/web test
