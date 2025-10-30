@@ -278,8 +278,12 @@ describe("ProfilePage Integration Tests", () => {
       expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
     });
 
+    // Wait for profile data to be loaded into form fields
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("John Doe")).toBeInTheDocument();
+    });
+
     // Check that existing data is loaded
-    expect(screen.getByDisplayValue("John Doe")).toBeInTheDocument();
     expect(
       screen.getByDisplayValue("Software engineer with 10 years experience")
     ).toBeInTheDocument();
