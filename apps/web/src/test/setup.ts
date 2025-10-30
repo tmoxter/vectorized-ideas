@@ -3,6 +3,8 @@ import { afterAll, afterEach, beforeAll, vi } from "vitest";
 import { setupServer } from "msw/node";
 import React from "react";
 
+vi.mock("server-only", () => ({}));
+
 // Setup MSW server for API mocking (with bypass for unhandled requests)
 export const server = setupServer();
 
