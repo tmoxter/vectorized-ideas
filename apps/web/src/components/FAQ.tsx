@@ -38,7 +38,10 @@ export default function FAQ({ items }: FAQProps) {
             </button>
             {expandedFaq === index && (
               <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                <p className="font-mono text-sm text-gray-700">{item.answer}</p>
+                <div
+                  className="font-mono text-sm text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: item.answer }}
+                />
               </div>
             )}
           </div>

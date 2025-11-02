@@ -324,7 +324,7 @@ describe("LandingPage", () => {
 
     // FAQ should not be expanded initially
     expect(
-      screen.queryByText(/Yes, but I found it hard to find people/i)
+      screen.queryByText(/Yes, but we found it hard to find people/i)
     ).not.toBeInTheDocument();
 
     // Click to expand
@@ -332,7 +332,7 @@ describe("LandingPage", () => {
 
     // FAQ content should be visible
     expect(
-      screen.getByText(/Yes, but I found it hard to find people/i)
+      screen.getByText(/Yes, but we found it hard to find people/i)
     ).toBeInTheDocument();
 
     // Click again to collapse
@@ -341,7 +341,7 @@ describe("LandingPage", () => {
     // FAQ content should be hidden
     await waitFor(() => {
       expect(
-        screen.queryByText(/Yes, but I found it hard to find people/i)
+        screen.queryByText(/Yes, but we found it hard to find people/i)
       ).not.toBeInTheDocument();
     });
   });

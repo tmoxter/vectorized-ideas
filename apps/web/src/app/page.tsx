@@ -137,7 +137,9 @@ export default function Home() {
       answer:
         "Sharing your idea here means making it publically visible. But many founders will tell you that "
         + "the secrecy is rarely justified. Please don't share any sensitive information that you would "
-        + "want to protect. 'You can always recognize the first-timers because they’re too secretive. And "
+        + "want to protect. If you delete your account all your data is wiped permanently. "
+        + "<br/> <br/>"
+        + "'You can always recognize the first-timers because they’re too secretive. And "
         + "you can always recognize the experienced ones because they don’t care.' - Naval Ravikant",
     },
   ];
