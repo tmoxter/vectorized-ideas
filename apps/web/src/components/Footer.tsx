@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="border-t border-gray-300 py-8 px-6 mt-20">
@@ -7,9 +9,12 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="mb-4 md:mb-0">
             <div className="flex items-center space-x-3 mb-2">
-              <div className="w-6 h-6 rounded flex items-center justify-center bg-blue-200">
-                <span className="text-black font-mono text">{"\u{1D708}"}</span>
-              </div>
+              <Image
+                src="/vi.svg"
+                alt="vectorized-ideas logo"
+                width={28}
+                height={28}
+              />
               <span className="font-mono text-sm text-gray-700">
                 vectorized-ideas
               </span>

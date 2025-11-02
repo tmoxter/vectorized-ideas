@@ -134,11 +134,12 @@ export default function Home() {
               }}
               className="flex items-center space-x-3 hover:opacity-80"
             >
-              <div className="w-6 h-6 icon-gradient rounded flex items-center justify-center">
-                <span className="text-white font-mono text-xl">
-                  {"\u{1D708}"}
-                </span>
-              </div>
+              <Image
+                src="/vi.svg"
+                alt="vectorized-ideas logo"
+                width={32}
+                height={32}
+              />
               <span className="font-mono text-lg text-gray-900">
                 vectorized-ideas
               </span>

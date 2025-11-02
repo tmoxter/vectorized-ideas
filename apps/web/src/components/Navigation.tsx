@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabase";
+import Image from "next/image";
 import {
   Search,
   Sparkles,
@@ -71,9 +72,12 @@ export default function Navigation({
             }}
             className="flex items-center space-x-3 hover:opacity-80"
           >
-            <span className="font-mono text-lg text-gray-900 hidden sm:inline">
-              vectorized-ideas
-            </span>
+            <Image
+              src="/vi.svg"
+              alt="vectorized-ideas logo"
+              width={32}
+              height={32}
+            />
           </button>
 
           {/* Main Navigation Menu */}

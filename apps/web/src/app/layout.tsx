@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "vectorized ideas - co-founder matching via semantic similarity",
   description:
     "Use the similarity of your venture ideas to find and connect with co-founders",
+  icons: {
+    icon: "/vi.svg",
+  },
 };
 
 export default function RootLayout({

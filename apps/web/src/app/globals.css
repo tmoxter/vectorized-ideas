@@ -106,9 +106,48 @@ body {
   animation: drift 12s linear infinite;
 }
 
-/* Icon gradient for feature cards */
+/* Icon gradient for feature cards with liquid glass effect */
 .icon-gradient {
-  background: linear-gradient(to bottom right, #b7a7f8, #6ba8f4, #fdbfac);
+  background: linear-gradient(
+    135deg,
+    rgba(183, 167, 248, 0.85) 0%,
+    rgba(107, 168, 244, 0.85) 50%,
+    rgba(253, 191, 172, 0.85) 100%
+  );
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px 0 rgba(183, 167, 248, 0.15),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+    0 4px 12px 0 rgba(107, 168, 244, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-gradient::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  pointer-events: none;
+}
+
+.icon-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 40px 0 rgba(183, 167, 248, 0.25),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+    0 6px 20px 0 rgba(107, 168, 244, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* Ticker animation for scrolling text */
