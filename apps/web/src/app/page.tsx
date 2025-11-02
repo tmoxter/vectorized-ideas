@@ -5,12 +5,12 @@ import Image from "next/image";
 import { supabaseClient } from "@/lib/supabase";
 import TypewriterHero from "@/components/TypewriterHero";
 import Footer from "@/components/Footer";
+import FAQ, { type FAQItem } from "@/components/FAQ";
 import {
   ArrowUpZA,
   Telescope,
   Handshake,
   Map,
-  ChevronDown,
 } from "lucide-react";
 
 export default function Home() {
@@ -20,7 +20,6 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [isLoginMode, setIsLoginMode] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -117,6 +116,19 @@ export default function Home() {
       setMessage("An unexpected error occurred");
     }
   };
+
+  const faqItems: FAQItem[] = [
+    {
+      question: "Aren't there already alternative platforms out there?",
+      answer:
+        "Yes, but I found it hard to find people with aligned visions on them.",
+    },
+    {
+      question: "Won't other users steal my venture ideas?",
+      answer:
+        "First time founders tend to be secretive about their ideas, second-time founders shout them from the rooftops :).",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-breathe pb-10">
@@ -351,64 +363,7 @@ export default function Home() {
             {/* Technical Note */}
             <div className="max-w-4xl">
               {/* FAQ Section */}
-              <div className="mt-12">
-                <div className="space-y-4">
-                  {/* FAQ Item 1 */}
-                  <div className="bg-white rounded border border-gray-200 overflow-hidden">
-                    <button
-                      onClick={() =>
-                        setExpandedFaq(expandedFaq === 0 ? null : 0)
-                      }
-                      className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition duration-200"
-                    >
-                      <span className="font-mono font-semibold text-gray-900">
-                        Aren't there already alternative platforms out there?
-                      </span>
-                      <ChevronDown
-                        className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                          expandedFaq === 0 ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                    {expandedFaq === 0 && (
-                      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                        <p className="font-mono text-sm text-gray-700">
-                          Yes, but I found it hard to find people with aligned
-                          visions on them.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* FAQ Item 2 */}
-                  <div className="bg-white rounded border border-gray-200 overflow-hidden">
-                    <button
-                      onClick={() =>
-                        setExpandedFaq(expandedFaq === 1 ? null : 1)
-                      }
-                      className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition duration-200"
-                    >
-                      <span className="font-mono font-semibold text-gray-900">
-                        Won't other users steal my venture ideas?
-                      </span>
-                      <ChevronDown
-                        className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                          expandedFaq === 1 ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                    {expandedFaq === 1 && (
-                      <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                        <p className="font-mono text-sm text-gray-700">
-                          First time founders tend to be secretive about their
-                          ideas, second-time founders shout them from the
-                          rooftops :).
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <FAQ items={faqItems} />
 
               <div className="mt-12 p-4 bg-gray-50 rounded border-l-4 border-blue-950">
                 <p className="text-sm font-mono text-gray-00">
