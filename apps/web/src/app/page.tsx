@@ -10,7 +10,7 @@ import {
   ArrowUpZA,
   Telescope,
   Handshake,
-  Map,
+  Gem,
 } from "lucide-react";
 
 export default function Home() {
@@ -121,12 +121,24 @@ export default function Home() {
     {
       question: "Aren't there already alternative platforms out there?",
       answer:
-        "Yes, but I found it hard to find people with aligned visions on them.",
+        "Yes, but we found it hard to find people on them who want to work on the same problems. "
+        + "Usually you only get to specify the industry or field you are interested in but the emphasis "
+        + "is on people's backgrounds.",
+    },
+    {
+      question: "Do I need to login with my linkedin account?",
+      answer:
+        "Yes, since we want to keep this lightweight, avoid implementing a chat feature or store any credentials ourselves, "
+        + "at least for now, you can only log in with linkedin. Since you are sharing your profile with potential co-founders "
+        + "you need it anyway.",
     },
     {
       question: "Won't other users steal my venture ideas?",
       answer:
-        "First time founders tend to be secretive about their ideas, second-time founders shout them from the rooftops :).",
+        "Sharing your idea here means making it publically visible. But many founders will tell you that "
+        + "the secrecy is rarely justified. Please don't share any sensitive information that you would "
+        + "want to protect. 'You can always recognize the first-timers because they’re too secretive. And "
+        + "you can always recognize the experienced ones because they don’t care.' - Naval Ravikant",
     },
   ];
 
@@ -236,16 +248,14 @@ export default function Home() {
 
                 <div className="p-6 bg-white rounded border border-gray-200">
                   <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient">
-                    <Map className="w-5 h-5 text-white" />
+                    <Gem className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                    Compare
+                    Free and Without Ads
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Get aggregated insights into how much attention your field
-                    is getting. Your ideas are only shared with potential
-                    matches you'll soon see a map of venture ideas and how you
-                    fit in it.
+                    Vectorized-ideas is an experiment, a side project, and may hopefully become a community effort
+                    if people find it helpful. It is completely free.
                     <br />
                   </p>
                 </div>
