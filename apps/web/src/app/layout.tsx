@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Use the similarity of your venture ideas to find and connect with co-founders",
   icons: {
-    icon: "/vi.svg",
+    icon: "/vi_favicon.svg",
   },
 };
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 const phrases = [
   "your venture ideas",
-  "your side-projects",
+  "your side projects",
   "your research interests",
 ];
 
