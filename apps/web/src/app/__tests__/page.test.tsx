@@ -8,13 +8,17 @@ vi.mock("@/lib/supabase", () => ({
   supabaseClient: mockSupabaseClient,
 }));
 
-// Mock Footer and TypewriterHero components
+// Mock Footer, TypewriterHero, and OidcButton components
 vi.mock("@/components/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
 }));
 
 vi.mock("@/components/TypewriterHero", () => ({
   default: () => <div data-testid="typewriter">Hero</div>,
+}));
+
+vi.mock("@/components/OidcButton", () => ({
+  default: () => <button data-testid="oidc-button">Continue with LinkedIn</button>,
 }));
 
 // Mock next/image
@@ -201,62 +205,22 @@ describe("LandingPage", () => {
     });
   });
 
-  it("should handle Google OAuth sign in", async () => {
+  it("should render LinkedIn OAuth button", () => {
     const mockClient = {
       auth: {
         getSession: vi.fn().mockResolvedValue({
           data: { session: null },
         }),
-        signInWithOAuth: vi.fn().mockResolvedValue({
-          error: null,
-        }),
       },
     };
     mockSupabaseClient.mockReturnValue(mockClient);
 
-    const user = userEvent.setup();
     render(<LandingPage />);
 
-    const googleButton = screen.getByRole("button", {
-      name: /continue with google/i,
+    const linkedinButton = screen.getByRole("button", {
+      name: /continue with linkedin/i,
     });
-    await user.click(googleButton);
-
-    expect(mockClient.auth.signInWithOAuth).toHaveBeenCalledWith({
-      provider: "google",
-      options: {
-        redirectTo: "http://localhost/auth/callback",
-      },
-    });
-  });
-
-  it("should handle Apple OAuth sign in", async () => {
-    const mockClient = {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: { session: null },
-        }),
-        signInWithOAuth: vi.fn().mockResolvedValue({
-          error: null,
-        }),
-      },
-    };
-    mockSupabaseClient.mockReturnValue(mockClient);
-
-    const user = userEvent.setup();
-    render(<LandingPage />);
-
-    const appleButton = screen.getByRole("button", {
-      name: /continue with apple/i,
-    });
-    await user.click(appleButton);
-
-    expect(mockClient.auth.signInWithOAuth).toHaveBeenCalledWith({
-      provider: "apple",
-      options: {
-        redirectTo: "http://localhost/auth/callback",
-      },
-    });
+    expect(linkedinButton).toBeInTheDocument();
   });
 
   it("should disable submit button when fields are empty", () => {

@@ -6,6 +6,7 @@ import { supabaseClient } from "@/lib/supabase";
 import TypewriterHero from "@/components/TypewriterHero";
 import Footer from "@/components/Footer";
 import FAQ, { type FAQItem } from "@/components/FAQ";
+import OidcButton from "@/components/OidcButton";
 import {
   ArrowUpZA,
   Telescope,
@@ -79,43 +80,6 @@ export default function Home() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    const supabase = supabaseClient();
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        setMessage("Error: " + error.message);
-      }
-    } catch (error) {
-      setMessage("An unexpected error occurred");
-    }
-  };
-
-  const handleAppleSignIn = async () => {
-    const supabase = supabaseClient();
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "apple",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        setMessage("Error: " + error.message);
-      }
-    } catch (error) {
-      setMessage("An unexpected error occurred");
-    }
-  };
 
   const faqItems: FAQItem[] = [
     {
@@ -323,20 +287,8 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="mt-4 space-y-3">
-                      <button
-                        onClick={handleGoogleSignIn}
-                        className="w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded font-mono hover:bg-gray-50 transition duration-200"
-                      >
-                        continue with google
-                      </button>
-
-                      <button
-                        onClick={handleAppleSignIn}
-                        className="w-full bg-black border border-black text-white py-3 px-4 rounded font-mono hover:bg-gray-800 transition duration-200"
-                      >
-                        continue with apple
-                      </button>
+                    <div className="mt-4">
+                      <OidcButton />
                     </div>
                   </div>
 
