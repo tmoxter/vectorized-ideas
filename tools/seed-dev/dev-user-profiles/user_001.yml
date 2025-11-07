@@ -1,0 +1,47 @@
+email: "dev@local.test"
+
+profile:
+  name: "Alex Chen"
+  bio: "Full-stack developer with a passion for building products that solve real problems. Previously worked at several startups and excited to find a co-founder to build something meaningful."
+  achievements: "Built and scaled a SaaS platform to 10k users, Open source contributor to React ecosystem, Founded a successful developer community with 5k+ members"
+  avatarurl: null
+  region: "San Francisco Bay Area"
+  timezone: "America/Los_Angeles"
+  city_id: 5391959
+  experience: "Senior Software Engineer at tech startup (3 years), Full-stack Developer at agency (2 years), Freelance consultant (1 year)"
+  education: "BS Computer Science, Stanford University"
+  is_published: true
+  created_at: "2024-11-01T10:00:00Z"
+  updated_at: "2024-11-05T15:30:00Z"
+
+ventures:
+  - title: "AI-powered code review assistant"
+    description: "Building an intelligent code review tool that uses LLMs to provide contextual feedback on pull requests. The tool learns from your codebase patterns and team preferences to give personalized suggestions. Looking for a technical co-founder with ML/AI expertise."
+    created_at: "2024-11-02T09:00:00Z"
+    updated_at: "2024-11-05T14:00:00Z"
+
+  - title: "Sustainable packaging marketplace"
+    description: "Creating a B2B marketplace connecting businesses with eco-friendly packaging suppliers. We help companies reduce their environmental impact while maintaining cost-effectiveness. Platform includes carbon footprint tracking and sustainability reporting."
+    created_at: "2024-10-28T11:30:00Z"
+    updated_at: "2024-11-03T16:45:00Z"
+
+cofounder_preferences:
+  - title: "Technical expertise in ML/AI"
+    description: "Looking for someone with strong machine learning and AI background, preferably with experience in NLP and transformer models. Should be comfortable working with Python, TensorFlow/PyTorch."
+    created_at: "2024-11-02T09:15:00Z"
+    updated_at: "2024-11-05T14:15:00Z"
+
+  - title: "Business development and sales experience"
+    description: "For the sustainable packaging venture, seeking a co-founder with B2B sales experience and strong business development skills. Understanding of supply chain and logistics is a plus."
+    created_at: "2024-10-28T11:45:00Z"
+    updated_at: "2024-11-03T17:00:00Z"
+
+  - title: "Commitment and equity alignment"
+    description: "Looking for someone who can commit full-time and is interested in a 50/50 equity split. Should share similar values around building sustainable, user-focused products."
+    created_at: "2024-11-01T10:30:00Z"
+    updated_at: "2024-11-05T15:45:00Z"
+
+user_settings:
+  similarity_threshold: 1
+  region_scope: "worldwide"
+  updated_at: "2024-11-05T15:45:00Z"

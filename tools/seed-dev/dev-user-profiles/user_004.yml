@@ -1,0 +1,52 @@
+email: "sophia.founder@example.com"
+
+profile:
+  name: "Sophia Williams"
+  bio: "Serial entrepreneur and community builder. Founded and exited two startups in the creator economy space. Now focused on building tools that empower remote teams and distributed work. Believer in building in public and open source."
+  achievements: "Exited two startups (acquired by larger companies), Grew community from 0 to 100k members, Raised $5M in venture funding, Featured in Forbes 30 Under 30, Advise 10+ early-stage startups"
+  avatarurl: null
+  region: "Seattle, Washington"
+  timezone: "America/Los_Angeles"
+  city_id: 5809844
+  experience: "Founder & CEO at creator platform (4 years, acquired), Co-founder at community software startup (3 years, acquired), Product Manager at social media company (2 years)"
+  education: "BA Economics, University of Washington"
+  is_published: true
+  created_at: "2024-10-10T09:00:00Z"
+  updated_at: "2024-11-06T14:15:00Z"
+
+ventures:
+  - title: "Async video collaboration tool for remote teams"
+    description: "Building a tool that makes remote collaboration as effective as in-person. Combines async video messages with collaborative workspaces. Think Loom meets Notion. Already have 1000+ teams in beta with strong engagement metrics."
+    created_at: "2024-10-12T11:00:00Z"
+    updated_at: "2024-11-06T13:30:00Z"
+
+  - title: "Professional networking for indie makers"
+    description: "LinkedIn for independent creators and solo founders. Focus on showcasing projects and building in public rather than traditional job history. Includes revenue transparency and project showcases. Community-driven feature development."
+    created_at: "2024-09-25T15:30:00Z"
+    updated_at: "2024-11-02T10:45:00Z"
+
+cofounder_preferences:
+  - title: "Strong technical background in real-time systems"
+    description: "Need someone who can build robust real-time collaboration features. Experience with WebRTC, websockets, and handling high-concurrency scenarios. Bonus points for experience with video processing and streaming."
+    created_at: "2024-10-12T11:30:00Z"
+    updated_at: "2024-11-06T13:45:00Z"
+
+  - title: "Believer in community-led growth"
+    description: "Looking for someone who understands community building and doesn't just see users as numbers. Experience growing communities or building developer tools with strong community aspects. Should be comfortable being very active with users."
+    created_at: "2024-10-10T09:30:00Z"
+    updated_at: "2024-11-06T14:20:00Z"
+
+  - title: "Open to bootstrapping or raising VC funding"
+    description: "I have experience with both bootstrapped and VC-backed companies. Want someone who is flexible on the funding approach and can help evaluate what's best for this specific business. Preference for someone who's thought about business models deeply."
+    created_at: "2024-10-10T09:45:00Z"
+    updated_at: "2024-11-06T14:25:00Z"
+
+  - title: "Remote-first and values work-life balance"
+    description: "Building a remote tool means we should be fully remote ourselves. Looking for someone who thrives working remotely and values sustainable work practices. No hustle culture - building great products requires rest and perspective."
+    created_at: "2024-10-12T12:00:00Z"
+    updated_at: "2024-11-06T14:30:00Z"
+
+user_settings:
+  similarity_threshold: 1
+  region_scope: "worldwide"
+  updated_at: "2024-11-06T14:30:00Z"

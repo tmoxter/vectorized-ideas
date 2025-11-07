@@ -1,0 +1,14 @@
+# Environment variables
+.env
+
+# Embedding cache
+.embedding_cache.sqlite
+.embedding_cache.sqlite-shm
+.embedding_cache.sqlite-wal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python

@@ -1,0 +1,47 @@
+email: "jane.developer@example.com"
+
+profile:
+  name: "Jane Martinez"
+  bio: "Product designer turned entrepreneur with a focus on healthcare and education tech. Passionate about using technology to improve access to services for underserved communities."
+  achievements: "Led design for health tech app with 50k+ users, Won hackathon for accessibility-focused education platform, Mentored 20+ junior designers through nonprofit program"
+  avatarurl: null
+  region: "New York City"
+  timezone: "America/New_York"
+  city_id: 5128581
+  experience: "Lead Product Designer at healthcare startup (4 years), UX Designer at education platform (2 years), Design consultant for nonprofits (1 year)"
+  education: "MFA Interaction Design, NYU; BA Psychology, UC Berkeley"
+  is_published: true
+  created_at: "2024-10-25T08:00:00Z"
+  updated_at: "2024-11-06T10:20:00Z"
+
+ventures:
+  - title: "Mental health support platform for students"
+    description: "Developing an accessible mental health platform specifically designed for college students. Features include peer support groups, licensed therapist matching, and mood tracking with AI-powered insights. Focus on affordability and removing barriers to access."
+    created_at: "2024-10-26T13:00:00Z"
+    updated_at: "2024-11-06T09:30:00Z"
+
+  - title: "Community-driven language learning app"
+    description: "Building a language learning platform that connects learners with native speakers in their local area for in-person practice sessions. Gamification elements and cultural exchange focus. Starting with Spanish and Mandarin learners in major US cities."
+    created_at: "2024-10-20T15:30:00Z"
+    updated_at: "2024-11-04T11:15:00Z"
+
+cofounder_preferences:
+  - title: "Technical co-founder with mobile development experience"
+    description: "Need a technical co-founder who can build iOS and Android apps. React Native or Flutter experience preferred. Should be comfortable with real-time features and integrating AI/ML models."
+    created_at: "2024-10-26T13:30:00Z"
+    updated_at: "2024-11-06T09:45:00Z"
+
+  - title: "Passion for social impact and education"
+    description: "Looking for someone who is genuinely passionate about using technology for social good, particularly in education or healthcare. Experience working with underserved communities is a strong plus."
+    created_at: "2024-10-25T08:45:00Z"
+    updated_at: "2024-11-06T10:30:00Z"
+
+  - title: "Located in NYC or willing to relocate"
+    description: "Prefer someone based in New York City or willing to relocate here. Important to build strong in-person collaboration, especially in the early stages."
+    created_at: "2024-10-25T09:00:00Z"
+    updated_at: "2024-11-06T10:35:00Z"
+
+user_settings:
+  similarity_threshold: 1
+  region_scope: "worldwide"
+  updated_at: "2024-11-06T10:35:00Z"

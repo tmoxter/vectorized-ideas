@@ -1,0 +1,52 @@
+email: "marcus.tech@example.com"
+
+profile:
+  name: "Marcus Johnson"
+  bio: "Former data scientist turned AI entrepreneur. Passionate about making machine learning accessible to non-technical users. Previously led ML teams at Fortune 500 companies and now building tools to democratize AI."
+  achievements: "Published 15+ papers on NLP and computer vision, Led AI team that saved company $10M annually, Built open-source ML library with 50k+ GitHub stars, Speaker at ML conferences worldwide"
+  avatarurl: null
+  region: "Austin, Texas"
+  timezone: "America/Chicago"
+  city_id: 4671654
+  experience: "Head of ML/AI at fintech startup (2 years), Senior Data Scientist at Fortune 500 (4 years), ML Research Scientist at university lab (3 years)"
+  education: "PhD Machine Learning, MIT; MS Computer Science, Carnegie Mellon"
+  is_published: true
+  created_at: "2024-10-15T14:00:00Z"
+  updated_at: "2024-11-06T12:30:00Z"
+
+ventures:
+  - title: "No-code AI platform for small businesses"
+    description: "Building a platform that allows small businesses to create custom AI models without writing code. Drag-and-drop interface for training models on their own data. Starting with customer support automation and sales forecasting. Already have 200+ beta users."
+    created_at: "2024-10-16T10:00:00Z"
+    updated_at: "2024-11-06T11:00:00Z"
+
+  - title: "AI-powered medical diagnosis assistant"
+    description: "Developing an AI system to help doctors diagnose rare diseases faster by analyzing patient symptoms, medical history, and lab results. Working with hospital partners to validate accuracy. Focus on diseases that are often misdiagnosed or take months to identify."
+    created_at: "2024-09-20T08:30:00Z"
+    updated_at: "2024-11-04T16:20:00Z"
+
+  - title: "Climate change prediction models"
+    description: "Using advanced ML techniques to create more accurate local climate prediction models. Helping cities and municipalities plan infrastructure and disaster preparedness. Partnering with environmental research institutions."
+    created_at: "2024-10-01T13:15:00Z"
+    updated_at: "2024-11-05T09:45:00Z"
+
+cofounder_preferences:
+  - title: "Full-stack developer with product mindset"
+    description: "Need someone who can build beautiful, scalable web applications. Should understand both frontend (React/Next.js) and backend (Node/Python). Product thinking is crucial - not just executing but helping shape what we build."
+    created_at: "2024-10-16T10:30:00Z"
+    updated_at: "2024-11-06T11:15:00Z"
+
+  - title: "Experience in healthcare or medical tech"
+    description: "For the medical diagnosis project, looking for someone with healthcare industry experience. Could be a medical professional interested in tech, or someone who's built health tech products before. Understanding of regulatory requirements (HIPAA, FDA) is valuable."
+    created_at: "2024-09-20T09:00:00Z"
+    updated_at: "2024-11-04T16:30:00Z"
+
+  - title: "Comfortable with ambiguity and rapid iteration"
+    description: "Early stage means lots of pivoting and learning. Want someone who thrives in uncertainty, can move fast, and isn't afraid to throw away work when we learn something new. Previous startup experience is a plus but not required."
+    created_at: "2024-10-15T14:30:00Z"
+    updated_at: "2024-11-06T12:35:00Z"
+
+user_settings:
+  similarity_threshold: 1
+  region_scope: "worldwide"
+  updated_at: "2024-11-06T12:35:00Z"
