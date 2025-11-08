@@ -7,27 +7,13 @@ const supabase = supabaseClient();
 
 export default function LoginButton() {
   const [message, setMessage] = useState("");
-  const mode = process.env.NEXT_PUBLIC_AUTH_MODE ?? 'linkedin';
 
   const onClick = async () => {
     setMessage("");
 
     try {
-      if (mode === 'dev-magiclink') {
-        // Dev mode: magic link login
-        const r = await fetch('/api/dev-login', { method: 'GET' });
-        if (!r.ok) {
-          setMessage('Error: Dev login failed');
-          return;
-        }
-        // In case redirect doesn't happen automatically
-        const url = r.url; // NextResponse.redirect location
-        if (url) window.location.href = url;
-        return;
-      }
-
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'linkedin_oidc', // or 'linkedin'
+        provider: 'linkedin_oidc',
         options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback` }
       });
 
