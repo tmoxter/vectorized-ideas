@@ -5,9 +5,9 @@ profile:
   bio: "Full-stack developer with a passion for building products that solve real problems. Previously worked at several startups and excited to find a co-founder to build something meaningful."
   achievements: "Built and scaled a SaaS platform to 10k users, Open source contributor to React ecosystem, Founded a successful developer community with 5k+ members"
   avatarurl: null
-  region: "San Francisco Bay Area"
-  timezone: "America/Los_Angeles"
-  city_id: 5391959
+  region: null
+  timezone: null
+  city_id: 1
   experience: "Senior Software Engineer at tech startup (3 years), Full-stack Developer at agency (2 years), Freelance consultant (1 year)"
   education: "BS Computer Science, Stanford University"
   is_published: true

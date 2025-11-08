@@ -55,8 +55,9 @@ def get_or_create_user(
     r = httpx.get(f"{gotrue_url}/admin/users", params={"email": email}, headers=headers, timeout=10)
     r.raise_for_status()
     items = r.json().get("users") or r.json().get("data") or []
-    if items:
-        existing_id = items[0]["id"]
+    matching_users = [u for u in items if u.get("email") == email]
+    if matching_users:
+        existing_id = matching_users[0]["id"]
         print(f"  ✓ User already exists: {email} (ID: {existing_id})")
         return existing_id
 
@@ -100,14 +101,21 @@ def upsert_profile(supabase: Client, profile_data: dict) -> None:
     print(f"  ✓ Profile upserted: {profile_data.get('name', 'Unknown')}")
 
 
-def upsert_ventures(supabase: Client, ventures: list[dict]) -> None:
-    """Upsert user ventures to the user_ventures table."""
+def upsert_ventures(supabase: Client, ventures: list[dict]) -> list[dict]:
+    """Upsert user ventures to the user_ventures table.
+
+    Returns:
+        List of venture records with their IDs from the database
+    """
+    venture_records = []
     for venture in ventures:
-        supabase.table("user_ventures").upsert(
+        response = supabase.table("user_ventures").upsert(
             venture,
             on_conflict="id"
         ).execute()
+        venture_records.extend(response.data)
     print(f"  ✓ {len(ventures)} venture(s) upserted")
+    return venture_records
 
 
 def upsert_cofounder_preferences(supabase: Client, preferences: list[dict]) -> None:
@@ -172,7 +180,7 @@ def get_embedding(text: str, openai_key: SecretStr, model: str) -> list[float]:
 def upsert_venture_embeddings(
     supabase: Client,
     user_id: str,
-    ventures: list[dict],
+    venture_records: list[dict],
     openai_key: SecretStr,
     embedding_model: str,
 ) -> None:
@@ -181,11 +189,12 @@ def upsert_venture_embeddings(
     Args:
         supabase: Supabase client
         user_id: User ID
-        ventures: List of venture dictionaries
+        venture_records: List of venture records from database (with IDs)
         openai_key: OpenAI API key (SecretStr)
         embedding_model: Model to use for embeddings
     """
-    for venture in ventures:
+    for venture in venture_records:
+        venture_id = str(venture.get("id"))
         title = venture.get("title", "")
         description = venture.get("description", "")
 
@@ -194,6 +203,7 @@ def upsert_venture_embeddings(
         vector = get_embedding(text, openai_key, embedding_model)
 
         embedding_record = {
+            "entity_id": venture_id,
             "user_id": user_id,
             "entity_type": "venture",
             "model": embedding_model,
@@ -203,10 +213,10 @@ def upsert_venture_embeddings(
 
         supabase.table("embeddings").upsert(
             embedding_record,
-            on_conflict="user_id,entity_type"
+            on_conflict="entity_id"
         ).execute()
 
-    print(f"  ✓ {len(ventures)} venture embedding(s) upserted")
+    print(f"  ✓ {len(venture_records)} venture embedding(s) upserted")
 
 
 def seed_user(
@@ -245,11 +255,11 @@ def seed_user(
         upsert_profile(supabase, profile)
 
     if ventures := user_data.get("ventures", None):
-        upsert_ventures(supabase, ventures)
+        venture_records = upsert_ventures(supabase, ventures)
         upsert_venture_embeddings(
             supabase,
             user_id=user_id,
-            ventures=ventures,
+            venture_records=venture_records,
             openai_key=settings.openai_key,
             embedding_model=settings.embedding_model,
         )

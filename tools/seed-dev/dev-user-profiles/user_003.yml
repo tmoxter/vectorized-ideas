@@ -5,9 +5,9 @@ profile:
   bio: "Former data scientist turned AI entrepreneur. Passionate about making machine learning accessible to non-technical users. Previously led ML teams at Fortune 500 companies and now building tools to democratize AI."
   achievements: "Published 15+ papers on NLP and computer vision, Led AI team that saved company $10M annually, Built open-source ML library with 50k+ GitHub stars, Speaker at ML conferences worldwide"
   avatarurl: null
-  region: "Austin, Texas"
-  timezone: "America/Chicago"
-  city_id: 4671654
+  region: null
+  timezone: null
+  city_id: 3
   experience: "Head of ML/AI at fintech startup (2 years), Senior Data Scientist at Fortune 500 (4 years), ML Research Scientist at university lab (3 years)"
   education: "PhD Machine Learning, MIT; MS Computer Science, Carnegie Mellon"
   is_published: true

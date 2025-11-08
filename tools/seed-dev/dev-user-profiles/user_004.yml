@@ -5,9 +5,9 @@ profile:
   bio: "Serial entrepreneur and community builder. Founded and exited two startups in the creator economy space. Now focused on building tools that empower remote teams and distributed work. Believer in building in public and open source."
   achievements: "Exited two startups (acquired by larger companies), Grew community from 0 to 100k members, Raised $5M in venture funding, Featured in Forbes 30 Under 30, Advise 10+ early-stage startups"
   avatarurl: null
-  region: "Seattle, Washington"
-  timezone: "America/Los_Angeles"
-  city_id: 5809844
+  region: null
+  timezone: null
+  city_id: 4
   experience: "Founder & CEO at creator platform (4 years, acquired), Co-founder at community software startup (3 years, acquired), Product Manager at social media company (2 years)"
   education: "BA Economics, University of Washington"
   is_published: true

@@ -5,9 +5,9 @@ profile:
   bio: "Product designer turned entrepreneur with a focus on healthcare and education tech. Passionate about using technology to improve access to services for underserved communities."
   achievements: "Led design for health tech app with 50k+ users, Won hackathon for accessibility-focused education platform, Mentored 20+ junior designers through nonprofit program"
   avatarurl: null
-  region: "New York City"
-  timezone: "America/New_York"
-  city_id: 5128581
+  region: null
+  timezone: null
+  city_id: 2
   experience: "Lead Product Designer at healthcare startup (4 years), UX Designer at education platform (2 years), Design consultant for nonprofits (1 year)"
   education: "MFA Interaction Design, NYU; BA Psychology, UC Berkeley"
   is_published: true

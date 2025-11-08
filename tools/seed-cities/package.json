@@ -1,0 +1,22 @@
+{
+  "name": "seed-cities",
+  "version": "0.1.0",
+  "description": "Seed cities table for location autocomplete",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "tsx upsert_city_data.ts",
+    "seed:dev": "tsx upsert_city_data.ts"
+  },
+  "dependencies": {
+    "@ideditor/country-coder": "^5.1.0",
+    "@supabase/supabase-js": "^2.57.4",
+    "csv-parse": "^5.5.6",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0"
+  }
+}
