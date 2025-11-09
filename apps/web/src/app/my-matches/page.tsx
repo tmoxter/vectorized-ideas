@@ -13,7 +13,7 @@ import { BlockButton, BlockConfirmation } from "@/components/BlockConfirmation";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyMatches } from "@/hooks/useMyMatches";
 import { useInteraction } from "@/hooks/useInteraction";
-import { Users } from "lucide-react";
+import { Users, ExternalLink } from "lucide-react";
 
 export default function MyMatchesPage() {
   const router = useRouter();
@@ -95,11 +95,24 @@ export default function MyMatchesPage() {
             >
               <div className="p-6 bg-gray-50 border-t border-gray-100">
                 {!showBlockConfirm ? (
-                  <div className="flex justify-center">
-                    <BlockButton
-                      onClick={() => setShowBlockConfirm(true)}
-                      isSubmitting={isSubmitting}
-                    />
+                  <div className="flex flex-col gap-3">
+                    {selectedMatch?.profile?.avatarurl && (
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => window.open(selectedMatch.profile.avatarurl, '_blank', 'noopener,noreferrer')}
+                          className="group relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-mono text-sm text-white bg-gray-900 border border-gray-900 shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-transform duration-150 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(0,0,0,0.30)] active:translate-y-0 active:shadow-[0_6px_14px_rgba(0,0,0,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-900 before:content-[''] before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none before:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.35),rgba(255,255,255,0)_38%)] after:content-[''] after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none after:opacity-0 group-hover:after:opacity-100 after:transition-opacity after:duration-300 after:bg-[radial-gradient(120%_60%_at_50%_-20%,rgba(255,255,255,0.25),rgba(255,255,255,0))]"
+                        >
+                          Connect on LinkedIn
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                    <div className="flex justify-center">
+                      <BlockButton
+                        onClick={() => setShowBlockConfirm(true)}
+                        isSubmitting={isSubmitting}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <BlockConfirmation

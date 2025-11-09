@@ -356,6 +356,10 @@ describe("ProfilePage Integration Tests", () => {
       screen.getByPlaceholderText(/your full name/i),
       "Jane Smith"
     );
+    await user.type(
+      screen.getByPlaceholderText(/https:\/\/www.linkedin.com\/in\/yourprofile/i),
+      "https://www.linkedin.com/in/janesmith"
+    );
     // City is now a CityPicker component, not a text input
     await user.type(
       screen.getByPlaceholderText(/brief background about yourself/i),
@@ -447,6 +451,10 @@ describe("ProfilePage Integration Tests", () => {
     await user.type(
       screen.getByPlaceholderText(/your full name/i),
       "Jane Smith"
+    );
+    await user.type(
+      screen.getByPlaceholderText(/https:\/\/www.linkedin.com\/in\/yourprofile/i),
+      "https://www.linkedin.com/in/janesmith"
     );
     await user.type(
       screen.getByPlaceholderText(/AI-powered code review platform/i),
@@ -661,6 +669,10 @@ describe("ProfilePage Integration Tests", () => {
       "Jane Smith"
     );
     await user.type(
+      screen.getByPlaceholderText(/https:\/\/www.linkedin.com\/in\/yourprofile/i),
+      "https://www.linkedin.com/in/janesmith"
+    );
+    await user.type(
       screen.getByPlaceholderText(/AI-powered code review platform/i),
       "DevTools"
     );
@@ -679,5 +691,361 @@ describe("ProfilePage Integration Tests", () => {
     // Data should still be saved
     expect(mockProfilesDb).toHaveLength(1);
     expect(mockVenturesDb).toHaveLength(1);
+  });
+
+  describe("LinkedIn URL Validation", () => {
+    it("should accept valid LinkedIn URLs", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      const linkedinInput = screen.getByPlaceholderText(
+        /https:\/\/www.linkedin.com\/in\/yourprofile/i
+      );
+
+      // Test valid URL
+      await user.type(linkedinInput, "https://www.linkedin.com/in/johndoe");
+
+      // Should not show error
+      expect(
+        screen.queryByText(/url must be in the format/i)
+      ).not.toBeInTheDocument();
+    });
+
+    it("should accept valid LinkedIn URLs with hyphens and trailing slash", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      const linkedinInput = screen.getByPlaceholderText(
+        /https:\/\/www.linkedin.com\/in\/yourprofile/i
+      );
+
+      // Test URL with hyphens and trailing slash
+      await user.type(linkedinInput, "https://www.linkedin.com/in/john-doe-123/");
+
+      // Should not show error
+      expect(
+        screen.queryByText(/url must be in the format/i)
+      ).not.toBeInTheDocument();
+    });
+
+    it("should reject LinkedIn URLs with wrong domain", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      const linkedinInput = screen.getByPlaceholderText(
+        /https:\/\/www.linkedin.com\/in\/yourprofile/i
+      );
+
+      // Test invalid domain
+      await user.type(linkedinInput, "https://linkedin.co.uk/in/johndoe");
+
+      // Should show error
+      await waitFor(() => {
+        expect(
+          screen.getByText(/url must be in the format/i)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("should reject LinkedIn URLs without https", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      const linkedinInput = screen.getByPlaceholderText(
+        /https:\/\/www.linkedin.com\/in\/yourprofile/i
+      );
+
+      // Test URL without https
+      await user.type(linkedinInput, "http://www.linkedin.com/in/johndoe");
+
+      // Should show error
+      await waitFor(() => {
+        expect(
+          screen.getByText(/url must be in the format/i)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("should reject non-LinkedIn URLs", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      const linkedinInput = screen.getByPlaceholderText(
+        /https:\/\/www.linkedin.com\/in\/yourprofile/i
+      );
+
+      // Test completely different URL
+      await user.type(linkedinInput, "https://www.facebook.com/johndoe");
+
+      // Should show error
+      await waitFor(() => {
+        expect(
+          screen.getByText(/url must be in the format/i)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("should reject LinkedIn URLs with wrong path", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      const linkedinInput = screen.getByPlaceholderText(
+        /https:\/\/www.linkedin.com\/in\/yourprofile/i
+      );
+
+      // Test URL with company path instead of /in/
+      await user.type(linkedinInput, "https://www.linkedin.com/company/johndoe");
+
+      // Should show error
+      await waitFor(() => {
+        expect(
+          screen.getByText(/url must be in the format/i)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("should disable publish button when LinkedIn URL is invalid", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Fill in all required fields except valid LinkedIn URL
+      await user.type(
+        screen.getByPlaceholderText(/your full name/i),
+        "Jane Smith"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/https:\/\/www.linkedin.com\/in\/yourprofile/i),
+        "https://facebook.com/jane"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/AI-powered code review platform/i),
+        "DevTools Pro"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/explain the problem you're solving/i),
+        "A toolkit for developers"
+      );
+
+      // Publish button should be disabled due to invalid LinkedIn URL
+      const publishButton = screen.getByRole("button", {
+        name: /save & publish/i,
+      });
+      await waitFor(() => {
+        expect(publishButton).toBeDisabled();
+      });
+    });
+
+    it("should disable publish button when LinkedIn URL is empty", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Fill in all required fields except LinkedIn URL
+      await user.type(
+        screen.getByPlaceholderText(/your full name/i),
+        "Jane Smith"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/AI-powered code review platform/i),
+        "DevTools Pro"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/explain the problem you're solving/i),
+        "A toolkit for developers"
+      );
+
+      // Publish button should be disabled without LinkedIn URL
+      const publishButton = screen.getByRole("button", {
+        name: /save & publish/i,
+      });
+      expect(publishButton).toBeDisabled();
+    });
+
+    it("should enable publish button when LinkedIn URL is valid", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Fill in all required fields with valid LinkedIn URL
+      await user.type(
+        screen.getByPlaceholderText(/your full name/i),
+        "Jane Smith"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/https:\/\/www.linkedin.com\/in\/yourprofile/i),
+        "https://www.linkedin.com/in/janesmith"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/AI-powered code review platform/i),
+        "DevTools Pro"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/explain the problem you're solving/i),
+        "A toolkit for developers"
+      );
+
+      // Publish button should be enabled
+      const publishButton = screen.getByRole("button", {
+        name: /save & publish/i,
+      });
+      await waitFor(() => {
+        expect(publishButton).not.toBeDisabled();
+      });
+    });
+
+    it("should save LinkedIn URL to avatarurl field", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      const linkedinUrl = "https://www.linkedin.com/in/janesmith";
+
+      // Fill in required fields
+      await user.type(
+        screen.getByPlaceholderText(/your full name/i),
+        "Jane Smith"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/https:\/\/www.linkedin.com\/in\/yourprofile/i),
+        linkedinUrl
+      );
+      await user.type(
+        screen.getByPlaceholderText(/AI-powered code review platform/i),
+        "DevTools Pro"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/explain the problem you're solving/i),
+        "A comprehensive development toolkit"
+      );
+
+      // Save as draft
+      await user.click(screen.getByRole("button", { name: /save as draft/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/profile saved as draft/i)).toBeInTheDocument();
+      });
+
+      // Verify LinkedIn URL was saved to avatarurl field
+      expect(mockProfilesDb).toHaveLength(1);
+      expect(mockProfilesDb[0]).toMatchObject({
+        user_id: testUserId,
+        name: "Jane Smith",
+        avatarurl: linkedinUrl,
+      });
+    });
+
+    it("should load LinkedIn URL from avatarurl field", async () => {
+      // Pre-populate database with LinkedIn URL in avatarurl
+      mockProfilesDb = [
+        {
+          user_id: testUserId,
+          name: "John Doe",
+          avatarurl: "https://www.linkedin.com/in/johndoe",
+          is_published: false,
+        },
+      ];
+
+      mockVenturesDb = [
+        {
+          id: "venture-1",
+          user_id: testUserId,
+          title: "Test Project",
+          description: "Test description",
+        },
+      ];
+
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Wait for profile data to load
+      await waitFor(() => {
+        expect(screen.getByDisplayValue("John Doe")).toBeInTheDocument();
+      });
+
+      // Verify LinkedIn URL is loaded
+      expect(
+        screen.getByDisplayValue("https://www.linkedin.com/in/johndoe")
+      ).toBeInTheDocument();
+    });
+
+    it("should prevent publishing with validation error message when LinkedIn URL is invalid", async () => {
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Fill in all fields with invalid LinkedIn URL
+      await user.type(
+        screen.getByPlaceholderText(/your full name/i),
+        "Jane Smith"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/https:\/\/www.linkedin.com\/in\/yourprofile/i),
+        "invalid-url"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/AI-powered code review platform/i),
+        "DevTools Pro"
+      );
+      await user.type(
+        screen.getByPlaceholderText(/explain the problem you're solving/i),
+        "A toolkit"
+      );
+
+      // Try to publish (button should be disabled, but test the validation logic)
+      const publishButton = screen.getByRole("button", {
+        name: /save & publish/i,
+      });
+
+      // Button should be disabled
+      expect(publishButton).toBeDisabled();
+
+      // Error message should be visible
+      expect(
+        screen.getByText(/url must be in the format/i)
+      ).toBeInTheDocument();
+    });
   });
 });

@@ -29,6 +29,7 @@ export default function ProfilePage() {
     experience: "",
     education: "",
     city_id: null,
+    linkedinUrl: "",
     venture_title: "",
     venture_description: "",
     cofounder_preferences_title: "",
@@ -39,6 +40,7 @@ export default function ProfilePage() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [linkedinUrlError, setLinkedinUrlError] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -104,6 +106,7 @@ export default function ProfilePage() {
         experience: profileResult.data?.experience || "",
         education: profileResult.data?.education || "",
         city_id: cityId || null,
+        linkedinUrl: profileResult.data?.avatarurl || "",
         venture_title: ventureResult.data?.title || "",
         venture_description: ventureResult.data?.description || "",
         cofounder_preferences_title: preferencesResult.data?.title || "",
@@ -117,11 +120,34 @@ export default function ProfilePage() {
     }
   };
 
+  const validateLinkedInUrl = (url: string): boolean => {
+    if (!url) {
+      setLinkedinUrlError("LinkedIn URL is required");
+      return false;
+    }
+
+    // Must match https://www.linkedin.com/in/{vanityName}
+    const linkedInPattern = /^https:\/\/www\.linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
+
+    if (!linkedInPattern.test(url)) {
+      setLinkedinUrlError("URL must be in the format: https://www.linkedin.com/in/yourprofile");
+      return false;
+    }
+
+    setLinkedinUrlError("");
+    return true;
+  };
+
   const handleInputChange = (field: keyof ProfileFormData, value: string) => {
     setProfileData((prev) => ({
       ...prev,
       [field]: value,
     }));
+
+    // Validate LinkedIn URL on change
+    if (field === "linkedinUrl") {
+      validateLinkedInUrl(value);
+    }
   };
 
   const handleCityChange = (selectedCity: City | null) => {
@@ -134,6 +160,12 @@ export default function ProfilePage() {
 
   const saveProfile = async (publish: boolean = false) => {
     if (!user) return;
+
+    // Validate LinkedIn URL when publishing
+    if (publish && !validateLinkedInUrl(profileData.linkedinUrl)) {
+      setMessage("Please provide a valid LinkedIn URL before publishing");
+      return;
+    }
 
     setIsSaving(true);
     setMessage("");
@@ -150,6 +182,7 @@ export default function ProfilePage() {
         experience: profileData.experience,
         education: profileData.education,
         city_id: city?.id || null,
+        avatarurl: profileData.linkedinUrl,
         is_published: publish,
         updated_at: now,
       };
@@ -349,6 +382,29 @@ export default function ProfilePage() {
 
               <div className="mt-6">
                 <label className="block font-mono text-sm text-gray-700 mb-2">
+                  LinkedIn Profile URL *
+                </label>
+                <input
+                  type="url"
+                  value={profileData.linkedinUrl}
+                  onChange={(e) => handleInputChange("linkedinUrl", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded font-mono text-sm focus:ring-2 focus:border-transparent outline-none ${
+                    linkedinUrlError
+                      ? "border-red-300 focus:ring-red-500"
+                      : "border-gray-300 focus:ring-blue-500"
+                  }`}
+                  placeholder="https://www.linkedin.com/in/yourprofile"
+                  required
+                />
+                {linkedinUrlError && (
+                  <p className="mt-1 text-xs font-mono text-red-600">
+                    {linkedinUrlError}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-6">
+                <label className="block font-mono text-sm text-gray-700 mb-2">
                   Bio
                 </label>
                 <textarea
@@ -516,6 +572,8 @@ export default function ProfilePage() {
               disabled={
                 isSaving ||
                 !profileData.name ||
+                !profileData.linkedinUrl ||
+                !!linkedinUrlError ||
                 !profileData.venture_title ||
                 !profileData.venture_description
               }

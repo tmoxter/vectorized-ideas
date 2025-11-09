@@ -26,6 +26,7 @@ export interface ProfileData {
   education?: string;
   city_name?: string;
   country?: string;
+  avatarurl?: string; // LinkedIn URL - only available for matches
 }
 
 export interface BaseProfile {
@@ -56,6 +57,7 @@ export interface ProfileFormData {
   experience: string;
   education: string;
   city_id: number | null;
+  linkedinUrl: string;
   venture_title: string;
   venture_description: string;
   cofounder_preferences_title: string;

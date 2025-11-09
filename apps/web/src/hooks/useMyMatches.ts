@@ -48,7 +48,7 @@ export function useMyMatches(userId: string | undefined) {
         ] = await Promise.all([
           supabase
             .from("profiles")
-            .select("name, bio, achievements, experience, education, city_id")
+            .select("name, bio, achievements, experience, education, city_id, avatarurl")
             .eq("user_id", matchedUserId)
             .maybeSingle(),
           supabase
@@ -92,6 +92,7 @@ export function useMyMatches(userId: string | undefined) {
             education: profileResult.data.education || "",
             city_name,
             country,
+            avatarurl: profileResult.data.avatarurl || undefined,
           };
           return {
             id: matchedUserId,
