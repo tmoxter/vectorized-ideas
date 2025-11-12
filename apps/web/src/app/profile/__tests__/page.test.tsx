@@ -1048,4 +1048,397 @@ describe("ProfilePage Integration Tests", () => {
       ).toBeInTheDocument();
     });
   });
+
+  describe("Hide Profile Functionality", () => {
+    it("should show hide profile button when profile is published", async () => {
+      // Pre-populate with published profile
+      mockProfilesDb = [
+        {
+          user_id: testUserId,
+          name: "John Doe",
+          bio: "Test bio",
+          avatarurl: "https://www.linkedin.com/in/johndoe",
+          is_published: true,
+        },
+      ];
+
+      mockVenturesDb = [
+        {
+          id: "venture-1",
+          user_id: testUserId,
+          title: "Test Project",
+          description: "Test description",
+        },
+      ];
+
+      mockPreferencesDb = [
+        {
+          user_id: testUserId,
+          title: "Test",
+          description: "Test preferences",
+        },
+      ];
+
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Hide profile button should be visible
+      await waitFor(() => {
+        expect(screen.getByTestId("hide-profile-button")).toBeInTheDocument();
+      });
+
+      expect(screen.getByText(/your profile is currently/i)).toBeInTheDocument();
+      expect(screen.getByText(/published/i)).toBeInTheDocument();
+    });
+
+    it("should not show hide profile button when profile is not published", async () => {
+      // Pre-populate with unpublished profile
+      mockProfilesDb = [
+        {
+          user_id: testUserId,
+          name: "John Doe",
+          bio: "Test bio",
+          avatarurl: "https://www.linkedin.com/in/johndoe",
+          is_published: false,
+        },
+      ];
+
+      mockVenturesDb = [
+        {
+          id: "venture-1",
+          user_id: testUserId,
+          title: "Test Project",
+          description: "Test description",
+        },
+      ];
+
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Hide profile button should not be visible
+      await waitFor(() => {
+        expect(
+          screen.queryByTestId("hide-profile-button")
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    it("should hide profile when hide button is clicked", async () => {
+      // Pre-populate with published profile
+      mockProfilesDb = [
+        {
+          user_id: testUserId,
+          name: "John Doe",
+          bio: "Test bio",
+          avatarurl: "https://www.linkedin.com/in/johndoe",
+          is_published: true,
+        },
+      ];
+
+      mockVenturesDb = [
+        {
+          id: "venture-1",
+          user_id: testUserId,
+          title: "Test Project",
+          description: "Test description",
+        },
+      ];
+
+      mockPreferencesDb = [
+        {
+          user_id: testUserId,
+          title: "Test",
+          description: "Test preferences",
+        },
+      ];
+
+      // Create mock client with update functionality
+      const mockClient = mockSupabaseClient();
+      mockClient.from = vi.fn((table: string) => {
+        const queryBuilder = {
+          select: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockReturnThis(),
+          upsert: vi.fn(),
+          update: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          order: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockReturnThis(),
+          single: vi.fn(),
+        };
+
+        if (table === "profiles") {
+          queryBuilder.single.mockImplementation(() => {
+            const profile = mockProfilesDb.find(
+              (p) => p.user_id === testUserId
+            );
+            if (profile) {
+              return Promise.resolve({ data: profile, error: null });
+            }
+            return Promise.resolve({
+              data: null,
+              error: { message: "Not found" },
+            });
+          });
+
+          queryBuilder.update.mockImplementation((data: any) => {
+            return {
+              eq: vi.fn().mockImplementation((field: string, value: any) => {
+                const profileIndex = mockProfilesDb.findIndex(
+                  (p) => p.user_id === value
+                );
+                if (profileIndex >= 0) {
+                  mockProfilesDb[profileIndex] = {
+                    ...mockProfilesDb[profileIndex],
+                    ...data,
+                  };
+                }
+                return Promise.resolve({ data, error: null });
+              }),
+            };
+          });
+
+          queryBuilder.upsert.mockImplementation((data: any) => {
+            const existingIndex = mockProfilesDb.findIndex(
+              (p) => p.user_id === data.user_id
+            );
+            if (existingIndex >= 0) {
+              mockProfilesDb[existingIndex] = {
+                ...mockProfilesDb[existingIndex],
+                ...data,
+              };
+            } else {
+              mockProfilesDb.push(data);
+            }
+            return Promise.resolve({ data, error: null });
+          });
+        }
+
+        if (table === "user_ventures") {
+          queryBuilder.single.mockImplementation(() => {
+            const venture = mockVenturesDb.find(
+              (v) => v.user_id === testUserId
+            );
+            return Promise.resolve({ data: venture, error: null });
+          });
+
+          queryBuilder.upsert.mockImplementation((data: any) => {
+            return Promise.resolve({ data, error: null });
+          });
+        }
+
+        if (
+          table === "user_cofounder_preferences" ||
+          table === "user_cofounder_preference"
+        ) {
+          queryBuilder.single.mockImplementation(() => {
+            const pref = mockPreferencesDb.find(
+              (p) => p.user_id === testUserId
+            );
+            return Promise.resolve({ data: pref, error: null });
+          });
+
+          queryBuilder.upsert.mockImplementation((data: any) => {
+            return Promise.resolve({ data, error: null });
+          });
+        }
+
+        return queryBuilder;
+      });
+
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Wait for hide button to appear
+      await waitFor(() => {
+        expect(screen.getByTestId("hide-profile-button")).toBeInTheDocument();
+      });
+
+      // Verify profile is published
+      expect(mockProfilesDb[0].is_published).toBe(true);
+
+      // Click hide button
+      await user.click(screen.getByTestId("hide-profile-button"));
+
+      // Wait for success message
+      await waitFor(() => {
+        expect(
+          screen.getByText(/profile hidden successfully/i)
+        ).toBeInTheDocument();
+      });
+
+      // Verify is_published was set to false
+      expect(mockProfilesDb[0].is_published).toBe(false);
+
+      // Hide button should disappear
+      await waitFor(() => {
+        expect(
+          screen.queryByTestId("hide-profile-button")
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    it("should handle hide profile errors gracefully", async () => {
+      // Pre-populate with published profile
+      mockProfilesDb = [
+        {
+          user_id: testUserId,
+          name: "John Doe",
+          bio: "Test bio",
+          avatarurl: "https://www.linkedin.com/in/johndoe",
+          is_published: true,
+        },
+      ];
+
+      mockVenturesDb = [
+        {
+          id: "venture-1",
+          user_id: testUserId,
+          title: "Test Project",
+          description: "Test description",
+        },
+      ];
+
+      mockPreferencesDb = [
+        {
+          user_id: testUserId,
+          title: "Test",
+          description: "Test preferences",
+        },
+      ];
+
+      // Mock client with update error
+      const mockClient = mockSupabaseClient();
+      mockClient.from = vi.fn((table: string) => {
+        const queryBuilder = {
+          select: vi.fn().mockReturnThis(),
+          update: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          single: vi.fn(),
+          upsert: vi.fn(),
+        };
+
+        if (table === "profiles") {
+          queryBuilder.single.mockImplementation(() => {
+            const profile = mockProfilesDb[0];
+            return Promise.resolve({ data: profile, error: null });
+          });
+
+          queryBuilder.update.mockImplementation(() => {
+            return {
+              eq: vi.fn().mockResolvedValue({
+                data: null,
+                error: { message: "Database error" },
+              }),
+            };
+          });
+
+          queryBuilder.upsert.mockResolvedValue({ data: {}, error: null });
+        }
+
+        if (table === "user_ventures") {
+          queryBuilder.single.mockResolvedValue({
+            data: mockVenturesDb[0],
+            error: null,
+          });
+          queryBuilder.upsert.mockResolvedValue({ data: {}, error: null });
+        }
+
+        if (
+          table === "user_cofounder_preferences" ||
+          table === "user_cofounder_preference"
+        ) {
+          queryBuilder.single.mockResolvedValue({
+            data: mockPreferencesDb[0],
+            error: null,
+          });
+          queryBuilder.upsert.mockResolvedValue({ data: {}, error: null });
+        }
+
+        return queryBuilder;
+      });
+
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Wait for hide button
+      await waitFor(() => {
+        expect(screen.getByTestId("hide-profile-button")).toBeInTheDocument();
+      });
+
+      // Click hide button
+      await user.click(screen.getByTestId("hide-profile-button"));
+
+      // Should show error message
+      await waitFor(() => {
+        expect(screen.getByText(/error hiding profile/i)).toBeInTheDocument();
+      });
+    });
+
+    it("should disable hide button while hiding is in progress", async () => {
+      // Pre-populate with published profile
+      mockProfilesDb = [
+        {
+          user_id: testUserId,
+          name: "John Doe",
+          bio: "Test bio",
+          avatarurl: "https://www.linkedin.com/in/johndoe",
+          is_published: true,
+        },
+      ];
+
+      mockVenturesDb = [
+        {
+          id: "venture-1",
+          user_id: testUserId,
+          title: "Test Project",
+          description: "Test description",
+        },
+      ];
+
+      mockPreferencesDb = [
+        {
+          user_id: testUserId,
+          title: "Test",
+          description: "Test preferences",
+        },
+      ];
+
+      const user = userEvent.setup();
+      render(<ProfilePage />);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
+      });
+
+      // Wait for hide button
+      await waitFor(() => {
+        expect(screen.getByTestId("hide-profile-button")).toBeInTheDocument();
+      });
+
+      const hideButton = screen.getByTestId("hide-profile-button");
+      expect(hideButton).not.toBeDisabled();
+
+      // Click hide button
+      await user.click(hideButton);
+
+      // Button text should change to "Hiding..."
+      await waitFor(() => {
+        expect(screen.getByText(/hiding\.\.\./i)).toBeInTheDocument();
+      });
+    });
+  });
 });

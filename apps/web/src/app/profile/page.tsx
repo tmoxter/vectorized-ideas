@@ -39,8 +39,10 @@ export default function ProfilePage() {
   const [city, setCity] = useState<City | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isHiding, setIsHiding] = useState(false);
   const [message, setMessage] = useState("");
   const [linkedinUrlError, setLinkedinUrlError] = useState("");
+  const [isPublished, setIsPublished] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -113,6 +115,7 @@ export default function ProfilePage() {
         cofounder_preferences_description:
           preferencesResult.data?.description || "",
       });
+      setIsPublished(profileResult.data?.is_published || false);
     } catch (error) {
       console.error("Error loading profile:", error);
     } finally {
@@ -156,6 +159,32 @@ export default function ProfilePage() {
       ...prev,
       city_id: selectedCity?.id || null,
     }));
+  };
+
+  const hideProfile = async () => {
+    if (!user) return;
+
+    setIsHiding(true);
+    setMessage("");
+
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_published: false, updated_at: new Date().toISOString() })
+        .eq("user_id", user.id);
+
+      if (error) {
+        setMessage("Error hiding profile: " + error.message);
+      } else {
+        setIsPublished(false);
+        setMessage("Profile hidden successfully! You will no longer appear in matches.");
+      }
+    } catch (error) {
+      setMessage("An unexpected error occurred");
+      console.error("Hide profile error:", error);
+    } finally {
+      setIsHiding(false);
+    }
   };
 
   const saveProfile = async (publish: boolean = false) => {
@@ -288,6 +317,7 @@ export default function ProfilePage() {
                 );
               } else {
                 if (publish) {
+                  setIsPublished(true);
                   setMessage(
                     "Profile published successfully! Redirecting to matches..."
                   );
@@ -592,6 +622,27 @@ export default function ProfilePage() {
               }`}
             >
               {message}
+            </div>
+          )}
+
+          {/* Hide Profile Section */}
+          {isPublished && (
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <h3 className="text-lg font-mono font-bold text-gray-900 mb-2">
+                Profile Visibility
+              </h3>
+              <p className="text-sm font-mono text-gray-600 mb-4">
+                Your profile is currently <strong>published</strong> and visible to other users.
+                You can hide it to stop appearing in matches.
+              </p>
+              <button
+                onClick={hideProfile}
+                disabled={isHiding}
+                data-testid="hide-profile-button"
+                className="px-6 py-3 rounded-lg font-mono text-sm text-white bg-red-600 border border-red-600 shadow-sm transition-all duration-150 ease-out hover:bg-red-700 hover:shadow-md active:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-600"
+              >
+                {isHiding ? "Hiding..." : "Hide my profile"}
+              </button>
             </div>
           )}
 
