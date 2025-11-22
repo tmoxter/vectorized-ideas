@@ -16,7 +16,7 @@ export default function TypewriterHero() {
 
   useEffect(() => {
     const currentPhrase = phrases[currentPhraseIndex];
-    const typingSpeed = isDeleting ? 30 : 50;
+    const typingSpeed = isDeleting ?40 : 60;
     const pauseDuration = 3000;
 
     if (!isDeleting && charIndex === currentPhrase.length) {
@@ -48,21 +48,13 @@ export default function TypewriterHero() {
   }, [charIndex, isDeleting, currentPhraseIndex]);
 
   return (
-    <div className="text-4xl md:text-5xl font-mono font-bold text-gray-900 mb-6 leading-tight">
+    <div className="text-4xl md:text-6xl font-mono font-bold text-gray-900 mb-6 leading-tight">
       <div>Find co-founders</div>
-
       <div>based on the similarity of</div>
-      <div className="relative inline-block my-1 isolate min-h-[1em]">
-        {/* Highlighter */}
-        <span
-          aria-hidden
-          className="absolute left-0 top-[0.15em] h-[1em] z-0 block bg-typewriter transition-all duration-200 ease-out rounded-sm pointer-events-none"
-          style={{ width: displayedText ? `${displayedText.length}ch` : "0ch" }}
-        />
-
-        {/* Text (keeps a minimum width so the line doesn't collapse) */}
-        <span className="relative z-10 inline-block min-w-[1ch] text-black-600">
+      <div className="relative inline-block my-1 min-h-[1em]">
+        <span className="inline-block min-w-[1ch] text-black-600">
           {displayedText}
+          <span className="animate-blink">_</span>
         </span>
       </div>
     </div>
