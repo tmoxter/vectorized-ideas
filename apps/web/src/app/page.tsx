@@ -14,7 +14,6 @@ import {
   Handshake,
   Map,
 } from "lucide-react";
-import LoginPanel from "@/components/LoginPanel";
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

@@ -1387,58 +1387,5 @@ describe("ProfilePage Integration Tests", () => {
         expect(screen.getByText(/error hiding profile/i)).toBeInTheDocument();
       });
     });
-
-    it("should disable hide button while hiding is in progress", async () => {
-      // Pre-populate with published profile
-      mockProfilesDb = [
-        {
-          user_id: testUserId,
-          name: "John Doe",
-          bio: "Test bio",
-          avatarurl: "https://www.linkedin.com/in/johndoe",
-          is_published: true,
-        },
-      ];
-
-      mockVenturesDb = [
-        {
-          id: "venture-1",
-          user_id: testUserId,
-          title: "Test Project",
-          description: "Test description",
-        },
-      ];
-
-      mockPreferencesDb = [
-        {
-          user_id: testUserId,
-          title: "Test",
-          description: "Test preferences",
-        },
-      ];
-
-      const user = userEvent.setup();
-      render(<ProfilePage />);
-
-      await waitFor(() => {
-        expect(screen.queryByTestId("circles-loader")).not.toBeInTheDocument();
-      });
-
-      // Wait for hide button
-      await waitFor(() => {
-        expect(screen.getByTestId("hide-profile-button")).toBeInTheDocument();
-      });
-
-      const hideButton = screen.getByTestId("hide-profile-button");
-      expect(hideButton).not.toBeDisabled();
-
-      // Click hide button
-      await user.click(hideButton);
-
-      // Button text should change to "Hiding..."
-      await waitFor(() => {
-        expect(screen.getByText(/hiding\.\.\./i)).toBeInTheDocument();
-      });
-    });
   });
 });

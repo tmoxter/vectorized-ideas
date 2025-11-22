@@ -8,7 +8,7 @@ vi.mock("@/lib/supabase", () => ({
   supabaseClient: mockSupabaseClient,
 }));
 
-// Mock Footer, TypewriterHero, and OidcButton components
+// Mock Footer, TypewriterHero, and MagneticLoginButton components
 vi.mock("@/components/Footer", () => ({
   default: () => <div data-testid="footer">Footer</div>,
 }));
@@ -17,8 +17,8 @@ vi.mock("@/components/TypewriterHero", () => ({
   default: () => <div data-testid="typewriter">Hero</div>,
 }));
 
-vi.mock("@/components/OidcButton", () => ({
-  default: () => <button data-testid="oidc-button">Continue with LinkedIn</button>,
+vi.mock("@/components/MagneticLoginButton", () => ({
+  default: () => <div data-testid="magnetic-login-button">Continue with LinkedIn</div>,
 }));
 
 // Mock next/image
@@ -30,16 +30,13 @@ vi.mock("next/image", () => ({
 const LandingPage = await import("../page").then((m) => m.default);
 
 describe("LandingPage", () => {
-  const testEmail = "test@example.com";
-  const testPassword = "password123";
-
   beforeEach(() => {
     vi.clearAllMocks();
     delete (window as any).location;
     (window as any).location = { href: "", origin: "http://localhost" };
   });
 
-  it("should render signup form by default", () => {
+  it("should render MagneticLoginButton", () => {
     const mockClient = {
       auth: {
         getSession: vi.fn().mockResolvedValue({
@@ -51,17 +48,12 @@ describe("LandingPage", () => {
 
     render(<LandingPage />);
 
-    expect(screen.getByText("Join the search")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/email address/i)).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText(/password \(min 6 characters\)/i)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /create account/i })
-    ).toBeInTheDocument();
+    const loginButton = screen.getByTestId("magnetic-login-button");
+    expect(loginButton).toBeInTheDocument();
+    expect(loginButton).toHaveTextContent(/continue with linkedin/i);
   });
 
-  it("should toggle between signup and login modes", async () => {
+  it("should render TypewriterHero component", () => {
     const mockClient = {
       auth: {
         getSession: vi.fn().mockResolvedValue({
@@ -71,141 +63,46 @@ describe("LandingPage", () => {
     };
     mockSupabaseClient.mockReturnValue(mockClient);
 
-    const user = userEvent.setup();
     render(<LandingPage />);
 
-    // Initially in signup mode
-    expect(screen.getByText("Join the search")).toBeInTheDocument();
-
-    // Click toggle to login
-    const toggleButton = screen.getByText(/already have an account\? log in/i);
-    await user.click(toggleButton);
-
-    // Now in login mode
-    expect(screen.getByText("welcome back")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /log in/i })).toBeInTheDocument();
-
-    // Click toggle back to signup
-    const toggleBackButton = screen.getByText(/need an account\? sign up/i);
-    await user.click(toggleBackButton);
-
-    expect(screen.getByText("Join the search")).toBeInTheDocument();
+    expect(screen.getByTestId("typewriter")).toBeInTheDocument();
   });
 
-  it("should handle successful signup", async () => {
+  it("should render Footer component", () => {
     const mockClient = {
       auth: {
         getSession: vi.fn().mockResolvedValue({
           data: { session: null },
         }),
-        signUp: vi.fn().mockResolvedValue({
-          data: {
-            user: { id: "user-123" },
-            session: null,
-          },
-          error: null,
-        }),
       },
     };
     mockSupabaseClient.mockReturnValue(mockClient);
 
-    const user = userEvent.setup();
     render(<LandingPage />);
 
-    await user.type(screen.getByPlaceholderText(/email address/i), testEmail);
-    await user.type(
-      screen.getByPlaceholderText(/password \(min 6 characters\)/i),
-      testPassword
-    );
-    await user.click(screen.getByRole("button", { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/check your email to confirm your account/i)
-      ).toBeInTheDocument();
-    });
-
-    expect(mockClient.auth.signUp).toHaveBeenCalledWith({
-      email: testEmail,
-      password: testPassword,
-      options: {
-        emailRedirectTo: "http://localhost/auth/callback",
-      },
-    });
+    expect(screen.getByTestId("footer")).toBeInTheDocument();
   });
 
-  it("should handle successful login", async () => {
+  it("should render 'How it works' section", () => {
     const mockClient = {
       auth: {
         getSession: vi.fn().mockResolvedValue({
           data: { session: null },
         }),
-        signInWithPassword: vi.fn().mockResolvedValue({
-          data: {
-            user: { id: "user-123" },
-            session: { access_token: "token-123" },
-          },
-          error: null,
-        }),
       },
     };
     mockSupabaseClient.mockReturnValue(mockClient);
 
-    const user = userEvent.setup();
     render(<LandingPage />);
 
-    // Toggle to login mode
-    await user.click(screen.getByText(/already have an account\? log in/i));
-
-    await user.type(screen.getByPlaceholderText(/email address/i), testEmail);
-    await user.type(screen.getByPlaceholderText(/password/i), testPassword);
-    await user.click(screen.getByRole("button", { name: /log in/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/logged in successfully/i)).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      expect(window.location.href).toBe("/auth/callback");
-    });
-
-    expect(mockClient.auth.signInWithPassword).toHaveBeenCalledWith({
-      email: testEmail,
-      password: testPassword,
-    });
+    expect(screen.getByText("How it works")).toBeInTheDocument();
+    expect(screen.getByText("Semantic Similarity")).toBeInTheDocument();
+    expect(screen.getByText("Visibility")).toBeInTheDocument();
+    expect(screen.getByText("Connect on LinkedIn")).toBeInTheDocument();
+    expect(screen.getByText("Discover")).toBeInTheDocument();
   });
 
-  it("should display error messages on failed signup", async () => {
-    const errorMessage = "Email already registered";
-    const mockClient = {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: { session: null },
-        }),
-        signUp: vi.fn().mockResolvedValue({
-          data: { user: null, session: null },
-          error: { message: errorMessage },
-        }),
-      },
-    };
-    mockSupabaseClient.mockReturnValue(mockClient);
-
-    const user = userEvent.setup();
-    render(<LandingPage />);
-
-    await user.type(screen.getByPlaceholderText(/email address/i), testEmail);
-    await user.type(
-      screen.getByPlaceholderText(/password \(min 6 characters\)/i),
-      testPassword
-    );
-    await user.click(screen.getByRole("button", { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
-    });
-  });
-
-  it("should render LinkedIn OAuth button", () => {
+  it("should render FAQ section", () => {
     const mockClient = {
       auth: {
         getSession: vi.fn().mockResolvedValue({
@@ -217,56 +114,7 @@ describe("LandingPage", () => {
 
     render(<LandingPage />);
 
-    const linkedinButton = screen.getByRole("button", {
-      name: /continue with linkedin/i,
-    });
-    expect(linkedinButton).toBeInTheDocument();
-  });
-
-  it("should disable submit button when fields are empty", () => {
-    const mockClient = {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: { session: null },
-        }),
-      },
-    };
-    mockSupabaseClient.mockReturnValue(mockClient);
-
-    render(<LandingPage />);
-
-    const submitButton = screen.getByRole("button", {
-      name: /create account/i,
-    });
-    expect(submitButton).toBeDisabled();
-  });
-
-  it("should clear form when toggling between modes", async () => {
-    const mockClient = {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: { session: null },
-        }),
-      },
-    };
-    mockSupabaseClient.mockReturnValue(mockClient);
-
-    const user = userEvent.setup();
-    render(<LandingPage />);
-
-    // Fill in form
-    await user.type(screen.getByPlaceholderText(/email address/i), testEmail);
-    await user.type(
-      screen.getByPlaceholderText(/password \(min 6 characters\)/i),
-      testPassword
-    );
-
-    // Toggle to login
-    await user.click(screen.getByText(/already have an account\? log in/i));
-
-    // Form should be cleared
-    expect(screen.getByPlaceholderText(/email address/i)).toHaveValue("");
-    expect(screen.getByPlaceholderText(/password/i)).toHaveValue("");
+    expect(screen.getByText("FAQ")).toBeInTheDocument();
   });
 
   it("should expand and collapse FAQ items", async () => {
@@ -307,6 +155,35 @@ describe("LandingPage", () => {
       expect(
         screen.queryByText(/Yes, but we found it hard to find people/i)
       ).not.toBeInTheDocument();
+    });
+  });
+
+  it("should redirect to /matches when authenticated and logo is clicked", async () => {
+    const mockClient = {
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: { access_token: "token-123" } },
+        }),
+      },
+    };
+    mockSupabaseClient.mockReturnValue(mockClient);
+
+    const user = userEvent.setup();
+    render(<LandingPage />);
+
+    // Wait for authentication check
+    await waitFor(() => {
+      const logo = screen.getByAltText("vectorized-ideas logo");
+      expect(logo).toBeInTheDocument();
+    });
+
+    const logoButton = screen.getByText("vectorized-ideas").closest("button");
+    expect(logoButton).toBeInTheDocument();
+
+    await user.click(logoButton!);
+
+    await waitFor(() => {
+      expect(window.location.href).toBe("/matches");
     });
   });
 });
