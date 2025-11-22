@@ -38,6 +38,7 @@ export default function Navigation({
 }: NavigationProps) {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -57,8 +58,22 @@ export default function Navigation({
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="px-6 py-4 border-b border-gray-200 bg-white">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 border-b border-gray-300 transition-all duration-300 ${
+        isScrolled ? 'px-6 py-2 shadow-md' : 'px-6 py-4'
+      }`}
+      style={{ backgroundColor: '#FFFFFB' }}
+    >
       <nav className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo */}
         <div className="flex items-center space-x-8">
@@ -89,13 +104,16 @@ export default function Navigation({
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button
-                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
-                  currentPage === "home" || currentPage === "discover"
-                    ? "bg-silver text-gray-900 font-semibold"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
+                className="px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 text-gray-700"
               >
-                <span>Discover</span>
+                <span
+                  className={currentPage === "home" || currentPage === "discover" ? "font-semibold" : ""}
+                  style={currentPage === "home" || currentPage === "discover" ? {
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  } : {}}
+                >
+                  Discover
+                </span>
                 <ChevronDown
                   className={`w-3 h-3 transition-transform duration-200 ${
                     activeDropdown === "discover" ? "rotate-180" : ""
@@ -104,8 +122,8 @@ export default function Navigation({
               </button>
 
               {activeDropdown === "discover" && (
-                <div className="absolute top-full pt-2 left-0 w-76 z-70">
-                  <div className="bg-white border border-gray-200 rounded-sm shadow-xl overflow-hidden">
+                <div className="absolute top-full pt-2 left-0 w-86 z-70">
+                  <div className="border border-gray-200 rounded-sm shadow-2xl overflow-hidden" style={{ backgroundColor: '#FFFFFB' }}>
                     <div className="p-2">
                       <button
                         onClick={() => navigate("/home")}
@@ -113,12 +131,19 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-sm font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "home"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "home" && <Home className="w-4 h-4" />}
-                        <span>Dashboard</span>
+                        <span
+                          className={currentPage === "home" ? "font-semibold" : ""}
+                          style={currentPage === "home" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Dashboard
+                        </span>
                       </button>
                       <button
                         onClick={() => navigate("/matches")}
@@ -126,14 +151,21 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "discover"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "discover" && (
                           <Search className="w-4 h-4" />
                         )}
-                        <span>Discover Profiles</span>
+                        <span
+                          className={currentPage === "discover" ? "font-semibold" : ""}
+                          style={currentPage === "discover" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Discover Profiles
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -148,15 +180,16 @@ export default function Navigation({
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button
-                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
-                  currentPage === "my-matches" ||
-                  currentPage === "skipped" ||
-                  currentPage === "pending-requests"
-                    ? "bg-silver text-gray-900 font-semibold"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
+                className="px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 text-gray-700"
               >
-                <span>History</span>
+                <span
+                  className={currentPage === "my-matches" || currentPage === "skipped" || currentPage === "pending-requests" ? "font-semibold" : ""}
+                  style={currentPage === "my-matches" || currentPage === "skipped" || currentPage === "pending-requests" ? {
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  } : {}}
+                >
+                  History
+                </span>
                 <ChevronDown
                   className={`w-3 h-3 transition-transform duration-200 ${
                     activeDropdown === "history" ? "rotate-180" : ""
@@ -165,8 +198,8 @@ export default function Navigation({
               </button>
 
               {activeDropdown === "history" && (
-                <div className="absolute top-full pt-2 left-0 w-76 z-60">
-                  <div className="bg-white border border-gray-200 rounded-sm shadow-xl overflow-hidden">
+                <div className="absolute top-full pt-2 left-0 w-86 z-60">
+                  <div className="border border-gray-200 rounded-sm shadow-2xl overflow-hidden" style={{ backgroundColor: '#FFFFFB' }}>
                     <div className="p-2">
                       <button
                         onClick={() => navigate("/pending-requests")}
@@ -174,14 +207,21 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "pending-requests"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "pending-requests" && (
                           <Clock className="w-4 h-4" />
                         )}
-                        <span>Pending Requests</span>
+                        <span
+                          className={currentPage === "pending-requests" ? "font-semibold" : ""}
+                          style={currentPage === "pending-requests" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Pending Requests
+                        </span>
                       </button>
                       <button
                         onClick={() => navigate("/my-matches")}
@@ -189,14 +229,21 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "my-matches"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "my-matches" && (
                           <Sparkles className="w-4 h-4" />
                         )}
-                        <span>Matches</span>
+                        <span
+                          className={currentPage === "my-matches" ? "font-semibold" : ""}
+                          style={currentPage === "my-matches" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Matches
+                        </span>
                       </button>
                       <button
                         onClick={() => navigate("/skipped")}
@@ -204,14 +251,21 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "skipped"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "skipped" && (
                           <SkipForward className="w-4 h-4" />
                         )}
-                        <span>Skipped Profiles</span>
+                        <span
+                          className={currentPage === "skipped" ? "font-semibold" : ""}
+                          style={currentPage === "skipped" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Skipped Profiles
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -226,15 +280,16 @@ export default function Navigation({
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <button
-                className={`px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 ${
-                  currentPage === "profile" ||
-                  currentPage === "settings" ||
-                  currentPage === "blocked"
-                    ? "bg-silver text-gray-900 font-semibold"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
+                className="px-4 py-2 font-mono text-sm transition duration-200 rounded-md flex items-center space-x-1 text-gray-700"
               >
-                <span>Account</span>
+                <span
+                  className={currentPage === "profile" || currentPage === "settings" || currentPage === "blocked" ? "font-semibold" : ""}
+                  style={currentPage === "profile" || currentPage === "settings" || currentPage === "blocked" ? {
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  } : {}}
+                >
+                  Account
+                </span>
                 <ChevronDown
                   className={`w-3 h-3 transition-transform duration-200 ${
                     activeDropdown === "account" ? "rotate-180" : ""
@@ -243,8 +298,8 @@ export default function Navigation({
               </button>
 
               {activeDropdown === "account" && (
-                <div className="absolute top-full pt-2 left-0 w-76 z-60">
-                  <div className="bg-white border border-gray-200 rounded-sm shadow-xl overflow-hidden">
+                <div className="absolute top-full pt-2 left-0 w-86 z-60">
+                  <div className="border border-gray-200 rounded-sm shadow-2xl overflow-hidden" style={{ backgroundColor: '#FFFFFB' }}>
                     <div className="p-2">
                       <button
                         onClick={() => navigate("/profile")}
@@ -252,14 +307,21 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "profile"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "profile" && (
                           <User className="w-4 h-4" />
                         )}
-                        <span>Profile</span>
+                        <span
+                          className={currentPage === "profile" ? "font-semibold" : ""}
+                          style={currentPage === "profile" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Profile
+                        </span>
                       </button>
                       <button
                         onClick={() => navigate("/settings")}
@@ -267,14 +329,21 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "settings"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "settings" && (
                           <Settings className="w-4 h-4" />
                         )}
-                        <span>Account Settings</span>
+                        <span
+                          className={currentPage === "settings" ? "font-semibold" : ""}
+                          style={currentPage === "settings" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Account Settings
+                        </span>
                       </button>
                       <button
                         onClick={() => navigate("/blocked")}
@@ -282,14 +351,21 @@ export default function Navigation({
                         onMouseLeave={() => setHoveredItem(null)}
                         className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 flex items-center space-x-3 ${
                           currentPage === "blocked"
-                            ? "bg-silver text-gray-900 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
+                            ? "text-gray-900 font-semibold"
+                            : "text-gray-700 "
                         }`}
                       >
                         {hoveredItem === "blocked" && (
                           <ShieldOff className="w-4 h-4" />
                         )}
-                        <span>Blocked Profiles</span>
+                        <span
+                          className={currentPage === "blocked" ? "font-semibold" : ""}
+                          style={currentPage === "blocked" ? {
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                          } : {}}
+                        >
+                          Blocked Profiles
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -308,7 +384,7 @@ export default function Navigation({
           )}
           <button
             onClick={onLogout}
-            className="px-4 py-2 rounded-md font-mono text-sm text-red-600 hover:bg-red-50 transition duration-200 flex items-center space-x-2"
+            className="px-4 py-2 rounded-md font-mono text-sm text-red-600 transition duration-200 flex items-center space-x-2"
           >
             <LogOut className="w-4 h-4" />
             <span className="hidden sm:inline">Logout</span>

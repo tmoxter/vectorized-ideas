@@ -18,7 +18,7 @@ export function ProfileListLayout({
 }: ProfileListLayoutProps) {
   return (
     <div className="grid grid-cols-12 gap-6">
-      <div className="col-span-4 bg-white rounded-lg border border-gray-200 p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+      <div className="col-span-4 p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
         <h2 className="font-mono font-semibold text-gray-900 mb-4">
           {profiles.length} {profiles.length === 1 ? "profile" : "profiles"}
         </h2>
@@ -34,7 +34,7 @@ export function ProfileListLayout({
         </div>
       </div>
 
-      <div className="col-span-8 bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="col-span-8 rounded-xl border border-gray-500 shadow-lg overflow-hidden">
         <ProfileDetail profile={selectedProfile} />
         {children}
       </div>

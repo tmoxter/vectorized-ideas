@@ -20,10 +20,15 @@ export function ProfileHeader({
   requestDate,
 }: ProfileHeaderProps) {
   return (
-    <div className="p-6 border-b border-gray-100">
+    <div className="p-6 border-b-1 border-gray-500">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-mono font-bold text-gray-900 mb-2">
+          <h2
+            className="text-2xl font-mono font-bold bg-clip-text text-transparent mb-2"
+            style={{
+              backgroundImage: 'linear-gradient(135deg, rgb(183, 167, 248) 0%, rgb(107, 168, 244) 50%, rgb(253, 191, 172) 100%)'
+            }}
+          >
             {name}
           </h2>
           <div className="flex items-center space-x-4 text-sm font-mono text-gray-600">

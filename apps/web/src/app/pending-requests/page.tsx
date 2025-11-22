@@ -87,7 +87,7 @@ export default function PendingRequestsPage() {
         onLogout={logout}
       />
 
-      <main className="px-6 py-8">
+      <main className="px-6 pt-24 pb-8">
         <div className="max-w-4xl mx-auto">
           <PageHeader
             title="Pending Requests"

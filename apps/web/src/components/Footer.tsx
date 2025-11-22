@@ -28,6 +28,12 @@ export default function Footer() {
             <a href="#" className="text-gray-500 hover:text-gray-700">
               github
             </a>
+            <a href="#" className="text-gray-500 hover:text-gray-700">
+              imprint
+            </a>
+            <a href="#" className="text-gray-500 hover:text-gray-700">
+              data policy
+            </a>
           </div>
         </div>
 

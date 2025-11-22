@@ -5,16 +5,16 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { TickerBanner } from "@/components/TickerBanner";
+import Spaceship from "@/components/Spaceship";
 import { NavigationCard } from "@/components/NavigationCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useBannerCounts } from "@/hooks/useBannerCounts";
 import {
   Search,
-  Sparkles,
+  Handshake,
   User,
   Settings,
-  BarChart3,
-  SkipForward,
+  Undo2,
   Clock,
 } from "lucide-react";
 
@@ -35,13 +35,16 @@ export default function HomePage() {
         onLogout={logout}
       />
 
-      <main className="px-6 py-8">
-        <div className="max-w-4xl mx-auto">
+      <main className="pt-24 pb-8">
+
+        <div className="max-w-6xl mx-auto">
+          <TickerBanner data={bannerData} />
+        </div>
+
+        <div className="max-w-4xl mx-auto px-6">
           <div className="mb-8">
             <h1 className="text-3xl font-mono font-bold text-gray-900 mb-2"></h1>
           </div>
-
-          <TickerBanner data={bannerData} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <NavigationCard
@@ -59,14 +62,14 @@ export default function HomePage() {
             />
 
             <NavigationCard
-              Icon={SkipForward}
+              Icon={Undo2}
               title="Revisit Skipped Profiles"
               description="review profiles you previously passed on and reconsider potential connections"
               onClick={() => router.push("/skipped")}
             />
 
             <NavigationCard
-              Icon={Sparkles}
+              Icon={Handshake}
               title="Matches"
               description="view your mutual matches and connect with co-founders who are interested in collaborating"
               onClick={() => router.push("/my-matches")}
@@ -84,13 +87,6 @@ export default function HomePage() {
               title="Settings"
               description="manage your account settings, preferences, and blocked profiles"
               onClick={() => router.push("/settings")}
-            />
-
-            <NavigationCard
-              Icon={BarChart3}
-              title="Analyze"
-              description="view insights and analytics about your matching activity and profile performance"
-              onClick={() => router.push("/analyze")}
             />
           </div>
         </div>

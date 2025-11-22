@@ -93,7 +93,7 @@ export default function MatchesPage() {
         onLogout={logout}
       />
 
-      <main className="px-6 py-8">
+      <main className="px-6 pt-24 pb-8">
         <div className="max-w-4xl mx-auto">
           <PageHeader
             title="Discover Profiles"
@@ -115,10 +115,10 @@ export default function MatchesPage() {
               onAction={() => router.push("/profile")}
             />
           ) : currentCandidate ? (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className=" border rounded-md border-gray-400 shadow-md overflow-hidden">
               <ProfileDetail profile={currentCandidate} />
 
-              <div className="p-6 bg-gray-50 border-t border-gray-100">
+              <div className="p-6 border-t border-gray-100">
                 {!showBlockConfirm ? (
                   <>
                     <ActionButtons

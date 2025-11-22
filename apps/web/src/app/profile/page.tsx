@@ -368,7 +368,7 @@ export default function ProfilePage() {
         onLogout={logout}
       />
 
-      <main className="px-6 py-8">
+      <main className="px-6 pt-24 pb-8">
         <div className="max-w-4xl mx-auto">
           <PageHeader
             title="Profile Setup"
@@ -378,7 +378,7 @@ export default function ProfilePage() {
 
           <div className="space-y-8">
             {/* Personal Information */}
-            <section className="bg-white p-6 rounded border border-gray-200">
+            <section className="p-6 rounded border border-gray-800">
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
                 01. Personal Info
               </h2>
@@ -392,7 +392,7 @@ export default function ProfilePage() {
                     type="text"
                     value={profileData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
                     placeholder="your full name"
                     required
                   />
@@ -418,7 +418,7 @@ export default function ProfilePage() {
                   type="url"
                   value={profileData.linkedinUrl}
                   onChange={(e) => handleInputChange("linkedinUrl", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded font-mono text-sm focus:ring-2 focus:border-transparent outline-none ${
+                  className={`w-full px-3 py-2 border rounded font-mono text-sm focus:ring-2 focus:border-transparent outline-none bg-white ${
                     linkedinUrlError
                       ? "border-red-300 focus:ring-red-500"
                       : "border-gray-300 focus:ring-blue-500"
@@ -441,7 +441,7 @@ export default function ProfilePage() {
                   value={profileData.bio}
                   onChange={(e) => handleInputChange("bio", e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white"
                   placeholder="brief background about yourself, your experience, skills..."
                 />
               </div>
@@ -456,7 +456,7 @@ export default function ProfilePage() {
                     handleInputChange("achievements", e.target.value)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white"
                   placeholder="previous companies, projects, notable achievements, technical skills..."
                 />
               </div>
@@ -471,7 +471,7 @@ export default function ProfilePage() {
                     handleInputChange("experience", e.target.value)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white"
                   placeholder="work experience, roles, companies..."
                 />
               </div>
@@ -486,14 +486,14 @@ export default function ProfilePage() {
                     handleInputChange("education", e.target.value)
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white"
                   placeholder="degrees, schools, certifications..."
                 />
               </div>
             </section>
 
             {/* Venture Ideas */}
-            <section className="bg-white p-6 rounded border border-gray-200">
+            <section className="p-6 rounded border border-gray-800">
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
                 02.Venture / Project Ideas
               </h2>
@@ -512,7 +512,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     handleInputChange("venture_title", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
                   placeholder="e.g., AI-powered code review platform, sustainable food delivery network..."
                   required
                 />
@@ -528,7 +528,7 @@ export default function ProfilePage() {
                     handleInputChange("venture_description", e.target.value)
                   }
                   rows={8}
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white"
                   placeholder="explain the problem you're solving, your proposed solution, target market, technical approach, business model, vision for the future..."
                   required
                 />
@@ -540,7 +540,7 @@ export default function ProfilePage() {
             </section>
 
             {/* Co-founder Preferences */}
-            <section className="bg-white p-6 rounded border border-gray-200">
+            <section className="p-6 rounded border border-gray-800">
               <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
                 03. Co-founder Preferences
               </h2>
@@ -562,7 +562,7 @@ export default function ProfilePage() {
                       e.target.value
                     )
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
                   placeholder="e.g., seeking technical co-founder, looking for business-minded partner..."
                 />
               </div>
@@ -580,7 +580,7 @@ export default function ProfilePage() {
                     )
                   }
                   rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white"
                   placeholder="describe ideal co-founder skills, experience, work style, equity expectations, time commitment, complementary skills to yours..."
                 />
               </div>

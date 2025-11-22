@@ -17,8 +17,8 @@ export function ProfileListItem({
       onClick={onClick}
       className={`w-full text-left p-4 rounded-lg border transition duration-200 ${
         isSelected
-          ? "border-black bg-gray-50"
-          : "border-gray-200 hover:border-gray-300"
+          ? "border-black shadow-lg"
+          : "border-gray-300 hover:border-gray-950 shadow-md"
       }`}
     >
       <div className="font-mono font-semibold text-gray-900">

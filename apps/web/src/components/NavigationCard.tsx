@@ -17,7 +17,7 @@ export function NavigationCard({
   return (
     <button
       onClick={onClick}
-      className="p-6 bg-white rounded border border-gray-200 text-left hover:border-gray-300 hover:shadow-lg transition-all duration-200 group"
+      className="p-6 rounded border border-gray-900 text-left shadow-md hover:border-gray-950 hover:shadow-xl transition-all duration-200 group"
     >
       <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient group-hover:scale-110 transition-transform duration-200">
         <Icon className="w-5 h-5 text-white" />

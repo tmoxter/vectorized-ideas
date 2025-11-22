@@ -97,7 +97,7 @@ export default function SkippedProfilesPage() {
         onLogout={logout}
       />
 
-      <main className="px-6 py-8">
+      <main className="px-6 pt-24 pb-8">
         <div className="max-w-7xl mx-auto">
           <PageHeader title="Skipped Profiles" highlight />
 
@@ -118,7 +118,7 @@ export default function SkippedProfilesPage() {
               selectedProfile={selectedProfile}
               onSelectProfile={(m) => setSelectedProfileId(m.id)}
             >
-              <div className="p-6 bg-gray-50 border-t border-gray-100">
+              <div className="p-6 border-t border-gray-100">
                 {!showBlockConfirm ? (
                   <>
                     <div className="flex justify-center space-x-4">

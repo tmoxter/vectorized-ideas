@@ -114,7 +114,7 @@ export default function SettingsPage() {
         onLogout={logout}
       />
 
-      <main className="px-6 py-8">
+      <main className="px-6 pt-24 pb-8">
         <div className="max-w-4xl mx-auto">
           <PageHeader
             title="Account Settings"
@@ -124,7 +124,7 @@ export default function SettingsPage() {
           {message && <MessageBanner message={message} type="success" />}
 
           {/* Account Information */}
-          <section className="bg-white p-6 rounded border border-gray-200 mb-6">
+          <section className="p-6 rounded border border-gray-800 shadow-md mb-6">
             <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
               Account Information
             </h2>
@@ -147,7 +147,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Matching Preferences */}
-          <section className="bg-white p-6 rounded border border-gray-200 mb-6">
+          <section className=" p-6 rounded border border-gray-800 shadow-md mb-6">
             <h2 className="text-xl font-mono font-bold text-gray-900 mb-4">
               Matching Preferences
             </h2>
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                             className={`w-full text-left px-4 py-3 rounded-md font-mono text-sm transition duration-200 ${
                               regionFilter === option
                                 ? "bg-silver text-gray-900 font-semibold"
-                                : "text-gray-700 hover:silver hover:text-gray-900"
+                                : "text-gray-700 hover:bg-silver hover:text-gray-900"
                             }`}
                           >
                             {option}

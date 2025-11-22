@@ -72,7 +72,7 @@ export default function MyMatchesPage() {
         onLogout={logout}
       />
 
-      <main className="px-6 py-8">
+      <main className="px-6 pt-24 pb-8">
         <div className="max-w-7xl mx-auto">
           <PageHeader title="Matches" highlight />
 
@@ -93,7 +93,7 @@ export default function MyMatchesPage() {
               selectedProfile={selectedMatch}
               onSelectProfile={(m) => setSelectedMatchId(m.id)}
             >
-              <div className="p-6 bg-gray-50 border-t border-gray-100">
+              <div className="p-6 border-t border-gray-100">
                 {!showBlockConfirm ? (
                   <div className="flex flex-col gap-3">
                     {selectedMatch?.profile?.avatarurl && (

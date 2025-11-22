@@ -6,13 +6,15 @@ import { supabaseClient } from "@/lib/supabase";
 import TypewriterHero from "@/components/TypewriterHero";
 import Footer from "@/components/Footer";
 import FAQ, { type FAQItem } from "@/components/FAQ";
-import LoginPanel from "@/components/LoginPanel";
+import MagneticLoginButton from "@/components/MagneticLoginButton";
+import SectionHeader from "@/components/SectionHeader";
 import {
   ArrowUpZA,
   Telescope,
   Handshake,
-  Gem,
+  Map,
 } from "lucide-react";
+import LoginPanel from "@/components/LoginPanel";
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,6 +56,12 @@ export default function Home() {
         + "'You can always recognize the first-timers because they’re too secretive. And "
         + "you can always recognize the experienced ones because they don’t care.' - Naval Ravikant",
     },
+    {
+      question: "I lost access to my linked-in account and would like to delete my profile.",
+      answer:
+          "If you can log-in via linked-in, please do so and permanentlty delete your account under 'Account Settings'. If have really lost "
+          + "access to your linked-in credentials, send me an email to delete your data."
+    }
   ];
 
   return (
@@ -87,42 +95,33 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <main className="px-6 py-16">
+      <main className="relative z-10 px-6 py-20">
         <div className="max-w-6xl mx-auto">
           <div>
             <div className="flex flex-col lg:flex-row items-start gap-8 mb-12">
-              <div className="flex-1 max-w-4xl">
+              <div className="flex-1 max-w-5xl">
                 <TypewriterHero />
-                <p className="text-lg text-gray-700 mb-8 leading-relaxed font-mono">
-                  Use your projects and venture ideas to find collaborators with
-                  conceptually similar visions and connect with those who want
-                  to work on related challenges or are already tackling the same
+                <p className="text-xl text-gray-900 mb-8 leading-relaxed font-mono">
+                  Vectorized-ideas is a lightweight, minimal, and free co-founder matchig platform. Use your project and venture ideas to find collaborators and connect with those already tackling the same
                   problems as you.
                 </p>
-              </div>
-              <div className="hidden lg:block lg:w-80 lg:flex-shrink-0">
-                <Image
-                  src="/rocket.svg"
-                  alt="Light bulb illustration"
-                  width={256}
-                  height={256}
-                  className="w-full h-auto"
-                />
               </div>
             </div>
 
             {/* Content Section - How it works + Sign Up Form */}
-            <div className="flex flex-col lg:flex-row gap-8 mb-12">
+            <div className="flex flex-col lg:flex-row gap-8 mb-12 py-5">
               {/* How it works */}
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-6 bg-white rounded border border-gray-200">
+              <div className="flex-1">
+                <SectionHeader title="How it works" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-6 rounded border border-gray-900 shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <div className="w-11 h-11 rounded flex items-center justify-center mb-4 icon-gradient">
                     <ArrowUpZA className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Semantic Similarity
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-900 text-m">
                     Describe what you are working on, embed your ideas as
                     semantic vectors, and search through profiles of others who
                     are either already working on similar ideas or want to solve
@@ -130,14 +129,14 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="p-6 bg-white rounded border border-gray-200">
+                <div className="p-6 rounded border border-gray-900 shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient">
                     <Telescope className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Visibility
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-900 text-m">
                     You share your first name and region, and give an overview
                     over your background, skills, and accomplishments. Of
                     course, you also get to see each other's project ideas along
@@ -146,60 +145,65 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="p-6 bg-white rounded border border-gray-200">
+                <div className="p-6 rounded border border-gray-900 shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient">
                     <Handshake className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
                     Connect on LinkedIn
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-900 text-m">
                     If both parties are interested, your LinkedIn profiles are
                     shared to connect directly. We don't have a chat feature for
                     now to keep it lightweight. <br />
                   </p>
                 </div>
 
-                <div className="p-6 bg-white rounded border border-gray-200">
+                <div className="p-6 rounded border border-gray-900 shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <div className="w-10 h-10 rounded flex items-center justify-center mb-4 icon-gradient">
-                    <Gem className="w-5 h-5 text-white" />
+                    <Map className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-lg font-mono font-semibold text-gray-900 mb-2">
-                    Free and Without Ads
+                    Discover
                   </h3>
-                  <p className="text-gray-600 text-sm">
-                    Vectorized-ideas is an experiment, a side project, and may hopefully become a community effort
-                    if people find it helpful. It is completely free.
+                  <p className="text-gray-900 text-m">
+                    Work in progress: Discover how unique your ideas are and view aggregates how many out have
+                    tackled the same problems.
                     <br />
                   </p>
+                </div>
                 </div>
               </div>
 
               {/* Sign Up / Login Form */}
-              <div className="lg:w-96">
-                <LoginPanel />
+              <div className="lg:w-96 min-h-[400px]">
+                <MagneticLoginButton />
               </div>
             </div>
 
             {/* Technical Note */}
-            <div className="max-w-4xl">
-              {/* FAQ Section */}
-              <FAQ items={faqItems} />
+            <div className="max-w-5xl">
 
-              <div className="mt-12 p-4 bg-gray-50 rounded border-l-4 border-blue-950">
-                <p className="text-sm font-mono text-gray-00">
-                  <strong>Note:</strong> Vectorizied-ideas is completely free to
-                  use and in an experimental state. If you find any bugs or have
-                  suggestions, please open an issue or even better a PR on
+              <SectionHeader title="Free and open-source" />
+              <div className="mt-6 rounded mb-10">
+                <p className="text-m font-mono text-gray-900">
+                  Vectorized-ideas is an experiment and a side project. It is completely free and does not generate any profit, e.g., by showing you adds.
+                  It is also in an experimental state, so if you find any bugs or have
+                  suggestions, please open an issue or a PR on
                   GitHub.
                   <a
                     href="https://github.com"
-                    className="text-blue-950 hover:underline ml-1"
-                  >
-                    View source →
+                    className="text-gray-900 hover:underline ml-1"
+                    >
+                    <strong>View source on GH →</strong>
                   </a>
                 </p>
               </div>
+
+              {/* FAQ Section */}
+              <SectionHeader title="FAQ" />
+              <FAQ items={faqItems} />
+
             </div>
           </div>
         </div>
