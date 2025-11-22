@@ -1,4 +1,7 @@
-# pnpm-workspace.yaml
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - apps/*
+  - packages/*
+  - tools/*
+
+onlyBuiltDependencies:
+  - supabase
